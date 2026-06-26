@@ -372,9 +372,20 @@ h1 {
 
 .detail-sheet h2 {
   padding-right: 34px;
-  margin-top: 4px;
+  margin-top: 0;
   font-size: 18px;
   line-height: 1.2;
+}
+
+.detail-sheet h2 a {
+  color: inherit;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.detail-sheet h2 a:focus-visible {
+  outline: 3px solid rgba(8, 127, 140, 0.24);
+  outline-offset: 3px;
 }
 
 .detail-actions,

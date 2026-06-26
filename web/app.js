@@ -120,8 +120,7 @@ function bindDom() {
   dom.resetFilters = document.querySelector("#reset-filters");
   dom.detailSheet = document.querySelector("#detail-sheet");
   dom.closeDetail = document.querySelector("#close-detail");
-  dom.detailKicker = document.querySelector("#detail-kicker");
-  dom.detailTitle = document.querySelector("#detail-title");
+  dom.detailTitleLink = document.querySelector("#detail-title-link");
   dom.routeHome = document.querySelector("#route-home");
   dom.routeFrom = document.querySelector("#route-from");
   dom.routeTo = document.querySelector("#route-to");
@@ -647,9 +646,10 @@ function renderSelectedCircle() {
 }
 
 function renderDetail(place) {
-  const meta = place.meta || {};
-  dom.detailKicker.textContent = meta.source_list || "local";
-  dom.detailTitle.textContent = place.name;
+  dom.detailTitleLink.textContent = place.name;
+  dom.detailTitleLink.href = getGoogleMapsUrl(place);
+  dom.detailTitleLink.title = `Open ${place.name} in Google Maps`;
+  dom.detailTitleLink.setAttribute("aria-label", `Open ${place.name} in Google Maps`);
   dom.detailSheet.classList.add("is-open");
   renderRoute();
 }
@@ -1000,6 +1000,14 @@ function getPopupHtml(place) {
   `;
 }
 
+function getGoogleMapsUrl(place) {
+  const [lat, lng] = place.coordinates || [];
+  if (Number.isFinite(lat) && Number.isFinite(lng)) {
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${lat},${lng}`)}`;
+  }
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name)}`;
+}
+
 function getPlaceSubtitle(place) {
   const meta = place.meta || {};
   const parts = [];
@@ -1021,7 +1029,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=173", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=174", { updateViaCache: "none" })
       .catch((error) => {
         console.info("Offline service worker unavailable.", error);
       });

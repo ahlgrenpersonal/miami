@@ -8,7 +8,7 @@
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="vendor/leaflet/leaflet.css?v=171">
-    <link rel="stylesheet" href="styles.css?v=173">
+    <link rel="stylesheet" href="styles.css?v=174">
   </head>
   <body>
     <main class="app-shell">
@@ -46,8 +46,7 @@
 
         <section id="detail-sheet" class="detail-sheet" aria-live="polite">
           <button id="close-detail" class="close-button" type="button" title="Close details" aria-label="Close details">x</button>
-          <p id="detail-kicker"></p>
-          <h2 id="detail-title">Select a place</h2>
+          <h2><a id="detail-title-link" href="#" target="_blank" rel="noopener noreferrer">Select a place</a></h2>
           <div class="detail-actions" aria-label="Route actions">
             <button id="route-home" type="button">Route home</button>
             <button id="route-from" type="button">Route from here</button>
@@ -65,6 +64,6 @@
     </main>
 
     <script src="vendor/leaflet/leaflet.js?v=171"></script>
-    <script src="app.js?v=173"></script>
+    <script src="app.js?v=174"></script>
   </body>
 </html>
