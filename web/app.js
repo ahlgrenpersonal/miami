@@ -1,7 +1,7 @@
 const STATE_URL = "../state.json";
 const ROUTING_GRAPH_URL = "routing_graph.json";
 const ROUTING_GRAPH_MANIFEST_URL = "routing_graph/manifest.json";
-const OFFLINE_TILE_VERSION = "169";
+const OFFLINE_TILE_VERSION = "170";
 const HOME_RADIUS_METERS = 805;
 const DEFAULT_HOME_ZOOM = 15;
 const DEFAULT_MAX_SNAP_DISTANCE_METERS = 500;
@@ -1032,11 +1032,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=169", { updateViaCache: "none" })
-      .then(() => navigator.serviceWorker.ready)
-      .then((registration) => {
-        requestOfflineTileCache(registration);
-      })
+    navigator.serviceWorker.register("sw.js?v=170", { updateViaCache: "none" })
       .catch((error) => {
         console.info("Offline service worker unavailable.", error);
       });
