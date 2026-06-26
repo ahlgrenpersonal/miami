@@ -1,7 +1,8 @@
 const STATE_URL = "../state.json";
 const ROUTING_GRAPH_URL = "routing_graph.json";
 const ROUTING_GRAPH_MANIFEST_URL = "routing_graph/manifest.json";
-const OFFLINE_TILE_VERSION = "170";
+const HOME_PLACE_ID = "place_id_panorama_tower";
+const OFFLINE_TILE_VERSION = "171";
 const HOME_RADIUS_METERS = 805;
 const DEFAULT_HOME_ZOOM = 15;
 const DEFAULT_MAX_SNAP_DISTANCE_METERS = 500;
@@ -124,6 +125,7 @@ function bindDom() {
   dom.detailTitle = document.querySelector("#detail-title");
   dom.detailTags = document.querySelector("#detail-tags");
   dom.detailFacts = document.querySelector("#detail-facts");
+  dom.routeHome = document.querySelector("#route-home");
   dom.routeFrom = document.querySelector("#route-from");
   dom.routeTo = document.querySelector("#route-to");
   dom.modeShortest = document.querySelector("#mode-shortest");
@@ -178,6 +180,13 @@ function bindEvents() {
   dom.routeFrom.addEventListener("click", () => {
     if (!app.selectedId) return;
     app.routeFromId = app.selectedId;
+    renderRoute();
+  });
+
+  dom.routeHome.addEventListener("click", () => {
+    if (!app.selectedId) return;
+    app.routeFromId = HOME_PLACE_ID;
+    app.routeToId = app.selectedId;
     renderRoute();
   });
 
@@ -500,7 +509,7 @@ function summarizeCanvasPixels(context, width, height) {
 
 function getMarkerIcon(place) {
   const classes = ["spin-marker"];
-  if (place.id === "place_id_panorama_tower") {
+  if (place.id === HOME_PLACE_ID) {
     classes.push("is-home");
   } else if (place.filterTags.includes("dessert")) {
     classes.push("is-dessert");
@@ -1032,7 +1041,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=170", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=171", { updateViaCache: "none" })
       .catch((error) => {
         console.info("Offline service worker unavailable.", error);
       });
