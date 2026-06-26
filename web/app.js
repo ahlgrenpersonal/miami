@@ -1,7 +1,7 @@
 const STATE_URL = "../state.json";
 const ROUTING_GRAPH_URL = "routing_graph.json";
 const ROUTING_GRAPH_MANIFEST_URL = "routing_graph/manifest.json";
-const OFFLINE_TILE_VERSION = "167";
+const OFFLINE_TILE_VERSION = "168";
 const HOME_RADIUS_METERS = 805;
 const DEFAULT_HOME_ZOOM = 15;
 const DEFAULT_MAX_SNAP_DISTANCE_METERS = 500;
@@ -82,6 +82,7 @@ const app = {
   routeToId: null,
   travelMode: "shortest",
   routingGraph: null,
+  routingGraphPromise: null,
   routingGraphStatus: "idle",
   routeAdjacency: null,
   routeNodes: [],
@@ -102,7 +103,6 @@ async function init() {
   initMap();
   renderAll();
   scheduleCanvasQaCapture();
-  loadRoutingGraph().then(() => renderRoute());
   registerServiceWorker();
 }
 
@@ -261,6 +261,16 @@ async function loadRoutingGraph() {
     app.routingGraphStatus = "error";
     console.info("Local routing graph unavailable; direct route preview will be used.", error);
   }
+}
+
+function ensureRoutingGraph() {
+  if (app.routingGraphStatus === "ready" || app.routingGraphStatus === "error") {
+    return Promise.resolve();
+  }
+  if (!app.routingGraphPromise) {
+    app.routingGraphPromise = loadRoutingGraph();
+  }
+  return app.routingGraphPromise;
 }
 
 async function fetchRoutingGraph() {
@@ -680,6 +690,9 @@ async function renderRoute() {
       dom.clearRoute.hidden = false;
       const bounds = L.latLngBounds([from.coordinates, to.coordinates]).pad(0.35);
       app.map.fitBounds(bounds, { animate: true, maxZoom: 17 });
+      ensureRoutingGraph().then(() => {
+        if (requestId === app.routeRequestId) renderRoute();
+      });
       return;
     }
     const route = getLocalRoute(from.coordinates, to.coordinates, app.travelMode);
@@ -1019,7 +1032,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=167", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=168", { updateViaCache: "none" })
       .then(() => navigator.serviceWorker.ready)
       .then((registration) => {
         requestOfflineTileCache(registration);
