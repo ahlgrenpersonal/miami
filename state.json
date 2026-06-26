@@ -1,0 +1,3092 @@
+{
+  "user_profile": {
+    "home_base_name": "Panorama Tower",
+    "home_base": [
+      25.7633066,
+      -80.1904428
+    ],
+    "current_year": 2027,
+    "local_bounds": {
+      "lat_min": 25.66,
+      "lat_max": 25.88,
+      "lon_min": -80.36,
+      "lon_max": -80.1
+    }
+  },
+  "places": {
+    "place_id_panorama_tower": {
+      "name": "Panorama Tower",
+      "coordinates": [
+        25.7633066,
+        -80.1904428
+      ],
+      "tags": [
+        "brickell",
+        "building",
+        "home_base"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": -1,
+        "category": "Home base",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "1100 Brickell Bay Dr, Miami, FL 33131",
+        "distance_from_home_m": 0,
+        "local_evidence": [
+          "manual_home_base"
+        ],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual",
+          "query": "Panorama Tower Brickell Miami FL",
+          "display_name": "Panorama Tower",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_la_prima_casa_montessori_roads_campus": {
+      "name": "La Prima Casa Montessori - Roads Campus",
+      "coordinates": [
+        25.7541839,
+        -80.2094603
+      ],
+      "tags": [
+        "montessori_school",
+        "school"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 0,
+        "category": "Montessori school",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "2733 SW 3rd Ave, Miami, FL 33129",
+        "distance_from_home_m": 2158,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "La Prima Casa Montessori - Roads Campus 2733 SW 3rd Ave, Miami, FL 33129",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_hobie_island_beach_park": {
+      "name": "Hobie Island Beach Park",
+      "coordinates": [
+        25.745574,
+        -80.1770083
+      ],
+      "tags": [
+        "beach_park",
+        "park"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 1,
+        "category": "Beach park",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Old, Rickenbacker Cswy, Miami, FL 33149",
+        "distance_from_home_m": 2387,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Hobie Island Beach Park Old, Rickenbacker Cswy, Miami, FL 33149",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_hobie_island_beach_park_north": {
+      "name": "Hobie Island Beach Park North",
+      "coordinates": [
+        25.7462304,
+        -80.1997232
+      ],
+      "tags": [
+        "beach_park",
+        "park"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 2,
+        "category": "Beach park",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Rickenbacker Cswy, Miami, FL 33149",
+        "distance_from_home_m": 2114,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Hobie Island Beach Park North Rickenbacker Cswy, Miami, FL 33149",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_kids_playground": {
+      "name": "Kids Playground",
+      "coordinates": [
+        25.7475977,
+        -80.2057016
+      ],
+      "tags": [
+        "brickell",
+        "playground"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 3,
+        "category": "Playground",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "2731 Brickell Ct, Miami, FL 33129",
+        "distance_from_home_m": 2321,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Kids Playground 2731 Brickell Ct, Miami, FL 33129",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_bayfront_park_playground": {
+      "name": "Bayfront Park Playground",
+      "coordinates": [
+        25.7734025,
+        -80.1857724
+      ],
+      "tags": [
+        "playground"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 4,
+        "category": "Playground",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "100 Chopin Plaza, Miami, FL 33131",
+        "distance_from_home_m": 1216,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Bayfront Park Playground 100 Chopin Plaza, Miami, FL 33131",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_miami_riverwalk": {
+      "name": "Miami Riverwalk",
+      "coordinates": [
+        25.7689462,
+        -80.1958978
+      ],
+      "tags": [
+        "riverwalk"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 5,
+        "category": "Riverwalk",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Miami Riverwalk, Miami, FL 33132",
+        "distance_from_home_m": 832,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim",
+          "query": "Miami Riverwalk Miami Riverwalk, Miami, FL 33132",
+          "display_name": "Miami Riverwalk, Riverwalk, Torch of Friendship, Miami, Miami-Dade County, Florida, 33131, United States",
+          "match_score": 1.0,
+          "osm_type": "node",
+          "osm_id": 6583009095
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_promenada_miami_river": {
+      "name": "Promenada Miami River",
+      "coordinates": [
+        25.769744,
+        -80.1887567
+      ],
+      "tags": [
+        "riverwalk"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 6,
+        "category": "Riverwalk",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "River Walk Trail, Miami, FL 33111",
+        "distance_from_home_m": 735,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Promenada Miami River River Walk Trail, Miami, FL 33111",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_south_lawn": {
+      "name": "South Lawn",
+      "coordinates": [
+        25.7644163,
+        -80.1846829
+      ],
+      "tags": [
+        "brickell",
+        "park"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 7,
+        "category": "Park",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Brickell Key, Brickell Key Dr, Miami, FL 33131",
+        "distance_from_home_m": 590,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "South Lawn Brickell Key, Brickell Key Dr, Miami, FL 33131",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_the_centinel": {
+      "name": "The Centinel",
+      "coordinates": [
+        25.7693231,
+        -80.1828066
+      ],
+      "tags": [
+        "brickell",
+        "statue"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 8,
+        "category": "Statue",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "848 Brickell Key Dr, Miami, FL 33131",
+        "distance_from_home_m": 1016,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "The Centinel 848 Brickell Key Dr, Miami, FL 33131",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_brickell_city_centre": {
+      "name": "Brickell City Centre",
+      "coordinates": [
+        25.767392,
+        -80.1929123
+      ],
+      "tags": [
+        "brickell",
+        "indoors",
+        "shopping_mall"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 9,
+        "category": "Shopping mall",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "701 S Miami Ave, Miami, FL 33130",
+        "distance_from_home_m": 517,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Brickell City Centre 701 S Miami Ave, Miami, FL 33130",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_simpson_rockland_hammock_preserve_park": {
+      "name": "Simpson Rockland Hammock Preserve Park",
+      "coordinates": [
+        25.7582156,
+        -80.1969433
+      ],
+      "tags": [
+        "nature_preserve",
+        "park"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 10,
+        "category": "Nature preserve",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "55 SW 17th Rd, Miami, FL 33129",
+        "distance_from_home_m": 863,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Simpson Rockland Hammock Preserve Park 55 SW 17th Rd, Miami, FL 33129",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_southside_park": {
+      "name": "Southside Park",
+      "coordinates": [
+        25.7631546,
+        -80.1961492
+      ],
+      "tags": [
+        "park"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 11,
+        "category": "Park",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Southside Park, Miami, FL",
+        "distance_from_home_m": 572,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Southside Park Southside Park, Miami, FL",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_the_underline_hammock_playground": {
+      "name": "The Underline Hammock Playground",
+      "coordinates": [
+        25.7598331,
+        -80.1963413
+      ],
+      "tags": [
+        "playground"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 12,
+        "category": "Playground",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "5614 M-Path, Miami, FL 33129",
+        "distance_from_home_m": 706,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "The Underline Hammock Playground 5614 M-Path, Miami, FL 33129",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_1814_brickell_park": {
+      "name": "1814 Brickell Park",
+      "coordinates": [
+        25.755788,
+        -80.196719
+      ],
+      "tags": [
+        "brickell",
+        "playground"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 13,
+        "category": "Playground",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "1814 Brickell Ave, Miami, FL 33129",
+        "distance_from_home_m": 1046,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "1814 Brickell Park 1814 Brickell Ave, Miami, FL 33129",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_bayside_marketplace": {
+      "name": "Bayside Marketplace",
+      "coordinates": [
+        25.7782365,
+        -80.1871026
+      ],
+      "tags": [
+        "shopping_mall"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 14,
+        "category": "Shopping mall",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "401 Biscayne Blvd, Miami, FL 33132",
+        "distance_from_home_m": 1693,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim",
+          "query": "Bayside Marketplace 401 Biscayne Blvd, Miami, FL 33132",
+          "display_name": "Bayside Marketplace, 401, Biscayne Boulevard, Downtown Miami, Torch of Friendship, Miami, Miami-Dade County, Florida, 33132, United States",
+          "match_score": 1.0,
+          "osm_type": "relation",
+          "osm_id": 17832055
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_hummus_mediterranean_street_food": {
+      "name": "Hummus Mediterranean street food",
+      "coordinates": [
+        25.7774615,
+        -80.1855821
+      ],
+      "tags": [
+        "food",
+        "mediterranean_restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 15,
+        "category": "Mediterranean restaurant",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "401 Biscayne Blvd S1120, Miami, FL 33132",
+        "distance_from_home_m": 1647,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Hummus Mediterranean street food 401 Biscayne Blvd S1120, Miami, FL 33132",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_phillip_patricia_frost_museum_of_science": {
+      "name": "Phillip & Patricia Frost Museum of Science",
+      "coordinates": [
+        25.7852621,
+        -80.1878898
+      ],
+      "tags": [
+        "indoors",
+        "science_museum"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 16,
+        "category": "Science museum",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "1101 Biscayne Blvd, Miami, FL 33132",
+        "distance_from_home_m": 2455,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Phillip & Patricia Frost Museum of Science 1101 Biscayne Blvd, Miami, FL 33132",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_the_underline": {
+      "name": "The Underline",
+      "coordinates": [
+        25.7665297,
+        -80.195554
+      ],
+      "tags": [
+        "park"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 17,
+        "category": "Park",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "SW 1st Ave, Miami, FL 33130",
+        "distance_from_home_m": 625,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "The Underline SW 1st Ave, Miami, FL 33130",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_motek_brickell": {
+      "name": "Motek Brickell",
+      "coordinates": [
+        25.7670731,
+        -80.1939498
+      ],
+      "tags": [
+        "brickell",
+        "food",
+        "mediterranean_restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 18,
+        "category": "Mediterranean restaurant",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "701 S Miami Ave #412A, Miami, FL 33131",
+        "distance_from_home_m": 547,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Motek Brickell 701 S Miami Ave #412A, Miami, FL 33131",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_cafe_americano": {
+      "name": "Cafe Americano",
+      "coordinates": [
+        25.7672454,
+        -80.1927974
+      ],
+      "tags": [
+        "american_restaurant",
+        "food"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 19,
+        "category": "American restaurant",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "701 S Miami Ave, Miami, FL 33130",
+        "distance_from_home_m": 497,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Cafe Americano 701 S Miami Ave, Miami, FL 33130",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_bellillo_a_taste_of_napoli": {
+      "name": "BELLILLO - A Taste of Napoli",
+      "coordinates": [
+        25.7656146,
+        -80.1930522
+      ],
+      "tags": [
+        "food",
+        "pizza_restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 20,
+        "category": "Pizza restaurant",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "881 S Miami Ave, Miami, FL 33130",
+        "distance_from_home_m": 366,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "BELLILLO - A Taste of Napoli 881 S Miami Ave, Miami, FL 33130",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_sexy_fish_miami": {
+      "name": "Sexy Fish Miami",
+      "coordinates": [
+        25.7643553,
+        -80.1930205
+      ],
+      "tags": [
+        "food",
+        "upscale_restaurant_bar"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 21,
+        "category": "Upscale restaurant/bar",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "1001 S Miami Ave, Miami, FL 33130",
+        "distance_from_home_m": 283,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Sexy Fish Miami 1001 S Miami Ave, Miami, FL 33130",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_107_taste_asian_restaurant_brickell": {
+      "name": "107 Taste Asian Restaurant Brickell",
+      "coordinates": [
+        25.7626039,
+        -80.1974775
+      ],
+      "tags": [
+        "asian_restaurant",
+        "brickell",
+        "food"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 22,
+        "category": "Asian restaurant",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "1190 SW 2nd Ave, Miami, FL 33130",
+        "distance_from_home_m": 709,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "107 Taste Asian Restaurant Brickell 1190 SW 2nd Ave, Miami, FL 33130",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_cvi_che_105_downtown": {
+      "name": "CVI.CHE 105 Downtown",
+      "coordinates": [
+        25.7754409,
+        -80.1884655
+      ],
+      "tags": [
+        "ceviche_peruvian_restaurant",
+        "food"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 23,
+        "category": "Ceviche / Peruvian restaurant",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "105 NE 3rd Ave, Miami, FL 33132",
+        "distance_from_home_m": 1364,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "CVI.CHE 105 Downtown 105 NE 3rd Ave, Miami, FL 33132",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_moshi_moshi_brickell": {
+      "name": "Moshi Moshi Brickell",
+      "coordinates": [
+        25.7610461,
+        -80.2003647
+      ],
+      "tags": [
+        "brickell",
+        "food",
+        "sushi_restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 24,
+        "category": "Sushi restaurant",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "1700 SW 3rd Ave, Miami, FL 33129",
+        "distance_from_home_m": 1025,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Moshi Moshi Brickell 1700 SW 3rd Ave, Miami, FL 33129",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_dando_la_brasa_miami": {
+      "name": "Dando La Brasa - Miami",
+      "coordinates": [
+        25.7604554,
+        -80.2016504
+      ],
+      "tags": [
+        "food",
+        "restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 25,
+        "category": "Restaurant",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "1836 SW 3rd Ave, Miami, FL 33129",
+        "distance_from_home_m": 1166,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Dando La Brasa - Miami 1836 SW 3rd Ave, Miami, FL 33129",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_craft_brickell": {
+      "name": "CRAFT Brickell",
+      "coordinates": [
+        25.7646268,
+        -80.190632
+      ],
+      "tags": [
+        "brickell",
+        "food",
+        "pizza_restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 26,
+        "category": "Pizza restaurant",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "947 Brickell Ave, Miami, FL 33131",
+        "distance_from_home_m": 148,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "CRAFT Brickell 947 Brickell Ave, Miami, FL 33131",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_brickell_city_pizza": {
+      "name": "Brickell City Pizza",
+      "coordinates": [
+        25.7682229,
+        -80.1910209
+      ],
+      "tags": [
+        "brickell",
+        "food",
+        "pizza_restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 27,
+        "category": "Pizza restaurant",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "500 Brickell Ave # L-1, Miami, FL 33131",
+        "distance_from_home_m": 550,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Brickell City Pizza 500 Brickell Ave # L-1, Miami, FL 33131",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_tacombi": {
+      "name": "Tacombi",
+      "coordinates": [
+        25.7674608,
+        -80.1947257
+      ],
+      "tags": [
+        "food",
+        "mexican_restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 28,
+        "category": "Mexican restaurant",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "69 SW 7th St, Miami, FL 33130",
+        "distance_from_home_m": 630,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Tacombi 69 SW 7th St, Miami, FL 33130",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_pura_vida_miami": {
+      "name": "Pura Vida Miami",
+      "coordinates": [
+        25.7668361,
+        -80.1895583
+      ],
+      "tags": [
+        "brickell",
+        "cafe",
+        "food"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 29,
+        "category": "Cafe",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "701 Brickell Ave, Miami, FL 33131",
+        "distance_from_home_m": 402,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Pura Vida Miami 701 Brickell Ave, Miami, FL 33131",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_hca_florida_mercy_hospital": {
+      "name": "HCA Florida Mercy Hospital",
+      "coordinates": [
+        25.7399918,
+        -80.2134456
+      ],
+      "tags": [
+        "healthcare",
+        "hospital"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 30,
+        "category": "Hospital",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "3663 S Miami Ave, Miami, FL 33133",
+        "distance_from_home_m": 3468,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "HCA Florida Mercy Hospital 3663 S Miami Ave, Miami, FL 33133",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_david_t_kennedy_park_playground": {
+      "name": "David T. Kennedy Park Playground",
+      "coordinates": [
+        25.7348489,
+        -80.2287444
+      ],
+      "tags": [
+        "park",
+        "park_playground",
+        "playground"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 31,
+        "category": "Park playground",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "2400 S Bayshore Dr, Miami, FL 33133",
+        "distance_from_home_m": 4973,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "David T. Kennedy Park Playground 2400 S Bayshore Dr, Miami, FL 33133",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_bayshore_club_bar_grill": {
+      "name": "Bayshore Club Bar & Grill",
+      "coordinates": [
+        25.7287715,
+        -80.2341624
+      ],
+      "tags": [
+        "food",
+        "grill"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 32,
+        "category": "Grill",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "3391 Pan American Dr, Miami, FL 33133",
+        "distance_from_home_m": 5824,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Bayshore Club Bar & Grill 3391 Pan American Dr, Miami, FL 33133",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_regatta_park": {
+      "name": "Regatta Park",
+      "coordinates": [
+        25.7280456,
+        -80.2363857
+      ],
+      "tags": [
+        "park"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 33,
+        "category": "Park",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "3500 Pan American Dr, Miami, FL 33133",
+        "distance_from_home_m": 6045,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Regatta Park 3500 Pan American Dr, Miami, FL 33133",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_cocowalk": {
+      "name": "CocoWalk",
+      "coordinates": [
+        25.7286658,
+        -80.2420632
+      ],
+      "tags": [
+        "coconut-grove",
+        "indoors",
+        "shopping_mall"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 34,
+        "category": "Shopping mall",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "3015 Grand Ave, Coconut Grove, FL 33133",
+        "distance_from_home_m": 6447,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "CocoWalk 3015 Grand Ave, Coconut Grove, FL 33133",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_peacock_park": {
+      "name": "Peacock Park",
+      "coordinates": [
+        25.7256603,
+        -80.2405536
+      ],
+      "tags": [
+        "park"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 35,
+        "category": "Park",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "2820 McFarlane Rd Suite 2, Miami, FL 33133",
+        "distance_from_home_m": 6536,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Peacock Park 2820 McFarlane Rd Suite 2, Miami, FL 33133",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_park_grove": {
+      "name": "Park Grove",
+      "coordinates": [
+        25.73065,
+        -80.2360463
+      ],
+      "tags": [
+        "building",
+        "coconut-grove",
+        "condominium_complex"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 36,
+        "category": "Condominium complex",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "2831 S Bayshore Dr, Coconut Grove, FL 33133",
+        "distance_from_home_m": 5835,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Park Grove 2831 S Bayshore Dr, Coconut Grove, FL 33133",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_mr_c_residences": {
+      "name": "Mr C Residences",
+      "coordinates": [
+        25.7307974,
+        -80.2359422
+      ],
+      "tags": [
+        "apartment_building",
+        "building",
+        "coconut-grove"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 37,
+        "category": "Apartment building",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "2655 S Bayshore Dr, Coconut Grove, FL 33133",
+        "distance_from_home_m": 5817,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Mr C Residences 2655 S Bayshore Dr, Coconut Grove, FL 33133",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_coral_way_community_center_playground": {
+      "name": "Coral Way Community Center Playground",
+      "coordinates": [
+        25.7603083,
+        -80.2144117
+      ],
+      "tags": [
+        "playground"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 38,
+        "category": "Playground",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "1320 FL-933, Miami, FL 33129",
+        "distance_from_home_m": 2423,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Coral Way Community Center Playground 1320 FL-933, Miami, FL 33129",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_kla_academy": {
+      "name": "KLA Academy",
+      "coordinates": [
+        25.7626734,
+        -80.2004342
+      ],
+      "tags": [
+        "preschool",
+        "school"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 39,
+        "category": "Preschool",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "375 SW 15th Rd, Miami, FL 33129",
+        "distance_from_home_m": 1003,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "KLA Academy 375 SW 15th Rd, Miami, FL 33129",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_maurice_a_ferre_park": {
+      "name": "Maurice A. Ferré Park",
+      "coordinates": [
+        25.7843583,
+        -80.1871918
+      ],
+      "tags": [
+        "park"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 40,
+        "category": "Park",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "1075 Biscayne Blvd, Miami, FL 33132",
+        "distance_from_home_m": 2363,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Maurice A. Ferré Park 1075 Biscayne Blvd, Miami, FL 33132",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_miami_children_s_museum": {
+      "name": "Miami Children's Museum",
+      "coordinates": [
+        25.7846994,
+        -80.1765206
+      ],
+      "tags": [
+        "children_s_museum",
+        "indoors"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 41,
+        "category": "Children's museum",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "980 MacArthur Cswy, Miami, FL 33132",
+        "distance_from_home_m": 2757,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Miami Children's Museum 980 MacArthur Cswy, Miami, FL 33132",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_coconut_grove_elementary_school": {
+      "name": "Coconut Grove Elementary School",
+      "coordinates": [
+        25.7284342,
+        -80.2431052
+      ],
+      "tags": [
+        "coconut-grove",
+        "elementary_school",
+        "school"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 42,
+        "category": "Elementary school",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "3351 Matilda St, Miami, FL 33133",
+        "distance_from_home_m": 6546,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Coconut Grove Elementary School 3351 Matilda St, Miami, FL 33133",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_metromover_tenth_street_promenade_station": {
+      "name": "Metromover Tenth Street Promenade station",
+      "coordinates": [
+        25.764016,
+        -80.19256
+      ],
+      "tags": [
+        "metromover",
+        "metromover_station",
+        "transit"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 43,
+        "category": "Metromover station",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Miami, FL 33131",
+        "distance_from_home_m": 226,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Metromover Tenth Street Promenade station Miami, FL 33131",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_metromover_brickell_city_centre_eight_street_station": {
+      "name": "Metromover Brickell City Centre Eight Street Station",
+      "coordinates": [
+        25.766888,
+        -80.192121
+      ],
+      "tags": [
+        "brickell",
+        "metromover",
+        "metromover_station",
+        "transit"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 44,
+        "category": "Metromover station",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Miami, FL 33130",
+        "distance_from_home_m": 432,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Metromover Brickell City Centre Eight Street Station Miami, FL 33130",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_metromover_financial_district_station": {
+      "name": "Metromover Financial District Station",
+      "coordinates": [
+        25.7604297,
+        -80.1929218
+      ],
+      "tags": [
+        "metromover",
+        "metromover_station",
+        "transit"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 45,
+        "category": "Metromover station",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Miami, FL 33131",
+        "distance_from_home_m": 405,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Metromover Financial District Station Miami, FL 33131",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_metromover_riverwalk_station": {
+      "name": "Metromover Riverwalk Station",
+      "coordinates": [
+        25.7710458,
+        -80.1926051
+      ],
+      "tags": [
+        "metromover",
+        "metromover_station",
+        "transit"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 46,
+        "category": "Metromover station",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Miami, FL 33131",
+        "distance_from_home_m": 887,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Metromover Riverwalk Station Miami, FL 33131",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_metromover_5th_st_station": {
+      "name": "Metromover 5th St. Station",
+      "coordinates": [
+        25.7691598,
+        -80.1922875
+      ],
+      "tags": [
+        "metromover",
+        "metromover_station",
+        "transit"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 47,
+        "category": "Metromover station",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "30 SE 5th St, Miami, FL 33131",
+        "distance_from_home_m": 677,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Metromover 5th St. Station 30 SE 5th St, Miami, FL 33131",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_metromover_college_bayside_station": {
+      "name": "Metromover College Bayside Station",
+      "coordinates": [
+        25.7776151,
+        -80.1899352
+      ],
+      "tags": [
+        "metromover",
+        "metromover_station",
+        "transit"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 48,
+        "category": "Metromover station",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Miami, FL 33132",
+        "distance_from_home_m": 1592,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Metromover College Bayside Station Miami, FL 33132",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_metromover_government_center_station": {
+      "name": "Metromover Government Center Station",
+      "coordinates": [
+        25.776062,
+        -80.1961054
+      ],
+      "tags": [
+        "metromover",
+        "metromover_station",
+        "transit"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 49,
+        "category": "Metromover station",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Miami, FL 33128",
+        "distance_from_home_m": 1527,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Metromover Government Center Station Miami, FL 33128",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_metromover_miami_avenue_station": {
+      "name": "Metromover Miami Avenue Station",
+      "coordinates": [
+        25.773424,
+        -80.1935991
+      ],
+      "tags": [
+        "metromover",
+        "metromover_station",
+        "transit"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 50,
+        "category": "Metromover station",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Miami, FL 33131",
+        "distance_from_home_m": 1169,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Metromover Miami Avenue Station Miami, FL 33131",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_metromover_bayfront_park_station": {
+      "name": "Metromover Bayfront Park Station",
+      "coordinates": [
+        25.7730944,
+        -80.1872841
+      ],
+      "tags": [
+        "metromover",
+        "metromover_station",
+        "transit"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 51,
+        "category": "Metromover station",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Miami, FL 33131",
+        "distance_from_home_m": 1133,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Metromover Bayfront Park Station Miami, FL 33131",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_metromover_museum_park_station": {
+      "name": "Metromover Museum Park Station",
+      "coordinates": [
+        25.785918,
+        -80.187934
+      ],
+      "tags": [
+        "metromover",
+        "metromover_station",
+        "transit"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 52,
+        "category": "Metromover station",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Miami, FL 33130",
+        "distance_from_home_m": 2527,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Metromover Museum Park Station Miami, FL 33130",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_dan_paul_plaza": {
+      "name": "Dan Paul Plaza",
+      "coordinates": [
+        25.7813469,
+        -80.185762
+      ],
+      "tags": [
+        "plaza"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 53,
+        "category": "Plaza",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "400 NE 8th St, Miami, FL 33130",
+        "distance_from_home_m": 2060,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Dan Paul Plaza 400 NE 8th St, Miami, FL 33130",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_publix_super_market_at_brickell_village": {
+      "name": "Publix Super Market at Brickell Village",
+      "coordinates": [
+        25.7611996,
+        -80.1967064
+      ],
+      "tags": [
+        "brickell",
+        "supermarket"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 54,
+        "category": "Supermarket",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "134 SW 13th St, Miami, FL 33130",
+        "distance_from_home_m": 670,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Publix Super Market at Brickell Village 134 SW 13th St, Miami, FL 33130",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_publix_super_market_at_mary_brickell_village": {
+      "name": "Publix Super Market at Mary Brickell Village",
+      "coordinates": [
+        25.7649231,
+        -80.1948914
+      ],
+      "tags": [
+        "brickell",
+        "supermarket"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 55,
+        "category": "Supermarket",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "911 SW 1st Ave, Miami, FL 33130",
+        "distance_from_home_m": 480,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Publix Super Market at Mary Brickell Village 911 SW 1st Ave, Miami, FL 33130",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_whole_foods_market": {
+      "name": "Whole Foods Market",
+      "coordinates": [
+        25.7722816,
+        -80.1895294
+      ],
+      "tags": [
+        "supermarket"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 56,
+        "category": "Supermarket",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "299 SE 3rd Ave, Miami, FL 33131",
+        "distance_from_home_m": 1002,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Whole Foods Market 299 SE 3rd Ave, Miami, FL 33131",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_azucar_ice_cream_little_havana": {
+      "name": "Azucar Ice Cream - Little Havana",
+      "coordinates": [
+        25.7658359,
+        -80.2196546
+      ],
+      "tags": [
+        "dessert",
+        "food",
+        "ice_cream"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 57,
+        "category": "Ice cream",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "1503 SW 8th St, Miami, FL 33135",
+        "distance_from_home_m": 2939,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Azucar Ice Cream - Little Havana 1503 SW 8th St, Miami, FL 33135",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_calle_ocho_murals": {
+      "name": "Calle Ocho Murals",
+      "coordinates": [
+        25.7655101,
+        -80.2181224
+      ],
+      "tags": [
+        "murals"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 58,
+        "category": "Murals",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "1380 SW 8th St, Miami, FL 33135",
+        "distance_from_home_m": 2783,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Calle Ocho Murals 1380 SW 8th St, Miami, FL 33135",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_south_pointe_park_playground": {
+      "name": "South Pointe Park Playground",
+      "coordinates": [
+        25.7655018,
+        -80.1325618
+      ],
+      "tags": [
+        "playground"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 59,
+        "category": "Playground",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "1 Washington Ave, Miami Beach, FL 33139",
+        "distance_from_home_m": 5801,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "South Pointe Park Playground 1 Washington Ave, Miami Beach, FL 33139",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_ocean_drive_at_south_pointe_drive": {
+      "name": "Ocean Drive at South Pointe Drive",
+      "coordinates": [
+        25.7683857,
+        -80.1332474
+      ],
+      "tags": [
+        "street"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 60,
+        "category": "Street",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Ocean Drive, Miami Beach, FL 33139",
+        "distance_from_home_m": 5755,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Ocean Drive at South Pointe Drive Ocean Drive, Miami Beach, FL 33139",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_lummus_park": {
+      "name": "Lummus Park",
+      "coordinates": [
+        25.7807351,
+        -80.1299789
+      ],
+      "tags": [
+        "park"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 61,
+        "category": "Park",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "1130 Ocean Dr, Miami Beach, FL 33139",
+        "distance_from_home_m": 6357,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "Lummus Park 1130 Ocean Dr, Miami Beach, FL 33139",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_south_pointe_beach": {
+      "name": "South Pointe Beach",
+      "coordinates": [
+        25.7673916,
+        -80.1309981
+      ],
+      "tags": [
+        "beach"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 62,
+        "category": "Beach",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "1 Washington Ave, Miami Beach, FL 33139",
+        "distance_from_home_m": 5970,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "South Pointe Beach 1 Washington Ave, Miami Beach, FL 33139",
+          "display_name": "Manual coordinate",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_1010_brickell_ave": {
+      "name": "1010 Brickell Ave",
+      "coordinates": [
+        25.7641395,
+        -80.1923265
+      ],
+      "tags": [
+        "brickell",
+        "building",
+        "condominium_complex"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 18,
+        "category": "Condominium complex",
+        "rating": 4.1,
+        "rating_count": 125,
+        "price": null,
+        "status": null,
+        "address": null,
+        "distance_from_home_m": 210,
+        "local_evidence": [
+          "local_keyword:1010 brickell",
+          "local_keyword:brickell"
+        ],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim",
+          "query": "1010 Brickell Ave Brickell Miami FL",
+          "display_name": "1010, Brickell Avenue, Brickell, Miami, Miami-Dade County, Florida, 33131, United States",
+          "match_score": 1.0,
+          "osm_type": "node",
+          "osm_id": 6010864375
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_701_brickell_ave": {
+      "name": "701 Brickell Ave",
+      "coordinates": [
+        25.7670884,
+        -80.1896963
+      ],
+      "tags": [
+        "brickell"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 20,
+        "category": null,
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Miami, FL 33131",
+        "distance_from_home_m": 427,
+        "local_evidence": [
+          "local_keyword:701 brickell",
+          "local_keyword:brickell",
+          "local_keyword:miami",
+          "zip_code",
+          "florida_address"
+        ],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim",
+          "query": "701 Brickell Ave Brickell Miami FL",
+          "display_name": "701 Brickell Avenue, Baywalk, Brickell, Torch of Friendship, Miami, Miami-Dade County, Florida, 33131, United States",
+          "match_score": 1.0,
+          "osm_type": "way",
+          "osm_id": 300193839
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_blanche_park": {
+      "name": "Blanche Park",
+      "coordinates": [
+        25.7338044,
+        -80.2422125
+      ],
+      "tags": [
+        "dog_park"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 27,
+        "category": "Dog park",
+        "rating": 4.6,
+        "rating_count": 567,
+        "price": null,
+        "status": null,
+        "address": null,
+        "distance_from_home_m": 6136,
+        "local_evidence": [
+          "local_keyword:blanche park"
+        ],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim",
+          "query": "Blanche Park Miami FL",
+          "display_name": "Blanche Park, 3045, Ocean View Heights, Miami, Miami-Dade County, Florida, 33133, United States",
+          "match_score": 1.0,
+          "osm_type": "way",
+          "osm_id": 522268809
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_merrie_christmas_park": {
+      "name": "Merrie Christmas Park",
+      "coordinates": [
+        25.7113668,
+        -80.2599674
+      ],
+      "tags": [
+        "park"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 28,
+        "category": "Park",
+        "rating": 4.6,
+        "rating_count": 453,
+        "price": null,
+        "status": null,
+        "address": null,
+        "distance_from_home_m": 9047,
+        "local_evidence": [
+          "local_keyword:merrie christmas"
+        ],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim",
+          "query": "Merrie Christmas Park Miami FL",
+          "display_name": "Merrie Christmas Park, 4355, Miami, Miami-Dade County, Florida, 33133, United States",
+          "match_score": 1.0,
+          "osm_type": "way",
+          "osm_id": 237024259
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_grovenor_house": {
+      "name": "Grovenor House",
+      "coordinates": [
+        25.7322348,
+        -80.234898
+      ],
+      "tags": [
+        "building",
+        "condominium_complex"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 32,
+        "category": "Condominium complex",
+        "rating": 4.4,
+        "rating_count": 55,
+        "price": null,
+        "status": null,
+        "address": null,
+        "distance_from_home_m": 5636,
+        "local_evidence": [
+          "local_keyword:grovenor house"
+        ],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim",
+          "query": "Grovenor House Miami FL",
+          "display_name": "Grovenor House, 2627, South Bayshore Drive, Dinner Key, Ocean View Heights, Miami, Miami-Dade County, Florida, 33133, United States",
+          "match_score": 1.0,
+          "osm_type": "way",
+          "osm_id": 436108011
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_shops_at_merrick_park": {
+      "name": "Shops at Merrick Park",
+      "coordinates": [
+        25.7315027,
+        -80.2601444
+      ],
+      "tags": [
+        "shopping_mall"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 50,
+        "category": "Shopping mall",
+        "rating": 4.6,
+        "rating_count": 5590,
+        "price": null,
+        "status": null,
+        "address": null,
+        "distance_from_home_m": 7826,
+        "local_evidence": [
+          "local_keyword:shops at merrick"
+        ],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim",
+          "query": "Shops at Merrick Park Miami FL",
+          "display_name": "Shops at Merrick Park, 358, San Lorenzo Avenue, Coral Gables, Miami-Dade County, Florida, 33146, United States",
+          "match_score": 1.0,
+          "osm_type": "way",
+          "osm_id": 291775638
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_jade_residences_at_brickell": {
+      "name": "Jade Residences at Brickell",
+      "coordinates": [
+        25.7603386,
+        -80.1895315
+      ],
+      "tags": [
+        "brickell",
+        "building",
+        "condominium_complex"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 124,
+        "category": "Condominium complex",
+        "rating": 4.7,
+        "rating_count": 259,
+        "price": null,
+        "status": null,
+        "address": null,
+        "distance_from_home_m": 342,
+        "local_evidence": [
+          "local_keyword:brickell"
+        ],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim",
+          "query": "Jade Residences at Brickell Brickell Miami FL",
+          "display_name": "Jade Residences at Brickell Bay, 1331, Brickell Bay Drive, Brickell, Miami, Miami-Dade County, Florida, 33131, United States",
+          "match_score": 1.0,
+          "osm_type": "way",
+          "osm_id": 300492232
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_ingraham_park": {
+      "name": "Ingraham Park",
+      "coordinates": [
+        25.70671,
+        -80.2604139
+      ],
+      "tags": [
+        "park"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 128,
+        "category": "Park",
+        "rating": 4.6,
+        "rating_count": 480,
+        "price": null,
+        "status": null,
+        "address": null,
+        "distance_from_home_m": 9420,
+        "local_evidence": [
+          "local_keyword:ingraham park"
+        ],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim",
+          "query": "Ingraham Park Miami FL",
+          "display_name": "Ingraham Park, 4751, Coral Gables, Miami-Dade County, Florida, 33133, United States",
+          "match_score": 1.0,
+          "osm_type": "way",
+          "osm_id": 292080820
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_coral_gables_waterway": {
+      "name": "Coral Gables Waterway",
+      "coordinates": [
+        25.7165638,
+        -80.2673581
+      ],
+      "tags": [
+        "channel"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 130,
+        "category": "Channel",
+        "rating": 3.7,
+        "rating_count": 3,
+        "price": null,
+        "status": null,
+        "address": null,
+        "distance_from_home_m": 9293,
+        "local_evidence": [
+          "local_keyword:coral gables"
+        ],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim",
+          "query": "Coral Gables Waterway Miami FL",
+          "display_name": "Coral Gables Waterway, Coral Gables, Miami-Dade County, Florida, United States",
+          "match_score": 1.0,
+          "osm_type": "way",
+          "osm_id": 161640295
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_rosetta_bakery": {
+      "name": "Rosetta Bakery",
+      "coordinates": [
+        25.7914055,
+        -80.1300535
+      ],
+      "tags": [
+        "bakery",
+        "dessert",
+        "food"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 2,
+        "category": "Bakery",
+        "rating": 4.2,
+        "rating_count": 758,
+        "price": null,
+        "status": null,
+        "address": null,
+        "distance_from_home_m": 6806,
+        "local_evidence": [
+          "local_keyword:rosetta bakery"
+        ],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim",
+          "query": "Rosetta Bakery Miami FL",
+          "display_name": "Rosetta Bakery, 1666, Collins Avenue, Española Way, Miami Beach, Miami-Dade County, Florida, 33139, United States",
+          "match_score": 1.0,
+          "osm_type": "node",
+          "osm_id": 4292652493
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_salt_straw": {
+      "name": "Salt & Straw",
+      "coordinates": [
+        25.7907365,
+        -80.1364241
+      ],
+      "tags": [
+        "dessert",
+        "food",
+        "ice_cream"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 20,
+        "category": "Ice Cream",
+        "rating": 4.7,
+        "rating_count": 646,
+        "price": null,
+        "status": null,
+        "address": null,
+        "distance_from_home_m": 6210,
+        "local_evidence": [
+          "local_keyword:salt & straw"
+        ],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim",
+          "query": "Salt & Straw Miami FL",
+          "display_name": "Salt & Straw, 500, Lincoln Lane North, Española Way, Miami Beach, Miami-Dade County, Florida, 33139, United States",
+          "match_score": 1.0,
+          "osm_type": "node",
+          "osm_id": 11512783470
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_wynwood_walls": {
+      "name": "Wynwood Walls",
+      "coordinates": [
+        25.8010509,
+        -80.1993178
+      ],
+      "tags": [
+        "art",
+        "museum"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 131,
+        "category": "Outdoor art museum",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "2516 NW 2nd Ave, Miami, FL 33127",
+        "distance_from_home_m": 4290,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim",
+          "query": "2516 NW 2nd Ave, Miami, FL 33127",
+          "display_name": "2516, Northwest 2nd Avenue, Overtown, Miami, Miami-Dade County, Florida, 33127, United States",
+          "match_score": 0.85,
+          "osm_type": "node",
+          "osm_id": 6091344790
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_miami_design_district": {
+      "name": "Miami Design District",
+      "coordinates": [
+        25.813535,
+        -80.193513
+      ],
+      "tags": [
+        "shopping_district"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 132,
+        "category": "Shopping district",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "4000 NE 1st Ave, Miami, FL 33137",
+        "distance_from_home_m": 5594,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim",
+          "query": "4000 NE 1st Ave, Miami, FL 33137",
+          "display_name": "4000, Northeast 1st Avenue, Design District, Miami, Miami-Dade County, Florida, 33137, United States",
+          "match_score": 0.85,
+          "osm_type": "way",
+          "osm_id": 884922935
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_collection_at_midtown_miami": {
+      "name": "Collection at Midtown Miami",
+      "coordinates": [
+        25.8092319,
+        -80.1943415
+      ],
+      "tags": [
+        "shopping_mall"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 133,
+        "category": "Shopping center",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "3401 N Miami Ave, Miami, FL 33127",
+        "distance_from_home_m": 5122,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim",
+          "query": "3401 N Miami Ave, Miami, FL 33127",
+          "display_name": "3401, North Miami Avenue, Midtown, Miami, Miami-Dade County, Florida, 33127, United States",
+          "match_score": 0.82,
+          "osm_type": "way",
+          "osm_id": 315830475
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_key_biscayne_beach": {
+      "name": "Key Biscayne Beach",
+      "coordinates": [
+        25.6903225,
+        -80.1586
+      ],
+      "tags": [
+        "beach"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 134,
+        "category": "Beach",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Key Biscayne, FL 33149",
+        "distance_from_home_m": 8720,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim_address_adjusted",
+          "query": "Key Biscayne Beach, Key Biscayne, FL 33149",
+          "display_name": "Beach Haus Key Biscayne, 285, Sunrise Drive, Key Biscayne, Miami-Dade County, Florida, 33149, United States",
+          "match_score": 0.55,
+          "osm_type": "way",
+          "osm_id": 306038208
+        },
+        "notes": "Nominatim matched a nearby beach hotel; marker adjusted east to the beach side of Key Biscayne.",
+        "npc_associations": []
+      }
+    },
+    "place_id_mister_o1_extraordinary_pizza_coconut_grove": {
+      "name": "Mister O1 Extraordinary Pizza - Coconut Grove",
+      "coordinates": [
+        25.7286438,
+        -80.2420384
+      ],
+      "tags": [
+        "food",
+        "pizza",
+        "restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 135,
+        "category": "Pizza restaurant",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "3015 Grand Ave Ste 165, Miami, FL 33133",
+        "distance_from_home_m": 6447,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim_address",
+          "query": "3015 Grand Ave, Miami, FL 33133",
+          "display_name": "CocoWalk, 3015, Grand Avenue, Ocean View Heights, Miami, Miami-Dade County, Florida, 33133, United States",
+          "match_score": 0.78,
+          "osm_type": "node",
+          "osm_id": 2498529919
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_chugs_diner": {
+      "name": "Chug's Diner",
+      "coordinates": [
+        25.727493,
+        -80.243396
+      ],
+      "tags": [
+        "diner",
+        "food",
+        "restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 136,
+        "category": "Diner",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "3444 Main Hwy Ste 21, Miami, FL 33133",
+        "distance_from_home_m": 6632,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim_address",
+          "query": "3444 Main Hwy, Miami, FL 33133",
+          "display_name": "3444, Main Highway, Ocean View Heights, Miami, Miami-Dade County, Florida, 33133, United States",
+          "match_score": 0.72,
+          "osm_type": "node",
+          "osm_id": 2697912480
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_bartaco_coconut_grove": {
+      "name": "bartaco",
+      "coordinates": [
+        25.7269645,
+        -80.2444491
+      ],
+      "tags": [
+        "food",
+        "restaurant",
+        "tacos"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 137,
+        "category": "Taco restaurant",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "3112 Commodore Plaza, Miami, FL 33133",
+        "distance_from_home_m": 6752,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim_address",
+          "query": "3112 Commodore Plaza, Miami, FL 33133",
+          "display_name": "3112, Commodore Plaza, Ocean View Heights, Miami, Miami-Dade County, Florida, 33133, United States",
+          "match_score": 0.85,
+          "osm_type": "node",
+          "osm_id": 4762329541
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_disco_donkey_smash_burgers": {
+      "name": "Disco Donkey: Smash Burgers",
+      "coordinates": [
+        25.7735568,
+        -80.1901174
+      ],
+      "tags": [
+        "burger",
+        "food",
+        "restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 138,
+        "category": "Burger restaurant",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "209 SE 1st St, Miami, FL 33131",
+        "distance_from_home_m": 1140,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim_address",
+          "query": "209 SE 1st St, Miami, FL 33131",
+          "display_name": "209, Southeast 1st Street, Downtown Miami, Miami, Miami-Dade County, Florida, 33131, United States",
+          "match_score": 0.85,
+          "osm_type": "node",
+          "osm_id": 6085440630
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_sovereign_poke_boba_asian_kitchen": {
+      "name": "Sovereign: Poke, Boba, Asian Kitchen",
+      "coordinates": [
+        25.7752339,
+        -80.1887232
+      ],
+      "tags": [
+        "asian",
+        "boba",
+        "food",
+        "restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 139,
+        "category": "Poke / boba restaurant",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "22 NE 3rd Ave, Miami, FL 33132",
+        "distance_from_home_m": 1337,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim_address",
+          "query": "22 NE 3rd Ave, Miami, FL 33132",
+          "display_name": "22, Northeast 3rd Avenue, Downtown Miami, Miami-Dade County, Florida, 33132, United States",
+          "match_score": 0.85,
+          "osm_type": "way",
+          "osm_id": 11120894
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    }
+  },
+  "routines": {
+    "morning_local_scan": {
+      "time_window": "06:00-10:00",
+      "waypoints": [
+        "place_id_panorama_tower"
+      ],
+      "constraints": {
+        "max_walk_minutes": 10,
+        "max_heat_index": 92
+      }
+    }
+  },
+  "source": "curated local places"
+}

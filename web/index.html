@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#f5f0e8">
+    <title>SPIN Brickell</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="vendor/leaflet/leaflet.css?v=167">
+    <link rel="stylesheet" href="styles.css?v=167">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="map-stage" aria-label="SPIN Brickell map">
+        <div id="map"></div>
+
+        <header class="top-bar">
+          <div class="mode-actions" aria-label="Map controls">
+            <button id="locate-home" class="icon-button" type="button" title="Center on Panorama Tower" aria-label="Center on Panorama Tower">+</button>
+          </div>
+        </header>
+
+        <aside id="places-panel" class="places-panel" aria-label="Places">
+          <div class="places-brand">
+            <span class="brand-mark" aria-hidden="true"></span>
+            <div>
+              <h1>SPIN Brickell</h1>
+              <p id="place-count">Loading places</p>
+            </div>
+            <button id="toggle-places-panel" class="icon-button panel-toggle" type="button" title="Collapse places" aria-label="Collapse places" aria-expanded="true">-</button>
+          </div>
+
+          <label class="search-field">
+            <span>Search</span>
+            <input id="search-input" type="search" autocomplete="off" placeholder="Place or tag">
+          </label>
+
+          <div class="filter-row" id="tag-filters" aria-label="Tag filters"></div>
+
+          <label class="toggle-line">
+            <input id="radius-filter" type="checkbox">
+            <span>10-min radius</span>
+          </label>
+
+          <div class="panel-head">
+            <span id="visible-count">0 visible</span>
+            <button id="reset-filters" class="reset-filters" type="button">Reset filters</button>
+          </div>
+          <div id="place-list" class="place-list"></div>
+        </aside>
+
+        <section id="detail-sheet" class="detail-sheet" aria-live="polite">
+          <button id="close-detail" class="close-button" type="button" title="Close details" aria-label="Close details">x</button>
+          <p id="detail-kicker"></p>
+          <h2 id="detail-title">Select a place</h2>
+          <div id="detail-tags" class="detail-tags"></div>
+          <div class="detail-actions" aria-label="Route actions">
+            <button id="route-from" type="button">Route from here</button>
+            <button id="route-to" type="button">Route to here</button>
+          </div>
+          <div class="travel-mode" aria-label="Travel mode">
+            <button id="mode-shortest" class="is-active" type="button" aria-pressed="true">Shortest</button>
+            <button id="mode-scenic" type="button" aria-pressed="false">Scenic</button>
+            <button id="mode-scooter" type="button" aria-pressed="false">Kid scooter</button>
+          </div>
+          <div id="route-status" class="route-status">No route selected</div>
+          <button id="clear-route" class="clear-route" type="button" hidden>Clear route</button>
+          <dl id="detail-facts"></dl>
+        </section>
+      </section>
+    </main>
+
+    <script src="vendor/leaflet/leaflet.js?v=167"></script>
+    <script src="app.js?v=167"></script>
+  </body>
+</html>

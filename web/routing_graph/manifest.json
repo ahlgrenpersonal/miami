@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-25T22:21:10Z",
+  "source": "OpenStreetMap Overpass API",
+  "simplification": "none; every walkable OSM way node is preserved as a routing node",
+  "max_snap_distance_m": 500,
+  "bbox": {
+    "south": 25.66,
+    "west": -80.275,
+    "north": 25.835,
+    "east": -80.1
+  },
+  "profiles": {
+    "shortest": {
+      "label": "Shortest",
+      "description": "Shortest locally routable walking distance.",
+      "speed_kmh": 5.0,
+      "score_weights": {},
+      "min_multiplier": 1.0,
+      "max_multiplier": 1.0,
+      "hard_penalties": {},
+      "fixed_penalties_m": {}
+    },
+    "scenic": {
+      "label": "Scenic",
+      "description": "Distance with bonuses for parks, waterfront-style names, low-stress paths, lighting, and walkable passages. Traffic crossings add fixed cost.",
+      "speed_kmh": 5.0,
+      "score_weights": {
+        "waterside": 0.25,
+        "waterfront": 0.3,
+        "park_path": 0.45,
+        "car_free": 0.1,
+        "scenic": 0.18,
+        "kid_scooter": 0.02,
+        "traffic_stress": -0.18
+      },
+      "min_multiplier": 0.35,
+      "max_multiplier": 2.6,
+      "hard_penalties": {},
+      "fixed_penalties_m": {
+        "traffic_crossing": 24.0,
+        "roadside_baywalk": 4.0
+      }
+    },
+    "kid_scooter": {
+      "label": "Kid scooter",
+      "description": "Distance with strong penalties for high-stress roads, rough surfaces, and traffic crossings, plus bonuses for cycleways and footways. Steps are a mild carry penalty.",
+      "speed_kmh": 10.0,
+      "score_weights": {
+        "kid_scooter": 0.78,
+        "scooter": 0.22,
+        "waterfront": 0.03,
+        "traffic_stress": -0.26
+      },
+      "min_multiplier": 0.35,
+      "max_multiplier": 3.0,
+      "hard_penalties": {
+        "highway=steps": 1.18
+      },
+      "fixed_penalties_m": {
+        "traffic_crossing": 42.0
+      }
+    }
+  },
+  "chunks": {
+    "nodes": [
+      "nodes-000.json",
+      "nodes-001.json",
+      "nodes-002.json",
+      "nodes-003.json",
+      "nodes-004.json"
+    ],
+    "edges": [
+      "edges-000.json",
+      "edges-001.json",
+      "edges-002.json",
+      "edges-003.json",
+      "edges-004.json",
+      "edges-005.json",
+      "edges-006.json"
+    ]
+  },
+  "node_count": 239050,
+  "edge_count": 274843
+}
