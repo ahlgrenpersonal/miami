@@ -116,15 +116,12 @@ function bindDom() {
   dom.togglePlacesPanel = document.querySelector("#toggle-places-panel");
   dom.tagFilters = document.querySelector("#tag-filters");
   dom.radiusFilter = document.querySelector("#radius-filter");
-  dom.homeButton = document.querySelector("#locate-home");
   dom.placeList = document.querySelector("#place-list");
   dom.resetFilters = document.querySelector("#reset-filters");
   dom.detailSheet = document.querySelector("#detail-sheet");
   dom.closeDetail = document.querySelector("#close-detail");
   dom.detailKicker = document.querySelector("#detail-kicker");
   dom.detailTitle = document.querySelector("#detail-title");
-  dom.detailTags = document.querySelector("#detail-tags");
-  dom.detailFacts = document.querySelector("#detail-facts");
   dom.routeHome = document.querySelector("#route-home");
   dom.routeFrom = document.querySelector("#route-from");
   dom.routeTo = document.querySelector("#route-to");
@@ -145,10 +142,6 @@ function bindEvents() {
   dom.radiusFilter.addEventListener("change", () => {
     app.radiusOnly = dom.radiusFilter.checked;
     renderAll();
-  });
-
-  dom.homeButton.addEventListener("click", () => {
-    centerHome();
   });
 
   dom.togglePlacesPanel.addEventListener("click", () => {
@@ -657,19 +650,6 @@ function renderDetail(place) {
   const meta = place.meta || {};
   dom.detailKicker.textContent = meta.source_list || "local";
   dom.detailTitle.textContent = place.name;
-  dom.detailTags.innerHTML = place.tags.slice(0, 10).map((tag) => `<span>${escapeHtml(tag)}</span>`).join("");
-
-  const facts = [
-    ["Category", meta.category || "Place"],
-    ["Distance", `${meta.distance_from_home_m ?? 0} m from Panorama`],
-    ["Rating", meta.rating ? `${meta.rating} (${meta.rating_count || 0})` : "No rating"],
-    ["Price", meta.price || "No price"],
-    ["Source", meta.source_list || "Generated"],
-  ];
-
-  dom.detailFacts.innerHTML = facts
-    .map(([key, value]) => `<dt>${escapeHtml(key)}</dt><dd>${escapeHtml(String(value))}</dd>`)
-    .join("");
   dom.detailSheet.classList.add("is-open");
   renderRoute();
 }
@@ -1041,7 +1021,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=171", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=173", { updateViaCache: "none" })
       .catch((error) => {
         console.info("Offline service worker unavailable.", error);
       });

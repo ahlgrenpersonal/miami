@@ -8,18 +8,12 @@
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="vendor/leaflet/leaflet.css?v=171">
-    <link rel="stylesheet" href="styles.css?v=171">
+    <link rel="stylesheet" href="styles.css?v=173">
   </head>
   <body>
     <main class="app-shell">
       <section class="map-stage" aria-label="SPIN Brickell map">
         <div id="map"></div>
-
-        <header class="top-bar">
-          <div class="mode-actions" aria-label="Map controls">
-            <button id="locate-home" class="icon-button" type="button" title="Center on Panorama Tower" aria-label="Center on Panorama Tower">+</button>
-          </div>
-        </header>
 
         <aside id="places-panel" class="places-panel" aria-label="Places">
           <div class="places-brand">
@@ -54,7 +48,6 @@
           <button id="close-detail" class="close-button" type="button" title="Close details" aria-label="Close details">x</button>
           <p id="detail-kicker"></p>
           <h2 id="detail-title">Select a place</h2>
-          <div id="detail-tags" class="detail-tags"></div>
           <div class="detail-actions" aria-label="Route actions">
             <button id="route-home" type="button">Route home</button>
             <button id="route-from" type="button">Route from here</button>
@@ -67,12 +60,11 @@
           </div>
           <div id="route-status" class="route-status">No route selected</div>
           <button id="clear-route" class="clear-route" type="button" hidden>Clear route</button>
-          <dl id="detail-facts"></dl>
         </section>
       </section>
     </main>
 
     <script src="vendor/leaflet/leaflet.js?v=171"></script>
-    <script src="app.js?v=171"></script>
+    <script src="app.js?v=173"></script>
   </body>
 </html>
