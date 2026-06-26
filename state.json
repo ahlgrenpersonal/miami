@@ -2871,7 +2871,7 @@
         "rating_count": null,
         "price": null,
         "status": null,
-        "address": "Key Biscayne, FL 33149",
+        "address": "685 Ocean Dr, Key Biscayne, FL 33149",
         "distance_from_home_m": 8720,
         "local_evidence": [],
         "scan_evidence": [],
@@ -2879,13 +2879,48 @@
         "skip_geocode_evidence": [],
         "geocode": {
           "source": "nominatim_address_adjusted",
-          "query": "Key Biscayne Beach, Key Biscayne, FL 33149",
+          "query": "Key Biscayne Beach 685 Ocean Dr, Key Biscayne, FL 33149",
           "display_name": "Beach Haus Key Biscayne, 285, Sunrise Drive, Key Biscayne, Miami-Dade County, Florida, 33149, United States",
           "match_score": 0.55,
           "osm_type": "way",
           "osm_id": 306038208
         },
-        "notes": "Nominatim matched a nearby beach hotel; marker adjusted east to the beach side of Key Biscayne.",
+        "notes": "Address updated to 685 Ocean Dr; marker kept on the beach side of Key Biscayne.",
+        "npc_associations": []
+      }
+    },
+    "place_id_hidden_beach": {
+      "name": "Hidden Beach",
+      "coordinates": [
+        25.7406875,
+        -80.1464375
+      ],
+      "tags": [
+        "beach"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 140,
+        "category": "Beach",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Arthur Lamb Jr Rd, Miami, FL 33149",
+        "distance_from_home_m": 5074,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "plus_code",
+          "query": "PVR3+7C Miami, Florida",
+          "display_name": "PVR3+7C Miami, Florida",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "Decoded from the supplied plus code.",
         "npc_associations": []
       }
     },

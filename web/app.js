@@ -1027,7 +1027,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=176", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=177", { updateViaCache: "none" })
       .catch((error) => {
         console.info("Offline service worker unavailable.", error);
       });
