@@ -1,18 +1,18 @@
-const CACHE_NAME = "spin-brickell-v168";
-const TILE_VERSION = "168";
+const CACHE_NAME = "spin-brickell-v169";
+const TILE_VERSION = "169";
 const TILE_CACHE_NAME = `spin-brickell-tiles-v${TILE_VERSION}`;
 const TILE_MANIFEST_URL = `./tiles/offline/manifest.json?v=${TILE_VERSION}`;
 const ROUTING_GRAPH_MANIFEST_URL = `./routing_graph/manifest.json?v=${TILE_VERSION}`;
 const APP_ASSETS = [
   "./",
   "./index.html",
-  "./vendor/leaflet/leaflet.css?v=168",
-  "./vendor/leaflet/leaflet.js?v=168",
+  "./vendor/leaflet/leaflet.css?v=169",
+  "./vendor/leaflet/leaflet.js?v=169",
   "./vendor/leaflet/images/marker-icon.png",
   "./vendor/leaflet/images/marker-icon-2x.png",
   "./vendor/leaflet/images/marker-shadow.png",
-  "./styles.css?v=168",
-  "./app.js?v=168",
+  "./styles.css?v=169",
+  "./app.js?v=169",
   ROUTING_GRAPH_MANIFEST_URL,
   TILE_MANIFEST_URL,
   "./manifest.webmanifest",
@@ -149,7 +149,6 @@ self.addEventListener("install", (event) => {
     caches.open(CACHE_NAME)
       .then(async (cache) => {
         await cache.addAll(APP_ASSETS);
-        await cacheRoutingGraphChunks(cache);
       })
       .then(() => self.skipWaiting())
   );
