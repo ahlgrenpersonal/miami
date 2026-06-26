@@ -1002,11 +1002,8 @@ function getPopupHtml(place) {
 }
 
 function getGoogleMapsUrl(place) {
-  const [lat, lng] = place.coordinates || [];
-  if (Number.isFinite(lat) && Number.isFinite(lng)) {
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${lat},${lng}`)}`;
-  }
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name)}`;
+  const searchText = `${place.name}, Miami FL`;
+  return `https://www.google.com/maps/search/${encodeURIComponent(searchText)}`;
 }
 
 function getPlaceSubtitle(place) {
@@ -1030,7 +1027,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=175", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=176", { updateViaCache: "none" })
       .catch((error) => {
         console.info("Offline service worker unavailable.", error);
       });
