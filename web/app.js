@@ -340,6 +340,7 @@ function initMap() {
     maxBounds: OFFLINE_TILE_BOUNDS,
     maxBoundsViscosity: 0.75,
   }).setView(initialCenter, initialZoom);
+  app.map.attributionControl.setPrefix(false);
 
   L.control.zoom({ position: "bottomright" }).addTo(app.map);
 
@@ -349,7 +350,7 @@ function initMap() {
     maxZoom: 19,
     bounds: OFFLINE_TILE_BOUNDS,
     noWrap: true,
-    attribution: "OpenStreetMap contributors, offline extract",
+    attribution: "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a>",
   }).addTo(app.map);
 
   app.radiusCircle = L.circle(home, {
@@ -1029,7 +1030,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=174", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=175", { updateViaCache: "none" })
       .catch((error) => {
         console.info("Offline service worker unavailable.", error);
       });
