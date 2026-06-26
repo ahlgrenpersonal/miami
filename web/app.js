@@ -1002,7 +1002,8 @@ function getPopupHtml(place) {
 }
 
 function getGoogleMapsUrl(place) {
-  const searchText = `${place.name}, Miami FL`;
+  const address = place.meta?.address;
+  const searchText = address ? `${place.name}, ${address}` : `${place.name}, Miami FL`;
   return `https://www.google.com/maps/search/${encodeURIComponent(searchText)}`;
 }
 
@@ -1027,7 +1028,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=177", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=178", { updateViaCache: "none" })
       .catch((error) => {
         console.info("Offline service worker unavailable.", error);
       });
