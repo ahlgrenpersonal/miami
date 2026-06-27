@@ -287,30 +287,17 @@ async function fetchWeatherSummary(lat, lon) {
   const data = await response.json();
   const temperatureC = Number(data.current?.temperature_2m);
   const humidityPct = Number(data.current?.relative_humidity_2m);
-  const rainPct = getNearestHourlyValue(data.hourly, data.current?.time, "precipitation_probability");
+  const rainPct = getSecondHighestHourlyValue(data.hourly, "precipitation_probability");
   if (!Number.isFinite(temperatureC) || !Number.isFinite(humidityPct) || !Number.isFinite(rainPct)) {
     throw new Error("Weather response missing expected values");
   }
   return { temperatureC, humidityPct, rainPct };
 }
 
-function getNearestHourlyValue(hourly, targetTime, field) {
-  const times = hourly?.time || [];
+function getSecondHighestHourlyValue(hourly, field) {
   const values = hourly?.[field] || [];
-  if (!times.length || !values.length) return NaN;
-  const targetMs = Date.parse(targetTime || times[0]);
-  let bestIndex = 0;
-  let bestDelta = Infinity;
-  for (let index = 0; index < times.length; index += 1) {
-    const value = Number(values[index]);
-    if (!Number.isFinite(value)) continue;
-    const delta = Math.abs(Date.parse(times[index]) - targetMs);
-    if (delta < bestDelta) {
-      bestDelta = delta;
-      bestIndex = index;
-    }
-  }
-  return Number(values[bestIndex]);
+  const sortedValues = values.map(Number).filter(Number.isFinite).sort((left, right) => right - left);
+  return sortedValues[1] ?? sortedValues[0] ?? NaN;
 }
 
 function setPlacesPanelCollapsed(isCollapsed) {
