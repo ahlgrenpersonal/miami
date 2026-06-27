@@ -6,6 +6,7 @@ const OFFLINE_TILE_VERSION = "175";
 const HOME_RADIUS_METERS = 805;
 const DEFAULT_HOME_ZOOM = 15;
 const DEFAULT_MAX_SNAP_DISTANCE_METERS = 500;
+const ROUTE_SNAP_CANDIDATE_LIMIT = 32;
 const OFFLINE_TILE_BOUNDS = [[25.660, -80.275], [25.835, -80.100]];
 const QA_CANVAS_CAPTURE_DELAY_MS = 1200;
 const ROUTING_PROFILES = {
@@ -718,38 +719,109 @@ async function renderRoute() {
 
 function getLocalRoute(fromCoordinates, toCoordinates, mode) {
   if (!app.routingGraph || !app.routeAdjacency || app.routeNodes.length === 0) return null;
-  const start = findNearestRouteNode(fromCoordinates);
-  const end = findNearestRouteNode(toCoordinates);
-  if (!start || !end) return null;
   const maxSnapDistanceM = app.routingGraph.max_snap_distance_m || DEFAULT_MAX_SNAP_DISTANCE_METERS;
-  if (start.distanceM > maxSnapDistanceM || end.distanceM > maxSnapDistanceM) return null;
+  const startCandidates = findNearestRouteNodes(fromCoordinates, ROUTE_SNAP_CANDIDATE_LIMIT)
+    .filter((node) => node.distanceM <= maxSnapDistanceM);
+  const endCandidates = findNearestRouteNodes(toCoordinates, ROUTE_SNAP_CANDIDATE_LIMIT)
+    .filter((node) => node.distanceM <= maxSnapDistanceM);
+  if (!startCandidates.length || !endCandidates.length) return null;
 
-  const nodeIds = findShortestPath(start.id, end.id, mode);
-  if (!nodeIds.length) return null;
+  const routeResult = findShortestPathBetweenCandidates(startCandidates, endCandidates, mode);
+  if (!routeResult?.nodeIds?.length) return null;
 
   const nodesById = app.routingGraph.nodes;
   const coordinates = [
     fromCoordinates,
-    ...nodeIds.map((id) => [nodesById[id].lat, nodesById[id].lon]),
+    ...routeResult.nodeIds.map((id) => [nodesById[id].lat, nodesById[id].lon]),
     toCoordinates,
   ];
   return {
     coordinates,
     distanceM: getRouteDistance(coordinates),
-    startSnapM: start.distanceM,
-    endSnapM: end.distanceM,
+    startSnapM: routeResult.start.distanceM,
+    endSnapM: routeResult.end.distanceM,
   };
 }
 
 function findNearestRouteNode(coordinates) {
-  let best = null;
+  return findNearestRouteNodes(coordinates, 1)[0] || null;
+}
+
+function findNearestRouteNodes(coordinates, limit) {
+  const best = [];
   for (const node of app.routeNodes) {
     const distanceM = getDistanceMeters(coordinates, node.coordinates);
-    if (!best || distanceM < best.distanceM) {
-      best = { id: node.id, distanceM };
+    const candidate = { id: node.id, distanceM };
+    if (best.length < limit) {
+      best.push(candidate);
+      best.sort((a, b) => a.distanceM - b.distanceM);
+    } else if (distanceM < best[best.length - 1].distanceM) {
+      best[best.length - 1] = candidate;
+      best.sort((a, b) => a.distanceM - b.distanceM);
     }
   }
   return best;
+}
+
+function findShortestPathBetweenCandidates(startCandidates, endCandidates, mode) {
+  const endById = new Map(endCandidates.map((candidate) => [candidate.id, candidate]));
+  const distances = new Map();
+  const previous = new Map();
+  const sourceByNode = new Map();
+  const visited = new Set();
+  const heap = new MinHeap();
+  let bestEnd = null;
+  let bestTotalCost = Infinity;
+
+  for (const start of startCandidates) {
+    const initialCost = start.distanceM;
+    if (initialCost >= (distances.get(start.id) ?? Infinity)) continue;
+    distances.set(start.id, initialCost);
+    previous.set(start.id, null);
+    sourceByNode.set(start.id, start);
+    heap.push(start.id, initialCost);
+  }
+
+  while (heap.size > 0) {
+    const current = heap.pop();
+    if (!current || visited.has(current.id)) continue;
+    if (current.priority >= bestTotalCost) break;
+    visited.add(current.id);
+
+    const end = endById.get(current.id);
+    if (end) {
+      const totalCost = current.priority + end.distanceM;
+      if (totalCost < bestTotalCost) {
+        bestTotalCost = totalCost;
+        bestEnd = { id: current.id, end };
+      }
+    }
+
+    for (const next of app.routeAdjacency.get(current.id) || []) {
+      if (visited.has(next.toId)) continue;
+      const candidate = current.priority + getEdgeCost(next.edge, mode);
+      if (candidate < (distances.get(next.toId) ?? Infinity)) {
+        distances.set(next.toId, candidate);
+        previous.set(next.toId, current.id);
+        sourceByNode.set(next.toId, sourceByNode.get(current.id));
+        heap.push(next.toId, candidate);
+      }
+    }
+  }
+
+  if (!bestEnd) return null;
+  const nodeIds = [bestEnd.id];
+  let currentId = bestEnd.id;
+  while (previous.get(currentId)) {
+    currentId = previous.get(currentId);
+    nodeIds.push(currentId);
+  }
+  nodeIds.reverse();
+  return {
+    nodeIds,
+    start: sourceByNode.get(nodeIds[0]),
+    end: bestEnd.end,
+  };
 }
 
 function findShortestPath(startId, endId, mode) {
