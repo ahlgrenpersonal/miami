@@ -8,7 +8,7 @@
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="vendor/leaflet/leaflet.css?v=175">
-    <link rel="stylesheet" href="styles.css?v=198">
+    <link rel="stylesheet" href="styles.css?v=199">
   </head>
   <body>
     <main class="app-shell">
@@ -42,16 +42,12 @@
               <span>Radar</span>
             </label>
           </div>
-          <div id="radar-status" class="overlay-status" hidden>
-            <span class="radar-swatch" aria-hidden="true"></span>
-            <span>Radar on; clear skies may show no colors</span>
-          </div>
-
           <div class="panel-head">
             <span id="visible-count">0 visible</span>
             <button id="reset-filters" class="reset-filters" type="button">Reset filters</button>
           </div>
           <div id="place-list" class="place-list"></div>
+          <button id="collapse-places-bottom" class="panel-collapse-bottom" type="button">Collapse menu</button>
         </aside>
 
         <section id="detail-sheet" class="detail-sheet" aria-live="polite">
@@ -74,6 +70,6 @@
     </main>
 
     <script src="vendor/leaflet/leaflet.js?v=175"></script>
-    <script src="app.js?v=202"></script>
+    <script src="app.js?v=203"></script>
   </body>
 </html>

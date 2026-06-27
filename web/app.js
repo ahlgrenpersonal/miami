@@ -154,10 +154,10 @@ function bindDom() {
   dom.searchInput = document.querySelector("#search-input");
   dom.placesPanel = document.querySelector("#places-panel");
   dom.togglePlacesPanel = document.querySelector("#toggle-places-panel");
+  dom.collapsePlacesBottom = document.querySelector("#collapse-places-bottom");
   dom.tagFilters = document.querySelector("#tag-filters");
   dom.noiseFilter = document.querySelector("#noise-filter");
   dom.radarFilter = document.querySelector("#radar-filter");
-  dom.radarStatus = document.querySelector("#radar-status");
   dom.placeList = document.querySelector("#place-list");
   dom.resetFilters = document.querySelector("#reset-filters");
   dom.detailSheet = document.querySelector("#detail-sheet");
@@ -190,6 +190,10 @@ function bindEvents() {
 
   dom.togglePlacesPanel.addEventListener("click", () => {
     setPlacesPanelCollapsed(!app.placesPanelCollapsed);
+  });
+
+  dom.collapsePlacesBottom.addEventListener("click", () => {
+    setPlacesPanelCollapsed(true);
   });
 
   dom.resetFilters.addEventListener("click", () => {
@@ -307,6 +311,7 @@ function setPlacesPanelCollapsed(isCollapsed) {
   dom.togglePlacesPanel.title = isCollapsed ? "Expand places" : "Collapse places";
   dom.togglePlacesPanel.setAttribute("aria-label", isCollapsed ? "Expand places" : "Collapse places");
   dom.togglePlacesPanel.setAttribute("aria-expanded", String(!isCollapsed));
+  dom.collapsePlacesBottom.hidden = isCollapsed;
   window.setTimeout(() => app.map?.invalidateSize(), 120);
 }
 
@@ -328,7 +333,6 @@ function setNoiseOverlayEnabled(isEnabled) {
 function setRadarOverlayEnabled(isEnabled) {
   app.radarOverlayEnabled = isEnabled;
   dom.radarFilter.checked = isEnabled;
-  dom.radarStatus.hidden = !isEnabled;
   if (!app.map) return;
   ensureRadarLayer();
   if (isEnabled) {
