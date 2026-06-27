@@ -611,8 +611,13 @@ function focusSearchMatch() {
   }
 }
 
+function hasActiveRoute() {
+  return Boolean(app.routeFromId && app.routeToId);
+}
+
 function selectPlace(id, options = {}) {
   const wasSelected = app.selectedId === id;
+  const preserveMapView = hasActiveRoute() && !options.forceMapMove;
   app.selectedId = id;
   const place = app.places.find((item) => item.id === id);
   if (!place) return;
@@ -623,15 +628,17 @@ function selectPlace(id, options = {}) {
     }
     marker.setIcon(getMarkerIcon(place));
     marker.setZIndexOffset(1000);
-    if (wasSelected) {
+    if (!preserveMapView && wasSelected) {
       const targetZoom = Math.max(app.map.getZoom(), options.source === "search" ? 18 : 17);
       app.map.flyTo(marker.getLatLng(), targetZoom, { animate: true, duration: 0.55 });
-    } else {
+    } else if (!preserveMapView) {
       app.map.panTo(marker.getLatLng(), { animate: true, duration: 0.35 });
     }
-    window.setTimeout(() => marker.openPopup(), 180);
+    if (!preserveMapView) {
+      window.setTimeout(() => marker.openPopup(), 180);
+    }
   }
-  renderDetail(place);
+  renderDetail(place, { fitRouteMap: !preserveMapView });
   renderMarkers();
   renderList();
 }
@@ -647,13 +654,13 @@ function renderSelectedCircle() {
   app.selectedCircle.setStyle({ opacity: 1, fillOpacity: 0.16 });
 }
 
-function renderDetail(place) {
+function renderDetail(place, options = {}) {
   dom.detailTitleLink.textContent = place.name;
   dom.detailTitleLink.href = getGoogleMapsUrl(place);
   dom.detailTitleLink.title = `Open ${place.name} in Google Maps`;
   dom.detailTitleLink.setAttribute("aria-label", `Open ${place.name} in Google Maps`);
   dom.detailSheet.classList.add("is-open");
-  renderRoute();
+  renderRoute({ fitMap: options.fitRouteMap !== false });
 }
 
 function setTravelMode(mode) {
@@ -667,11 +674,12 @@ function setTravelMode(mode) {
   renderRoute();
 }
 
-async function renderRoute() {
+async function renderRoute(options = {}) {
   const requestId = ++app.routeRequestId;
   const from = app.places.find((place) => place.id === app.routeFromId);
   const to = app.places.find((place) => place.id === app.routeToId);
   const modeLabel = getTravelModeLabel(app.travelMode);
+  const shouldFitMap = options.fitMap !== false;
 
   if (from && to && app.routeLine) {
     if (app.routingGraphStatus === "loading" || app.routingGraphStatus === "idle") {
@@ -679,10 +687,12 @@ async function renderRoute() {
       app.routeLine.setStyle({ opacity: 0.35, dashArray: "4 8" });
       dom.routeStatus.textContent = `${modeLabel}: loading local graph...`;
       dom.clearRoute.hidden = false;
-      const bounds = L.latLngBounds([from.coordinates, to.coordinates]).pad(0.35);
-      app.map.fitBounds(bounds, { animate: true, maxZoom: 17 });
+      if (shouldFitMap) {
+        const bounds = L.latLngBounds([from.coordinates, to.coordinates]).pad(0.35);
+        app.map.fitBounds(bounds, { animate: true, maxZoom: 17 });
+      }
       ensureRoutingGraph().then(() => {
-        if (requestId === app.routeRequestId) renderRoute();
+        if (requestId === app.routeRequestId) renderRoute({ fitMap: shouldFitMap });
       });
       return;
     }
@@ -695,14 +705,18 @@ async function renderRoute() {
         dashArray: app.travelMode === "shortest" ? "0" : app.travelMode === "scenic" ? "2 8" : "12 8",
       });
       dom.routeStatus.textContent = `${modeLabel}: ${from.name} -> ${to.name} (${formatRouteSummary(route.distanceM, app.travelMode)})`;
-      const bounds = L.latLngBounds(route.coordinates).pad(0.18);
-      app.map.fitBounds(bounds, { animate: true, maxZoom: 17 });
+      if (shouldFitMap) {
+        const bounds = L.latLngBounds(route.coordinates).pad(0.18);
+        app.map.fitBounds(bounds, { animate: true, maxZoom: 17 });
+      }
     } else {
       app.routeLine.setLatLngs([from.coordinates, to.coordinates]);
       app.routeLine.setStyle({ opacity: 0.7, dashArray: "4 8" });
       dom.routeStatus.textContent = `${modeLabel}: direct preview only; local graph unavailable for this pair`;
-      const bounds = L.latLngBounds([from.coordinates, to.coordinates]).pad(0.35);
-      app.map.fitBounds(bounds, { animate: true, maxZoom: 17 });
+      if (shouldFitMap) {
+        const bounds = L.latLngBounds([from.coordinates, to.coordinates]).pad(0.35);
+        app.map.fitBounds(bounds, { animate: true, maxZoom: 17 });
+      }
     }
     dom.clearRoute.hidden = false;
   } else {
