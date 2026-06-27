@@ -7,7 +7,6 @@ const WALK_SPEED_KMH = 6;
 const KID_SCOOTER_SPEED_KMH = 12;
 const KID_SCOOTER_BREAK_INTERVAL_MINUTES = 20;
 const KID_SCOOTER_BREAK_DURATION_MINUTES = 5;
-const HOME_RADIUS_METERS = 805;
 const DEFAULT_HOME_ZOOM = 15;
 const DEFAULT_MAX_SNAP_DISTANCE_METERS = 500;
 const ROUTE_SNAP_CANDIDATE_LIMIT = 32;
@@ -107,7 +106,6 @@ const app = {
   selectedId: null,
   activeTags: new Set(),
   search: "",
-  radiusOnly: false,
   placesPanelCollapsed: true,
   routeFromId: null,
   routeToId: null,
@@ -149,7 +147,6 @@ function bindDom() {
   dom.placesPanel = document.querySelector("#places-panel");
   dom.togglePlacesPanel = document.querySelector("#toggle-places-panel");
   dom.tagFilters = document.querySelector("#tag-filters");
-  dom.radiusFilter = document.querySelector("#radius-filter");
   dom.noiseFilter = document.querySelector("#noise-filter");
   dom.placeList = document.querySelector("#place-list");
   dom.resetFilters = document.querySelector("#reset-filters");
@@ -173,11 +170,6 @@ function bindEvents() {
     focusSearchMatch();
   });
 
-  dom.radiusFilter.addEventListener("change", () => {
-    app.radiusOnly = dom.radiusFilter.checked;
-    renderAll();
-  });
-
   dom.noiseFilter.addEventListener("change", () => {
     setNoiseOverlayEnabled(dom.noiseFilter.checked);
   });
@@ -189,10 +181,8 @@ function bindEvents() {
   dom.resetFilters.addEventListener("click", () => {
     app.activeTags.clear();
     app.search = "";
-    app.radiusOnly = false;
     app.selectedId = null;
     dom.searchInput.value = "";
-    dom.radiusFilter.checked = false;
     for (const button of dom.tagFilters.querySelectorAll(".chip")) {
       button.classList.remove("is-active");
       button.setAttribute("aria-pressed", "false");
@@ -520,14 +510,6 @@ function initMap() {
     attribution: "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a>",
   }).addTo(app.map);
 
-  app.radiusCircle = L.circle(home, {
-    radius: HOME_RADIUS_METERS,
-    color: "#087f8c",
-    weight: 2,
-    fillColor: "#087f8c",
-    fillOpacity: 0.08,
-  }).addTo(app.map);
-
   app.selectedCircle = L.circle(home, {
     radius: 95,
     color: "#d95d39",
@@ -709,7 +691,6 @@ function renderAll() {
 function getVisiblePlaces() {
   return app.places.filter((place) => {
     const hasSearch = Boolean(app.search);
-    if (!hasSearch && app.radiusOnly && (place.meta?.distance_from_home_m ?? Infinity) > HOME_RADIUS_METERS) return false;
     if (!hasSearch && app.activeTags.size > 0 && ![...app.activeTags].every((tag) => place.filterTags.includes(tag))) return false;
     if (app.search && !place.searchText.includes(app.search)) return false;
     return true;
@@ -762,7 +743,7 @@ function renderCounts() {
 }
 
 function getAreFiltersActive() {
-  return Boolean(app.search || app.radiusOnly || app.activeTags.size > 0);
+  return Boolean(app.search || app.activeTags.size > 0);
 }
 
 function focusSearchMatch() {
