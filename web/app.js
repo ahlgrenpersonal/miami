@@ -109,6 +109,7 @@ const app = {
   placesPanelCollapsed: true,
   routeFromId: null,
   routeToId: null,
+  routeAnchorMode: null,
   travelMode: "shortest",
   routingGraph: null,
   routingGraphPromise: null,
@@ -199,12 +200,9 @@ function bindEvents() {
 
   dom.routeLocation.addEventListener("click", () => {
     if (!app.selectedId) return;
-    if (!app.routeFromId || app.routeToId) {
-      app.routeFromId = app.selectedId;
-      app.routeToId = null;
-    } else if (app.routeFromId !== app.selectedId) {
-      app.routeToId = app.selectedId;
-    }
+    app.routeFromId = app.selectedId;
+    app.routeToId = null;
+    app.routeAnchorMode = "location";
     renderRoute();
   });
 
@@ -212,6 +210,7 @@ function bindEvents() {
     if (!app.selectedId) return;
     app.routeFromId = HOME_PLACE_ID;
     app.routeToId = app.selectedId;
+    app.routeAnchorMode = null;
     renderRoute();
   });
 
@@ -223,6 +222,7 @@ function bindEvents() {
     } else if (!hasActiveRoute() || (app.selectedId !== app.routeFromId && app.selectedId !== app.routeToId)) {
       app.routeFromId = HOME_PLACE_ID;
       app.routeToId = app.selectedId;
+      app.routeAnchorMode = null;
     }
     syncTravelModeButtons();
     renderRoute();
@@ -235,6 +235,7 @@ function bindEvents() {
   dom.clearRoute.addEventListener("click", () => {
     app.routeFromId = null;
     app.routeToId = null;
+    app.routeAnchorMode = null;
     renderRoute();
   });
 }
@@ -655,9 +656,17 @@ function hasActiveRoute() {
   return Boolean(app.routeFromId && app.routeToId);
 }
 
+function hasLocationRouteAnchor() {
+  return app.routeAnchorMode === "location" && Boolean(app.routeFromId);
+}
+
 function selectPlace(id, options = {}) {
   const wasSelected = app.selectedId === id;
-  const preserveMapView = hasActiveRoute() && !options.forceMapMove;
+  const shouldUpdateAnchoredRoute = hasLocationRouteAnchor() && id !== app.routeFromId;
+  if (shouldUpdateAnchoredRoute) {
+    app.routeToId = id;
+  }
+  const preserveMapView = (hasActiveRoute() || shouldUpdateAnchoredRoute) && !options.forceMapMove;
   app.selectedId = id;
   const place = app.places.find((item) => item.id === id);
   if (!place) return;
@@ -1363,7 +1372,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=193", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=194", { updateViaCache: "none" })
       .then((registration) => navigator.serviceWorker.ready.then((readyRegistration) => {
         requestOfflineTileCache(readyRegistration || registration);
       }))
