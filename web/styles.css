@@ -98,6 +98,7 @@ button {
 .places-panel.is-collapsed .search-field,
 .places-panel.is-collapsed .filter-row,
 .places-panel.is-collapsed .overlay-toggle-row,
+.places-panel.is-collapsed .overlay-status,
 .places-panel.is-collapsed .panel-head,
 .places-panel.is-collapsed .place-list {
   display: none;
@@ -292,6 +293,30 @@ h1 {
 
 .overlay-toggle-row .toggle-line {
   margin-top: 0;
+}
+
+.overlay-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 24px;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.overlay-status[hidden] {
+  display: none;
+}
+
+.radar-swatch {
+  width: 44px;
+  height: 8px;
+  flex: 0 0 44px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #45b649, #f6e84a, #f28e2b, #d62728, #8e24aa);
+  box-shadow: inset 0 0 0 1px rgba(32, 49, 45, 0.22);
 }
 
 .toggle-line input {

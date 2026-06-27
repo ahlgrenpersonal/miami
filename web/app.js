@@ -153,6 +153,7 @@ function bindDom() {
   dom.tagFilters = document.querySelector("#tag-filters");
   dom.noiseFilter = document.querySelector("#noise-filter");
   dom.radarFilter = document.querySelector("#radar-filter");
+  dom.radarStatus = document.querySelector("#radar-status");
   dom.placeList = document.querySelector("#place-list");
   dom.resetFilters = document.querySelector("#reset-filters");
   dom.detailSheet = document.querySelector("#detail-sheet");
@@ -277,6 +278,7 @@ function setNoiseOverlayEnabled(isEnabled) {
 function setRadarOverlayEnabled(isEnabled) {
   app.radarOverlayEnabled = isEnabled;
   dom.radarFilter.checked = isEnabled;
+  dom.radarStatus.hidden = !isEnabled;
   if (!app.map) return;
   ensureRadarLayer();
   if (isEnabled) {
