@@ -2,7 +2,7 @@ const STATE_URL = "../state.json";
 const ROUTING_GRAPH_URL = "routing_graph.json";
 const ROUTING_GRAPH_MANIFEST_URL = "routing_graph/manifest.json";
 const HOME_PLACE_ID = "place_id_panorama_tower";
-const OFFLINE_TILE_VERSION = "175";
+const OFFLINE_TILE_VERSION = "176";
 const HOME_RADIUS_METERS = 805;
 const DEFAULT_HOME_ZOOM = 15;
 const DEFAULT_MAX_SNAP_DISTANCE_METERS = 500;
@@ -18,7 +18,7 @@ const METROMOVER_STATION_LINKS = [
   ["place_id_metromover_miami_avenue_station", "place_id_metromover_government_center_station"],
   ["place_id_metromover_government_center_station", "place_id_metromover_college_bayside_station"],
   ["place_id_metromover_college_bayside_station", "place_id_metromover_museum_park_station"],
-  ["place_id_metromover_5th_st_station", "place_id_metromover_bayfront_park_station"],
+  ["place_id_metromover_riverwalk_station", "place_id_metromover_bayfront_park_station"],
   ["place_id_metromover_bayfront_park_station", "place_id_metromover_college_bayside_station"],
 ];
 const OFFLINE_TILE_BOUNDS = [[25.660, -80.275], [25.835, -80.100]];
@@ -1347,7 +1347,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=188", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=190", { updateViaCache: "none" })
       .then((registration) => navigator.serviceWorker.ready.then((readyRegistration) => {
         requestOfflineTileCache(readyRegistration || registration);
       }))

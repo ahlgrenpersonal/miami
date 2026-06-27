@@ -1,5 +1,5 @@
-const CACHE_NAME = "spin-brickell-v188";
-const TILE_VERSION = "175";
+const CACHE_NAME = "spin-brickell-v190";
+const TILE_VERSION = "176";
 const TILE_CACHE_NAME = `spin-brickell-tiles-v${TILE_VERSION}`;
 const TILE_MANIFEST_URL = `./tiles/offline/manifest.json?v=${TILE_VERSION}`;
 const ROUTING_GRAPH_MANIFEST_URL = `./routing_graph/manifest.json?v=${TILE_VERSION}`;
@@ -11,8 +11,8 @@ const APP_ASSETS = [
   "./vendor/leaflet/images/marker-icon.png",
   "./vendor/leaflet/images/marker-icon-2x.png",
   "./vendor/leaflet/images/marker-shadow.png",
-  "./styles.css?v=188",
-  "./app.js?v=188",
+  "./styles.css?v=190",
+  "./app.js?v=190",
   ROUTING_GRAPH_MANIFEST_URL,
   TILE_MANIFEST_URL,
   "./manifest.webmanifest",
