@@ -12,6 +12,12 @@ const DEFAULT_MAX_SNAP_DISTANCE_METERS = 500;
 const ROUTE_SNAP_CANDIDATE_LIMIT = 32;
 const METROMOVER_SPEED_KMH = 14.5;
 const METROMOVER_WAIT_MINUTES = 2;
+const WATER_TAXI_WAIT_MINUTES = 15;
+const WATER_TAXI_CROSSING_MINUTES = 20;
+const WATER_TAXI_STOP_IDS = [
+  "place_id_miami_beach_water_taxi_downtown_miami",
+  "place_id_water_taxi_mia_miami_beach",
+];
 const NOISE_OVERLAY_MIN_SCORE = 0.25;
 const NOISE_OVERLAY_MAX_EDGES = 9000;
 const RADAR_WMS_URL = "https://opengeo.ncep.noaa.gov/geoserver/conus/conus_bref_qcd/ows";
@@ -1015,9 +1021,39 @@ function getMetromoverRoute(fromCoordinates, toCoordinates) {
   const walkingRoute = getGraphRoute(fromCoordinates, toCoordinates, "shortest");
   if (!walkingRoute) return null;
 
+  const walkingMinutes = getTravelMinutes(walkingRoute.distanceM, "shortest");
+  let best = getBestMetromoverCandidate(fromCoordinates, toCoordinates);
+  const waterTaxiCandidate = getBestWaterTaxiCandidate(fromCoordinates, toCoordinates);
+  if (waterTaxiCandidate && (!best || waterTaxiCandidate.durationMinutes < best.durationMinutes
+    || (waterTaxiCandidate.durationMinutes === best.durationMinutes && waterTaxiCandidate.distanceM < best.distanceM))) {
+    best = waterTaxiCandidate;
+  }
+
+  if (!best || best.durationMinutes >= walkingMinutes) {
+    return { ...walkingRoute, durationMinutes: walkingMinutes, metromoverUsed: false, transitUsed: false };
+  }
+
+  return {
+    coordinates: mergeRouteCoordinates(...best.segments.map((segment) => segment.coordinates)),
+    distanceM: best.distanceM,
+    durationMinutes: best.durationMinutes,
+    metromoverUsed: best.type === "metromover",
+    waterTaxiUsed: best.type === "water_taxi",
+    transitUsed: true,
+    transitStartName: best.startName,
+    transitEndName: best.endName,
+    metromoverStartName: best.type === "metromover" ? best.startName : undefined,
+    metromoverEndName: best.type === "metromover" ? best.endName : undefined,
+    waterTaxiStartName: best.type === "water_taxi" ? best.startName : undefined,
+    waterTaxiEndName: best.type === "water_taxi" ? best.endName : undefined,
+    segments: best.segments,
+  };
+}
+
+function getBestMetromoverCandidate(fromCoordinates, toCoordinates) {
   const stations = getMetromoverStations();
   if (stations.length < 2) {
-    return { ...walkingRoute, durationMinutes: getTravelMinutes(walkingRoute.distanceM, "shortest") };
+    return null;
   }
 
   const startLegs = stations.map((station) => ({
@@ -1029,7 +1065,6 @@ function getMetromoverRoute(fromCoordinates, toCoordinates) {
     route: getGraphRoute(station.coordinates, toCoordinates, "shortest"),
   })).filter((leg) => leg.route);
 
-  const walkingMinutes = getTravelMinutes(walkingRoute.distanceM, "shortest");
   let best = null;
   for (const startLeg of startLegs) {
     for (const endLeg of endLegs) {
@@ -1041,47 +1076,74 @@ function getMetromoverRoute(fromCoordinates, toCoordinates) {
         + getTravelMinutes(endLeg.route.distanceM, "shortest");
       const distanceM = startLeg.route.distanceM + metroRoute.distanceM + endLeg.route.distanceM;
       if (!best || durationMinutes < best.durationMinutes || (durationMinutes === best.durationMinutes && distanceM < best.distanceM)) {
-        best = { startLeg, endLeg, metroRoute, distanceM, durationMinutes };
+        best = {
+          type: "metromover",
+          startName: startLeg.station.name,
+          endName: endLeg.station.name,
+          distanceM,
+          durationMinutes,
+          segments: [
+            { type: "walk", coordinates: startLeg.route.coordinates },
+            { type: "metromover", coordinates: metroRoute.coordinates },
+            { type: "walk", coordinates: endLeg.route.coordinates },
+          ],
+        };
       }
     }
   }
+  return best;
+}
 
-  if (!best || best.durationMinutes >= walkingMinutes) {
-    return { ...walkingRoute, durationMinutes: walkingMinutes, metromoverUsed: false };
+function getBestWaterTaxiCandidate(fromCoordinates, toCoordinates) {
+  const stops = WATER_TAXI_STOP_IDS.map((id) => app.places.find((place) => place.id === id))
+    .filter((place) => place && Array.isArray(place.coordinates));
+  if (stops.length !== 2) return null;
+
+  let best = null;
+  for (const [startStop, endStop] of [[stops[0], stops[1]], [stops[1], stops[0]]]) {
+    const startRoute = getGraphRoute(fromCoordinates, startStop.coordinates, "shortest");
+    const endRoute = getGraphRoute(endStop.coordinates, toCoordinates, "shortest");
+    if (!startRoute || !endRoute) continue;
+
+    const waterCoordinates = [startStop.coordinates, endStop.coordinates];
+    const waterDistanceM = getRouteDistance(waterCoordinates);
+    const durationMinutes = getTravelMinutes(startRoute.distanceM, "shortest")
+      + WATER_TAXI_WAIT_MINUTES
+      + WATER_TAXI_CROSSING_MINUTES
+      + getTravelMinutes(endRoute.distanceM, "shortest");
+    const distanceM = startRoute.distanceM + waterDistanceM + endRoute.distanceM;
+    if (!best || durationMinutes < best.durationMinutes || (durationMinutes === best.durationMinutes && distanceM < best.distanceM)) {
+      best = {
+        type: "water_taxi",
+        startName: startStop.name,
+        endName: endStop.name,
+        distanceM,
+        durationMinutes,
+        segments: [
+          { type: "walk", coordinates: startRoute.coordinates },
+          { type: "water_taxi", coordinates: waterCoordinates },
+          { type: "walk", coordinates: endRoute.coordinates },
+        ],
+      };
+    }
   }
-
-  return {
-    coordinates: mergeRouteCoordinates(
-      best.startLeg.route.coordinates,
-      best.metroRoute.coordinates,
-      best.endLeg.route.coordinates
-    ),
-    distanceM: best.distanceM,
-    durationMinutes: best.durationMinutes,
-    metromoverUsed: true,
-    metromoverStartName: best.startLeg.station.name,
-    metromoverEndName: best.endLeg.station.name,
-    segments: [
-      { type: "walk", coordinates: best.startLeg.route.coordinates },
-      { type: "metromover", coordinates: best.metroRoute.coordinates },
-      { type: "walk", coordinates: best.endLeg.route.coordinates },
-    ],
-  };
+  return best;
 }
 
 function renderRouteGeometry(route, mode) {
   clearRouteSegments();
-  if (mode === "metromover" && route.metromoverUsed && route.segments?.length) {
+  if (mode === "metromover" && route.transitUsed && route.segments?.length) {
     app.routeLine.setLatLngs([]);
     app.routeLine.setStyle({ opacity: 0 });
     for (const segment of route.segments) {
       const isMetromover = segment.type === "metromover";
+      const isWaterTaxi = segment.type === "water_taxi";
       const lineOptions = {
-        color: "#d95d39",
+        color: isWaterTaxi ? "#0b8ea0" : "#d95d39",
         weight: 5,
         opacity: 0.95,
       };
-      if (isMetromover) lineOptions.dashArray = "2 8";
+      if (isMetromover || isWaterTaxi) lineOptions.dashArray = "2 8";
       const line = L.polyline(segment.coordinates, lineOptions).addTo(app.map);
       app.routeSegmentLines.push(line);
     }
@@ -1396,7 +1458,7 @@ function formatRouteSummary(distanceM, mode) {
     const route = distanceM;
     const durationMinutes = route.durationMinutes ?? getTravelMinutes(route.distanceM, mode);
     const suffix = mode === "metromover"
-      ? route.metromoverUsed ? " | Metromover" : " | walking fastest"
+      ? route.waterTaxiUsed ? " | Water taxi" : route.metromoverUsed ? " | Metromover" : " | walking fastest"
       : "";
     return `${formatDistance(route.distanceM)} | ${formatDuration(durationMinutes)}${suffix}`;
   }
