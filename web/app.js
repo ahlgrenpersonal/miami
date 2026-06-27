@@ -3,12 +3,16 @@ const ROUTING_GRAPH_URL = "routing_graph.json";
 const ROUTING_GRAPH_MANIFEST_URL = "routing_graph/manifest.json";
 const HOME_PLACE_ID = "place_id_panorama_tower";
 const OFFLINE_TILE_VERSION = "176";
+const WALK_SPEED_KMH = 6;
+const KID_SCOOTER_SPEED_KMH = 12;
+const KID_SCOOTER_BREAK_INTERVAL_MINUTES = 20;
+const KID_SCOOTER_BREAK_DURATION_MINUTES = 5;
 const HOME_RADIUS_METERS = 805;
 const DEFAULT_HOME_ZOOM = 15;
 const DEFAULT_MAX_SNAP_DISTANCE_METERS = 500;
 const ROUTE_SNAP_CANDIDATE_LIMIT = 32;
-const METROMOVER_SPEED_KMH = 22;
-const METROMOVER_WAIT_MINUTES = 5;
+const METROMOVER_SPEED_KMH = 14.5;
+const METROMOVER_WAIT_MINUTES = 2;
 const METROMOVER_STATION_LINKS = [
   ["place_id_metromover_financial_district_station", "place_id_metromover_tenth_street_promenade_station"],
   ["place_id_metromover_tenth_street_promenade_station", "place_id_metromover_brickell_city_centre_eight_street_station"],
@@ -26,7 +30,7 @@ const QA_CANVAS_CAPTURE_DELAY_MS = 1200;
 const ROUTING_PROFILES = {
   shortest: {
     label: "Shortest",
-    speedKmh: 5,
+    speedKmh: WALK_SPEED_KMH,
     scoreWeights: {},
     minMultiplier: 1,
     maxMultiplier: 1,
@@ -35,7 +39,7 @@ const ROUTING_PROFILES = {
   },
   scenic: {
     label: "Scenic",
-    speedKmh: 5,
+    speedKmh: WALK_SPEED_KMH,
     scoreWeights: { waterside: 0.25, waterfront: 0.3, park_path: 0.45, car_free: 0.1, scenic: 0.18, kid_scooter: 0.02, traffic_stress: -0.18 },
     minMultiplier: 0.35,
     maxMultiplier: 2.6,
@@ -44,7 +48,7 @@ const ROUTING_PROFILES = {
   },
   kid_scooter: {
     label: "Kid scooter",
-    speedKmh: 10,
+    speedKmh: KID_SCOOTER_SPEED_KMH,
     scoreWeights: { kid_scooter: 0.78, scooter: 0.22, waterfront: 0.03, traffic_stress: -0.26 },
     minMultiplier: 0.35,
     maxMultiplier: 3,
@@ -102,7 +106,7 @@ const app = {
   activeTags: new Set(),
   search: "",
   radiusOnly: false,
-  placesPanelCollapsed: false,
+  placesPanelCollapsed: true,
   routeFromId: null,
   routeToId: null,
   travelMode: "shortest",
@@ -821,7 +825,7 @@ function getMetromoverRoute(fromCoordinates, toCoordinates) {
       const metroRoute = getMetromoverStationRoute(startLeg.station.id, endLeg.station.id);
       if (!metroRoute) continue;
       const durationMinutes = getTravelMinutes(startLeg.route.distanceM, "shortest")
-        + getMetromoverMinutes(metroRoute.distanceM)
+        + getMetromoverMinutes(metroRoute)
         + getTravelMinutes(endLeg.route.distanceM, "shortest");
       const distanceM = startLeg.route.distanceM + metroRoute.distanceM + endLeg.route.distanceM;
       if (!best || durationMinutes < best.durationMinutes || (durationMinutes === best.durationMinutes && distanceM < best.distanceM)) {
@@ -918,12 +922,14 @@ function getMetromoverStationRoute(fromStationId, toStationId) {
     const to = stationsById.get(toId);
     if (!from || !to) continue;
     const distanceM = getDistanceMeters(from.coordinates, to.coordinates);
+    const durationMinutes = getMetromoverEdgeMinutes(distanceM);
     if (!adjacency.has(fromId)) adjacency.set(fromId, []);
     if (!adjacency.has(toId)) adjacency.set(toId, []);
-    adjacency.get(fromId).push({ id: toId, distanceM });
-    adjacency.get(toId).push({ id: fromId, distanceM });
+    adjacency.get(fromId).push({ id: toId, distanceM, durationMinutes });
+    adjacency.get(toId).push({ id: fromId, distanceM, durationMinutes });
   }
 
+  const costs = new Map([[fromStationId, 0]]);
   const distances = new Map([[fromStationId, 0]]);
   const previous = new Map();
   const queue = new MinHeap();
@@ -931,18 +937,19 @@ function getMetromoverStationRoute(fromStationId, toStationId) {
   while (queue.size) {
     const current = queue.pop();
     if (!current) break;
-    if (current.priority > (distances.get(current.id) ?? Infinity)) continue;
+    if (current.priority > (costs.get(current.id) ?? Infinity)) continue;
     if (current.id === toStationId) break;
     for (const edge of adjacency.get(current.id) || []) {
-      const nextDistance = current.priority + edge.distanceM;
-      if (nextDistance < (distances.get(edge.id) ?? Infinity)) {
-        distances.set(edge.id, nextDistance);
+      const nextCost = current.priority + edge.durationMinutes;
+      if (nextCost < (costs.get(edge.id) ?? Infinity)) {
+        costs.set(edge.id, nextCost);
+        distances.set(edge.id, (distances.get(current.id) || 0) + edge.distanceM);
         previous.set(edge.id, current.id);
-        queue.push(edge.id, nextDistance);
+        queue.push(edge.id, nextCost);
       }
     }
   }
-  if (!distances.has(toStationId)) return null;
+  if (!costs.has(toStationId)) return null;
 
   const stationIds = [];
   for (let id = toStationId; id; id = previous.get(id)) {
@@ -955,11 +962,16 @@ function getMetromoverStationRoute(fromStationId, toStationId) {
   return {
     coordinates: stationIds.map((id) => stationsById.get(id).coordinates),
     distanceM: distances.get(toStationId),
+    durationMinutes: costs.get(toStationId),
   };
 }
 
-function getMetromoverMinutes(distanceM) {
-  return METROMOVER_WAIT_MINUTES + Math.max(1, Math.round((distanceM / 1000 / METROMOVER_SPEED_KMH) * 60));
+function getMetromoverMinutes(route) {
+  return METROMOVER_WAIT_MINUTES + Math.round(route.durationMinutes);
+}
+
+function getMetromoverEdgeMinutes(distanceM) {
+  return Math.max(1, (distanceM / 1000 / METROMOVER_SPEED_KMH) * 60);
 }
 
 function mergeRouteCoordinates(...segments) {
@@ -1115,7 +1127,7 @@ function getRoutingProfile(mode) {
   if (!graphProfile || typeof graphProfile !== "object") return fallback;
   return {
     label: graphProfile.label || fallback.label,
-    speedKmh: graphProfile.speedKmh ?? graphProfile.speed_kmh ?? fallback.speedKmh,
+    speedKmh: fallback.speedKmh,
     scoreWeights: graphProfile.scoreWeights || graphProfile.score_weights || fallback.scoreWeights,
     minMultiplier: graphProfile.minMultiplier ?? graphProfile.min_multiplier ?? fallback.minMultiplier,
     maxMultiplier: graphProfile.maxMultiplier ?? graphProfile.max_multiplier ?? fallback.maxMultiplier,
@@ -1180,7 +1192,11 @@ function formatRouteSummary(distanceM, mode) {
 
 function getTravelMinutes(distanceM, mode) {
   const speedKmh = getRoutingProfile(mode).speedKmh || 5;
-  return Math.max(1, Math.round((distanceM / 1000 / speedKmh) * 60));
+  const exactMovingMinutes = (distanceM / 1000 / speedKmh) * 60;
+  const movingMinutes = Math.max(1, Math.round(exactMovingMinutes));
+  if (mode !== "kid_scooter") return movingMinutes;
+  const breakCount = Math.floor(Math.max(0, exactMovingMinutes - 0.001) / KID_SCOOTER_BREAK_INTERVAL_MINUTES);
+  return movingMinutes + breakCount * KID_SCOOTER_BREAK_DURATION_MINUTES;
 }
 
 function formatDuration(minutes) {
@@ -1347,7 +1363,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=190", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=193", { updateViaCache: "none" })
       .then((registration) => navigator.serviceWorker.ready.then((readyRegistration) => {
         requestOfflineTileCache(readyRegistration || registration);
       }))
