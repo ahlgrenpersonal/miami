@@ -2673,8 +2673,8 @@
     "place_id_rosetta_bakery": {
       "name": "Rosetta Bakery",
       "coordinates": [
-        25.7914055,
-        -80.1300535
+        25.7914144,
+        -80.130022
       ],
       "tags": [
         "bakery",
@@ -2685,25 +2685,25 @@
         "source_list": "Curated",
         "source_ordinal": 2,
         "category": "Bakery",
-        "rating": 4.2,
-        "rating_count": 758,
-        "price": null,
+        "rating": 4.5,
+        "rating_count": 4507,
+        "price": "$$",
         "status": null,
-        "address": null,
-        "distance_from_home_m": 6806,
-        "local_evidence": [
-          "local_keyword:rosetta bakery"
-        ],
+        "address": "1666 Collins Ave, Miami Beach, FL 33139",
+        "distance_from_home_m": 6810,
+        "local_evidence": [],
         "scan_evidence": [],
-        "external_evidence": [],
+        "external_evidence": [
+          "google_maps_lookup"
+        ],
         "skip_geocode_evidence": [],
         "geocode": {
-          "source": "nominatim",
-          "query": "Rosetta Bakery Miami FL",
-          "display_name": "Rosetta Bakery, 1666, Collins Avenue, Española Way, Miami Beach, Miami-Dade County, Florida, 33139, United States",
-          "match_score": 1.0,
-          "osm_type": "node",
-          "osm_id": 4292652493
+          "source": "google_maps_lookup",
+          "query": "Rosetta Bakery 1666 Collins Ave, Miami Beach, FL 33139",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
         },
         "notes": "",
         "npc_associations": []
@@ -3221,6 +3221,84 @@
           "osm_id": null
         },
         "notes": "Coordinate literal supplied by user; no geocoding API call used.",
+        "npc_associations": []
+      }
+    },
+    "place_id_rosetta_bakery_brickell": {
+      "name": "Rosetta Bakery Brickell",
+      "coordinates": [
+        25.7658663,
+        -80.1934349
+      ],
+      "tags": [
+        "bakery",
+        "dessert",
+        "food"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 143,
+        "category": "Bakery",
+        "rating": 4.3,
+        "rating_count": 1342,
+        "price": "$$",
+        "status": null,
+        "address": "824 S Miami Ave, Miami, FL 33130",
+        "distance_from_home_m": 413,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Rosetta Bakery Brickell 824 S Miami Ave, Miami, FL 33130",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_e41_embarcadero_41_brickell": {
+      "name": "E41 - Embarcadero 41 Brickell",
+      "coordinates": [
+        25.7665629,
+        -80.1895926
+      ],
+      "tags": [
+        "food",
+        "peruvian_restaurant",
+        "restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 144,
+        "category": "Peruvian restaurant",
+        "rating": 5.0,
+        "rating_count": 219,
+        "price": "$$",
+        "status": null,
+        "address": "777 Brickell Ave Ste 130, Miami, FL 33131",
+        "distance_from_home_m": 372,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "E41 - Embarcadero 41 Brickell 777 Brickell Ave Ste 130, Miami, FL 33131",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
         "npc_associations": []
       }
     }
