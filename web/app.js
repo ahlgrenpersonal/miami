@@ -13,6 +13,8 @@ const DEFAULT_MAX_SNAP_DISTANCE_METERS = 500;
 const ROUTE_SNAP_CANDIDATE_LIMIT = 32;
 const METROMOVER_SPEED_KMH = 14.5;
 const METROMOVER_WAIT_MINUTES = 2;
+const NOISE_OVERLAY_MIN_SCORE = 0.25;
+const NOISE_OVERLAY_MAX_EDGES = 9000;
 const METROMOVER_STATION_LINKS = [
   ["place_id_metromover_financial_district_station", "place_id_metromover_tenth_street_promenade_station"],
   ["place_id_metromover_tenth_street_promenade_station", "place_id_metromover_brickell_city_centre_eight_street_station"],
@@ -116,6 +118,9 @@ const app = {
   routingGraphStatus: "idle",
   routeAdjacency: null,
   routeNodes: [],
+  noiseOverlayEnabled: false,
+  noiseOverlayEdges: null,
+  noiseOverlayLayer: null,
   routeRequestId: 0,
 };
 
@@ -145,6 +150,7 @@ function bindDom() {
   dom.togglePlacesPanel = document.querySelector("#toggle-places-panel");
   dom.tagFilters = document.querySelector("#tag-filters");
   dom.radiusFilter = document.querySelector("#radius-filter");
+  dom.noiseFilter = document.querySelector("#noise-filter");
   dom.placeList = document.querySelector("#place-list");
   dom.resetFilters = document.querySelector("#reset-filters");
   dom.detailSheet = document.querySelector("#detail-sheet");
@@ -170,6 +176,10 @@ function bindEvents() {
   dom.radiusFilter.addEventListener("change", () => {
     app.radiusOnly = dom.radiusFilter.checked;
     renderAll();
+  });
+
+  dom.noiseFilter.addEventListener("change", () => {
+    setNoiseOverlayEnabled(dom.noiseFilter.checked);
   });
 
   dom.togglePlacesPanel.addEventListener("click", () => {
@@ -248,6 +258,122 @@ function setPlacesPanelCollapsed(isCollapsed) {
   dom.togglePlacesPanel.setAttribute("aria-label", isCollapsed ? "Expand places" : "Collapse places");
   dom.togglePlacesPanel.setAttribute("aria-expanded", String(!isCollapsed));
   window.setTimeout(() => app.map?.invalidateSize(), 120);
+}
+
+function setNoiseOverlayEnabled(isEnabled) {
+  app.noiseOverlayEnabled = isEnabled;
+  dom.noiseFilter.checked = isEnabled;
+  if (!app.map) return;
+  ensureNoiseOverlayLayer();
+  if (isEnabled) {
+    app.noiseOverlayLayer.addTo(app.map);
+    ensureRoutingGraph().then(() => {
+      if (app.noiseOverlayEnabled) app.noiseOverlayLayer.redraw();
+    });
+  } else if (app.noiseOverlayLayer) {
+    app.noiseOverlayLayer.remove();
+  }
+}
+
+function ensureNoiseOverlayLayer() {
+  if (app.noiseOverlayLayer) return;
+  const NoiseOverlayLayer = L.Layer.extend({
+    onAdd(map) {
+      this._map = map;
+      this._canvas = L.DomUtil.create("canvas", "noise-overlay");
+      this._context = this._canvas.getContext("2d");
+      map.getPanes().overlayPane.appendChild(this._canvas);
+      map.on("moveend zoomend resize", this.redraw, this);
+      this.redraw();
+    },
+    onRemove(map) {
+      map.off("moveend zoomend resize", this.redraw, this);
+      this._canvas?.remove();
+      this._canvas = null;
+      this._context = null;
+      this._map = null;
+    },
+    redraw() {
+      if (!this._map || !this._canvas || !this._context) return;
+      const size = this._map.getSize();
+      const topLeft = this._map.containerPointToLayerPoint([0, 0]);
+      L.DomUtil.setPosition(this._canvas, topLeft);
+      if (this._canvas.width !== size.x) this._canvas.width = size.x;
+      if (this._canvas.height !== size.y) this._canvas.height = size.y;
+      this._context.clearRect(0, 0, size.x, size.y);
+      if (app.routingGraphStatus !== "ready") return;
+      drawNoiseOverlay(this._context, this._map);
+    },
+  });
+  app.noiseOverlayLayer = new NoiseOverlayLayer();
+}
+
+function drawNoiseOverlay(context, map) {
+  const edges = getNoiseOverlayEdges();
+  if (!edges.length) return;
+  const bounds = map.getBounds().pad(0.08);
+  const zoom = map.getZoom();
+  const lineWidth = Math.max(2.2, Math.min(8, (zoom - 11) * 0.65));
+  const visibleEdges = [];
+  for (const edge of edges) {
+    if (edge.south > bounds.getNorth()
+      || edge.north < bounds.getSouth()
+      || edge.west > bounds.getEast()
+      || edge.east < bounds.getWest()) {
+      continue;
+    }
+    visibleEdges.push(edge);
+  }
+  visibleEdges
+    .sort((a, b) => a.noise - b.noise)
+    .slice(-NOISE_OVERLAY_MAX_EDGES)
+    .forEach((edge) => {
+      const from = map.latLngToContainerPoint(edge.from);
+      const to = map.latLngToContainerPoint(edge.to);
+      context.beginPath();
+      context.moveTo(from.x, from.y);
+      context.lineTo(to.x, to.y);
+      context.strokeStyle = getNoiseOverlayColor(edge.noise);
+      context.globalAlpha = 0.34 + Math.min(0.38, edge.noise * 0.38);
+      context.lineWidth = lineWidth + edge.noise * 3.2;
+      context.lineCap = "round";
+      context.stroke();
+    });
+  context.globalAlpha = 1;
+}
+
+function getNoiseOverlayEdges() {
+  if (app.noiseOverlayEdges) return app.noiseOverlayEdges;
+  if (!app.routingGraph?.edges || !app.routingGraph?.nodes) return [];
+  const nodes = app.routingGraph.nodes;
+  app.noiseOverlayEdges = app.routingGraph.edges
+    .filter((edge) => (edge.noise || 0) >= NOISE_OVERLAY_MIN_SCORE)
+    .map((edge) => {
+      const fromNode = nodes[edge.from];
+      const toNode = nodes[edge.to];
+      if (!fromNode || !toNode) return null;
+      const from = [fromNode.lat, fromNode.lon];
+      const to = [toNode.lat, toNode.lon];
+      return {
+        from,
+        to,
+        noise: edge.noise || 0,
+        south: Math.min(from[0], to[0]),
+        north: Math.max(from[0], to[0]),
+        west: Math.min(from[1], to[1]),
+        east: Math.max(from[1], to[1]),
+      };
+    })
+    .filter(Boolean);
+  return app.noiseOverlayEdges;
+}
+
+function getNoiseOverlayColor(noise) {
+  if (noise >= 0.82) return "#7a1fb3";
+  if (noise >= 0.65) return "#d62f6c";
+  if (noise >= 0.48) return "#e4572e";
+  if (noise >= 0.34) return "#f18701";
+  return "#f6c945";
 }
 
 function renderTagFilters() {

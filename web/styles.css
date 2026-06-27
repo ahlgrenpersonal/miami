@@ -53,6 +53,11 @@ button {
   background: #e5e0d6;
 }
 
+.noise-overlay {
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
 .places-panel,
 .detail-sheet {
   position: absolute;
