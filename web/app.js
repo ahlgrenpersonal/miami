@@ -622,7 +622,7 @@ function renderList() {
       <strong>${escapeHtml(place.name)}</strong>
       <span>${getPlaceSubtitle(place)}</span>
     `;
-    button.addEventListener("click", () => selectPlace(place.id));
+    button.addEventListener("click", () => selectPlace(place.id, { source: "list" }));
     dom.placeList.appendChild(button);
   }
 }
@@ -661,6 +661,9 @@ function hasLocationRouteAnchor() {
 }
 
 function selectPlace(id, options = {}) {
+  if (options.source === "list") {
+    setPlacesPanelCollapsed(true);
+  }
   const wasSelected = app.selectedId === id;
   const shouldUpdateAnchoredRoute = hasLocationRouteAnchor() && id !== app.routeFromId;
   if (shouldUpdateAnchoredRoute) {
@@ -873,12 +876,13 @@ function renderRouteGeometry(route, mode) {
     app.routeLine.setStyle({ opacity: 0 });
     for (const segment of route.segments) {
       const isMetromover = segment.type === "metromover";
-      const line = L.polyline(segment.coordinates, {
+      const lineOptions = {
         color: "#d95d39",
         weight: 5,
         opacity: 0.95,
-        dashArray: isMetromover ? "2 8" : "0",
-      }).addTo(app.map);
+      };
+      if (isMetromover) lineOptions.dashArray = "2 8";
+      const line = L.polyline(segment.coordinates, lineOptions).addTo(app.map);
       app.routeSegmentLines.push(line);
     }
     return;
@@ -1221,9 +1225,9 @@ function getTravelModeLabel(mode) {
 }
 
 function getRouteDashArray(mode) {
-  if (mode === "shortest") return "0";
+  if (mode === "shortest") return null;
   if (mode === "scenic") return "2 8";
-  if (mode === "metromover") return "8 10";
+  if (mode === "metromover") return null;
   return "12 8";
 }
 
