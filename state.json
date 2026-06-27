@@ -776,26 +776,31 @@
       ],
       "tags": [
         "food",
-        "pizza_restaurant"
+        "italian_restaurant",
+        "pizza_restaurant",
+        "restaurant"
       ],
       "meta": {
         "source_list": "Curated",
         "source_ordinal": 20,
-        "category": "Pizza restaurant",
-        "rating": null,
-        "rating_count": null,
-        "price": null,
+        "category": "Italian restaurant",
+        "rating": 4.8,
+        "rating_count": 856,
+        "price": "$$",
         "status": null,
         "address": "881 S Miami Ave, Miami, FL 33130",
         "distance_from_home_m": 366,
         "local_evidence": [],
         "scan_evidence": [],
-        "external_evidence": [],
+        "external_evidence": [
+          "google_maps_shortlink",
+          "google_maps_lookup"
+        ],
         "skip_geocode_evidence": [],
         "geocode": {
-          "source": "manual_coordinate",
+          "source": "google_maps_lookup",
           "query": "BELLILLO - A Taste of Napoli 881 S Miami Ave, Miami, FL 33130",
-          "display_name": "Manual coordinate",
+          "display_name": "Google Maps place lookup",
           "match_score": 1,
           "osm_type": null,
           "osm_id": null
@@ -3293,6 +3298,288 @@
         "geocode": {
           "source": "google_maps_lookup",
           "query": "E41 - Embarcadero 41 Brickell 777 Brickell Ave Ste 130, Miami, FL 33131",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_happeas_mediterranean_grill": {
+      "name": "Happea's Mediterranean Grill",
+      "coordinates": [
+        25.7621466,
+        -80.1933442
+      ],
+      "tags": [
+        "food",
+        "mediterranean_restaurant",
+        "restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 145,
+        "category": "Mediterranean restaurant",
+        "rating": 4.7,
+        "rating_count": 1253,
+        "price": null,
+        "status": null,
+        "address": "1250 S Miami Ave Unit 4, Miami, FL 33130",
+        "distance_from_home_m": 318,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_shortlink",
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Happea's Mediterranean Grill 1250 S Miami Ave Unit 4, Miami, FL 33130",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_baires_grill_brickell": {
+      "name": "Baires Grill - Brickell",
+      "coordinates": [
+        25.7640139,
+        -80.193375
+      ],
+      "tags": [
+        "argentinian_restaurant",
+        "food",
+        "restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 146,
+        "category": "Argentinian restaurant",
+        "rating": 4.6,
+        "rating_count": 3130,
+        "price": null,
+        "status": null,
+        "address": "1010 S Miami Ave, Miami, FL 33130",
+        "distance_from_home_m": 304,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_shortlink",
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Baires Grill - Brickell 1010 S Miami Ave, Miami, FL 33130",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_santisimo_taco_miami": {
+      "name": "Santisimo Taco Miami",
+      "coordinates": [
+        25.7637935,
+        -80.1929807
+      ],
+      "tags": [
+        "food",
+        "mexican_restaurant",
+        "restaurant",
+        "taco"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 147,
+        "category": "Restaurant",
+        "rating": 4.8,
+        "rating_count": 74,
+        "price": null,
+        "status": null,
+        "address": "1025 S Miami Ave Cu-2, Miami, FL 33130",
+        "distance_from_home_m": 260,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_shortlink",
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Santisimo Taco Miami 1025 S Miami Ave Cu-2, Miami, FL 33130",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_marabu_restaurant": {
+      "name": "Marabu Restaurant",
+      "coordinates": [
+        25.766885,
+        -80.1939008
+      ],
+      "tags": [
+        "food",
+        "restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 148,
+        "category": "Restaurant",
+        "rating": 4.8,
+        "rating_count": 301,
+        "price": null,
+        "status": null,
+        "address": "701 S Miami Ave Fl 4, Miami, FL 33131",
+        "distance_from_home_m": 527,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_shortlink",
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Marabu Restaurant 701 S Miami Ave Fl 4, Miami, FL 33131",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_tacology_brickell_mexican_taqueria": {
+      "name": "Tacology Brickell - Mexican Taqueria",
+      "coordinates": [
+        25.7666978,
+        -80.1935424
+      ],
+      "tags": [
+        "food",
+        "mexican_restaurant",
+        "restaurant",
+        "taco"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 149,
+        "category": "Mexican restaurant",
+        "rating": 4.6,
+        "rating_count": 4081,
+        "price": null,
+        "status": null,
+        "address": "Centre, 4th, 701 S Miami Ave, Miami, FL 33131",
+        "distance_from_home_m": 488,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_shortlink",
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Tacology Brickell - Mexican Taqueria Centre, 4th, 701 S Miami Ave, Miami, FL 33131",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_lavka_gourmet_cafe": {
+      "name": "LAVKA Gourmet Cafe",
+      "coordinates": [
+        25.7668452,
+        -80.1958862
+      ],
+      "tags": [
+        "cafe",
+        "eastern_european_restaurant",
+        "food",
+        "restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 150,
+        "category": "Eastern European restaurant",
+        "rating": 4.8,
+        "rating_count": 4813,
+        "price": null,
+        "status": null,
+        "address": "766 SW 1st Ct, Miami, FL 33130",
+        "distance_from_home_m": 672,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_shortlink",
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "LAVKA Gourmet Cafe 766 SW 1st Ct, Miami, FL 33130",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_charlatam_miami": {
+      "name": "Charlatam - Miami",
+      "coordinates": [
+        25.7554352,
+        -80.2075256
+      ],
+      "tags": [
+        "food",
+        "latin_american_restaurant",
+        "restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 151,
+        "category": "Latin American restaurant",
+        "rating": 4.9,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "2525 SW 3rd Ave # Cu-2, Miami, FL 33129",
+        "distance_from_home_m": 1922,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_shortlink",
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Charlatam - Miami 2525 SW 3rd Ave # Cu-2, Miami, FL 33129",
           "display_name": "Google Maps place lookup",
           "match_score": 1,
           "osm_type": null,
