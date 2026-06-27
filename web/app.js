@@ -16,6 +16,7 @@ const NOISE_OVERLAY_MIN_SCORE = 0.25;
 const NOISE_OVERLAY_MAX_EDGES = 9000;
 const RADAR_WMS_URL = "https://opengeo.ncep.noaa.gov/geoserver/conus/conus_bref_qcd/ows";
 const RADAR_LAYER_NAME = "conus_bref_qcd";
+const WEATHER_REFRESH_MS = 15 * 60 * 1000;
 const METROMOVER_STATION_LINKS = [
   ["place_id_metromover_financial_district_station", "place_id_metromover_tenth_street_promenade_station"],
   ["place_id_metromover_tenth_street_promenade_station", "place_id_metromover_brickell_city_centre_eight_street_station"],
@@ -123,6 +124,7 @@ const app = {
   noiseOverlayLayer: null,
   radarOverlayEnabled: false,
   radarLayer: null,
+  weatherRefreshTimer: null,
   routeRequestId: 0,
 };
 
@@ -139,12 +141,14 @@ async function init() {
   await loadState();
   initMap();
   renderAll();
+  refreshWeather();
   scheduleCanvasQaCapture();
   registerServiceWorker();
 }
 
 function bindDom() {
   dom.map = document.querySelector("#map");
+  dom.weatherPill = document.querySelector("#weather-pill");
   dom.placeCount = document.querySelector("#place-count");
   dom.visibleCount = document.querySelector("#visible-count");
   dom.searchInput = document.querySelector("#search-input");
@@ -248,6 +252,65 @@ function bindEvents() {
     app.routeAnchorMode = null;
     renderRoute();
   });
+}
+
+async function refreshWeather() {
+  if (!dom.weatherPill || !app.state?.user_profile?.home_base) return;
+  window.clearTimeout(app.weatherRefreshTimer);
+  try {
+    const [lat, lon] = app.state.user_profile.home_base;
+    const weather = await fetchWeatherSummary(lat, lon);
+    dom.weatherPill.textContent = `${Math.round(weather.temperatureC)}°C · RH ${Math.round(weather.humidityPct)}% · Rain ${Math.round(weather.rainPct)}%`;
+    dom.weatherPill.title = "Weather near Panorama Tower";
+    dom.weatherPill.classList.remove("is-muted");
+  } catch (error) {
+    dom.weatherPill.textContent = "Weather unavailable";
+    dom.weatherPill.title = "Weather unavailable";
+    dom.weatherPill.classList.add("is-muted");
+  } finally {
+    app.weatherRefreshTimer = window.setTimeout(refreshWeather, WEATHER_REFRESH_MS);
+  }
+}
+
+async function fetchWeatherSummary(lat, lon) {
+  const params = new URLSearchParams({
+    latitude: lat.toFixed(5),
+    longitude: lon.toFixed(5),
+    current: "temperature_2m,relative_humidity_2m",
+    hourly: "precipitation_probability",
+    temperature_unit: "celsius",
+    forecast_hours: "6",
+    timezone: "auto",
+  });
+  const response = await fetch(`https://api.open-meteo.com/v1/forecast?${params.toString()}`, { cache: "no-store" });
+  if (!response.ok) throw new Error(`Weather request failed: ${response.status}`);
+  const data = await response.json();
+  const temperatureC = Number(data.current?.temperature_2m);
+  const humidityPct = Number(data.current?.relative_humidity_2m);
+  const rainPct = getNearestHourlyValue(data.hourly, data.current?.time, "precipitation_probability");
+  if (!Number.isFinite(temperatureC) || !Number.isFinite(humidityPct) || !Number.isFinite(rainPct)) {
+    throw new Error("Weather response missing expected values");
+  }
+  return { temperatureC, humidityPct, rainPct };
+}
+
+function getNearestHourlyValue(hourly, targetTime, field) {
+  const times = hourly?.time || [];
+  const values = hourly?.[field] || [];
+  if (!times.length || !values.length) return NaN;
+  const targetMs = Date.parse(targetTime || times[0]);
+  let bestIndex = 0;
+  let bestDelta = Infinity;
+  for (let index = 0; index < times.length; index += 1) {
+    const value = Number(values[index]);
+    if (!Number.isFinite(value)) continue;
+    const delta = Math.abs(Date.parse(times[index]) - targetMs);
+    if (delta < bestDelta) {
+      bestDelta = delta;
+      bestIndex = index;
+    }
+  }
+  return Number(values[bestIndex]);
 }
 
 function setPlacesPanelCollapsed(isCollapsed) {
