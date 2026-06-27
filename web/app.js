@@ -14,6 +14,8 @@ const METROMOVER_SPEED_KMH = 14.5;
 const METROMOVER_WAIT_MINUTES = 2;
 const NOISE_OVERLAY_MIN_SCORE = 0.25;
 const NOISE_OVERLAY_MAX_EDGES = 9000;
+const RADAR_WMS_URL = "https://opengeo.ncep.noaa.gov/geoserver/conus/conus_bref_qcd/ows";
+const RADAR_LAYER_NAME = "conus_bref_qcd";
 const METROMOVER_STATION_LINKS = [
   ["place_id_metromover_financial_district_station", "place_id_metromover_tenth_street_promenade_station"],
   ["place_id_metromover_tenth_street_promenade_station", "place_id_metromover_brickell_city_centre_eight_street_station"],
@@ -119,6 +121,8 @@ const app = {
   noiseOverlayEnabled: false,
   noiseOverlayEdges: null,
   noiseOverlayLayer: null,
+  radarOverlayEnabled: false,
+  radarLayer: null,
   routeRequestId: 0,
 };
 
@@ -148,6 +152,7 @@ function bindDom() {
   dom.togglePlacesPanel = document.querySelector("#toggle-places-panel");
   dom.tagFilters = document.querySelector("#tag-filters");
   dom.noiseFilter = document.querySelector("#noise-filter");
+  dom.radarFilter = document.querySelector("#radar-filter");
   dom.placeList = document.querySelector("#place-list");
   dom.resetFilters = document.querySelector("#reset-filters");
   dom.detailSheet = document.querySelector("#detail-sheet");
@@ -172,6 +177,10 @@ function bindEvents() {
 
   dom.noiseFilter.addEventListener("change", () => {
     setNoiseOverlayEnabled(dom.noiseFilter.checked);
+  });
+
+  dom.radarFilter.addEventListener("change", () => {
+    setRadarOverlayEnabled(dom.radarFilter.checked);
   });
 
   dom.togglePlacesPanel.addEventListener("click", () => {
@@ -263,6 +272,34 @@ function setNoiseOverlayEnabled(isEnabled) {
   } else if (app.noiseOverlayLayer) {
     app.noiseOverlayLayer.remove();
   }
+}
+
+function setRadarOverlayEnabled(isEnabled) {
+  app.radarOverlayEnabled = isEnabled;
+  dom.radarFilter.checked = isEnabled;
+  if (!app.map) return;
+  ensureRadarLayer();
+  if (isEnabled) {
+    app.radarLayer.addTo(app.map);
+  } else if (app.radarLayer) {
+    app.radarLayer.remove();
+  }
+}
+
+function ensureRadarLayer() {
+  if (app.radarLayer) return;
+  const refreshToken = Math.floor(Date.now() / (5 * 60 * 1000));
+  app.radarLayer = L.tileLayer.wms(RADAR_WMS_URL, {
+    layers: RADAR_LAYER_NAME,
+    format: "image/png",
+    transparent: true,
+    version: "1.1.1",
+    opacity: 0.58,
+    zIndex: 240,
+    uppercase: true,
+    _ts: refreshToken,
+    attribution: "NOAA/NWS MRMS radar",
+  });
 }
 
 function ensureNoiseOverlayLayer() {

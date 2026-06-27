@@ -8,7 +8,7 @@
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="vendor/leaflet/leaflet.css?v=175">
-    <link rel="stylesheet" href="styles.css?v=195">
+    <link rel="stylesheet" href="styles.css?v=196">
   </head>
   <body>
     <main class="app-shell">
@@ -31,10 +31,16 @@
 
           <div class="filter-row" id="tag-filters" aria-label="Tag filters"></div>
 
-          <label class="toggle-line">
-            <input id="noise-filter" type="checkbox">
-            <span>Noise</span>
-          </label>
+          <div class="overlay-toggle-row" aria-label="Map overlays">
+            <label class="toggle-line">
+              <input id="noise-filter" type="checkbox">
+              <span>Noise</span>
+            </label>
+            <label class="toggle-line">
+              <input id="radar-filter" type="checkbox">
+              <span>Radar</span>
+            </label>
+          </div>
 
           <div class="panel-head">
             <span id="visible-count">0 visible</span>
@@ -63,6 +69,6 @@
     </main>
 
     <script src="vendor/leaflet/leaflet.js?v=175"></script>
-    <script src="app.js?v=198"></script>
+    <script src="app.js?v=199"></script>
   </body>
 </html>

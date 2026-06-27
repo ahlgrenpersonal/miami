@@ -97,7 +97,7 @@ button {
 .places-panel.is-collapsed .places-brand p,
 .places-panel.is-collapsed .search-field,
 .places-panel.is-collapsed .filter-row,
-.places-panel.is-collapsed .toggle-line,
+.places-panel.is-collapsed .overlay-toggle-row,
 .places-panel.is-collapsed .panel-head,
 .places-panel.is-collapsed .place-list {
   display: none;
@@ -281,6 +281,17 @@ h1 {
   gap: 9px;
   margin-top: 12px;
   font-size: 13px;
+}
+
+.overlay-toggle-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.overlay-toggle-row .toggle-line {
+  margin-top: 0;
 }
 
 .toggle-line input {
