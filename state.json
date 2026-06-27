@@ -3588,6 +3588,234 @@
         "notes": "",
         "npc_associations": []
       }
+    },
+    "place_id_adrienne_arsht_metromover_station": {
+      "name": "Adrienne Arsht Metromover Station",
+      "coordinates": [
+        25.789452,
+        -80.187943
+      ],
+      "tags": [
+        "metromover",
+        "station",
+        "transit_station"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 152,
+        "category": "Metromover station",
+        "rating": 4.5,
+        "rating_count": 3,
+        "price": null,
+        "status": null,
+        "address": "Miami, FL 33132",
+        "distance_from_home_m": 2918,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Adrienne Arsht Metromover Station Miami, FL 33132",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "User supplied plus code QRQ6+QR Miami, Florida; coordinate resolved with Google Maps.",
+        "npc_associations": []
+      }
+    },
+    "place_id_miami_beach_water_taxi_downtown_miami": {
+      "name": "Miami Beach Water Taxi (Downtown Miami)",
+      "coordinates": [
+        25.7918576,
+        -80.185409
+      ],
+      "tags": [
+        "transportation",
+        "water_taxi"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 153,
+        "category": "Water taxi",
+        "rating": 4.7,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "1717 N Bayshore Dr, Miami, FL 33132",
+        "distance_from_home_m": 3214,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Miami Beach Water Taxi (Downtown Miami) 1717 N Bayshore Dr, Miami, FL 33132",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "Downtown Miami side of the Miami Beach water taxi.",
+        "npc_associations": []
+      }
+    },
+    "place_id_water_taxi_mia_miami_beach": {
+      "name": "Water Taxi MIA",
+      "coordinates": [
+        25.7933281,
+        -80.1450799
+      ],
+      "tags": [
+        "transportation",
+        "water_taxi"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 154,
+        "category": "Water taxi",
+        "rating": 5.0,
+        "rating_count": 10,
+        "price": null,
+        "status": null,
+        "address": "18 Street &, Purdy Ave, Miami Beach, FL 33139",
+        "distance_from_home_m": 5637,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Water Taxi MIA 18 Street &, Purdy Ave, Miami Beach, FL 33139",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "Miami Beach side of the Miami Beach water taxi.",
+        "npc_associations": []
+      }
+    },
+    "place_id_maurice_gibb_memorial_park": {
+      "name": "Maurice Gibb Memorial Park",
+      "coordinates": [
+        25.79262,
+        -80.1447473
+      ],
+      "tags": [
+        "park"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 155,
+        "category": "Park",
+        "rating": 4.7,
+        "rating_count": 5,
+        "price": null,
+        "status": null,
+        "address": "18th St & Purdy Avenue, Miami Beach, FL 33139",
+        "distance_from_home_m": 5618,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Maurice Gibb Memorial Park 18th St & Purdy Avenue, Miami Beach, FL 33139",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_avo_miami": {
+      "name": "Avo Miami",
+      "coordinates": [
+        25.7943176,
+        -80.1439598
+      ],
+      "tags": [
+        "food",
+        "health_food_restaurant",
+        "restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 156,
+        "category": "Health food restaurant",
+        "rating": 4.8,
+        "rating_count": 3085,
+        "price": null,
+        "status": null,
+        "address": "1834 Bay Rd, Miami Beach, FL 33139",
+        "distance_from_home_m": 5792,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Avo Miami 1834 Bay Rd, Miami Beach, FL 33139",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_trader_joes_miami_beach": {
+      "name": "Trader Joe's",
+      "coordinates": [
+        25.791789,
+        -80.142155
+      ],
+      "tags": [
+        "supermarket"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 157,
+        "category": "Grocery store",
+        "rating": 4.7,
+        "rating_count": 2397,
+        "price": null,
+        "status": null,
+        "address": "1683 West Ave, Miami Beach, FL 33139",
+        "distance_from_home_m": 5780,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Trader Joe's 1683 West Ave, Miami Beach, FL 33139",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
     }
   },
   "routines": {
