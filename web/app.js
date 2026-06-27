@@ -7,6 +7,8 @@ const HOME_RADIUS_METERS = 805;
 const DEFAULT_HOME_ZOOM = 15;
 const DEFAULT_MAX_SNAP_DISTANCE_METERS = 500;
 const ROUTE_SNAP_CANDIDATE_LIMIT = 32;
+const METROMOVER_SPEED_KMH = 22;
+const METROMOVER_WAIT_MINUTES = 5;
 const OFFLINE_TILE_BOUNDS = [[25.660, -80.275], [25.835, -80.100]];
 const QA_CANVAS_CAPTURE_DELAY_MS = 1200;
 const ROUTING_PROFILES = {
@@ -36,6 +38,15 @@ const ROUTING_PROFILES = {
     maxMultiplier: 3,
     hardPenalties: { "highway=steps": 1.18 },
     fixedPenaltiesM: { traffic_crossing: 42 },
+  },
+  metromover: {
+    label: "Metromover",
+    speedKmh: 5,
+    scoreWeights: {},
+    minMultiplier: 1,
+    maxMultiplier: 1,
+    hardPenalties: {},
+    fixedPenaltiesM: {},
   },
 };
 const TAG_FILTERS = [
@@ -123,8 +134,8 @@ function bindDom() {
   dom.closeDetail = document.querySelector("#close-detail");
   dom.detailTitleLink = document.querySelector("#detail-title-link");
   dom.routeHome = document.querySelector("#route-home");
-  dom.routeFrom = document.querySelector("#route-from");
-  dom.routeTo = document.querySelector("#route-to");
+  dom.routeLocation = document.querySelector("#route-location");
+  dom.routeMetromover = document.querySelector("#route-metromover");
   dom.modeShortest = document.querySelector("#mode-shortest");
   dom.modeScenic = document.querySelector("#mode-scenic");
   dom.modeScooter = document.querySelector("#mode-scooter");
@@ -170,9 +181,14 @@ function bindEvents() {
     renderList();
   });
 
-  dom.routeFrom.addEventListener("click", () => {
+  dom.routeLocation.addEventListener("click", () => {
     if (!app.selectedId) return;
-    app.routeFromId = app.selectedId;
+    if (!app.routeFromId || app.routeToId) {
+      app.routeFromId = app.selectedId;
+      app.routeToId = null;
+    } else if (app.routeFromId !== app.selectedId) {
+      app.routeToId = app.selectedId;
+    }
     renderRoute();
   });
 
@@ -183,9 +199,16 @@ function bindEvents() {
     renderRoute();
   });
 
-  dom.routeTo.addEventListener("click", () => {
+  dom.routeMetromover.addEventListener("click", () => {
     if (!app.selectedId) return;
-    app.routeToId = app.selectedId;
+    app.travelMode = "metromover";
+    if (app.routeFromId && !app.routeToId && app.routeFromId !== app.selectedId) {
+      app.routeToId = app.selectedId;
+    } else if (!hasActiveRoute() || (app.selectedId !== app.routeFromId && app.selectedId !== app.routeToId)) {
+      app.routeFromId = HOME_PLACE_ID;
+      app.routeToId = app.selectedId;
+    }
+    syncTravelModeButtons();
     renderRoute();
   });
 
@@ -665,13 +688,19 @@ function renderDetail(place, options = {}) {
 
 function setTravelMode(mode) {
   app.travelMode = mode;
-  dom.modeShortest.classList.toggle("is-active", mode === "shortest");
-  dom.modeShortest.setAttribute("aria-pressed", String(mode === "shortest"));
-  dom.modeScenic.classList.toggle("is-active", mode === "scenic");
-  dom.modeScenic.setAttribute("aria-pressed", String(mode === "scenic"));
-  dom.modeScooter.classList.toggle("is-active", mode === "kid_scooter");
-  dom.modeScooter.setAttribute("aria-pressed", String(mode === "kid_scooter"));
+  syncTravelModeButtons();
   renderRoute();
+}
+
+function syncTravelModeButtons() {
+  dom.modeShortest.classList.toggle("is-active", app.travelMode === "shortest");
+  dom.modeShortest.setAttribute("aria-pressed", String(app.travelMode === "shortest"));
+  dom.modeScenic.classList.toggle("is-active", app.travelMode === "scenic");
+  dom.modeScenic.setAttribute("aria-pressed", String(app.travelMode === "scenic"));
+  dom.modeScooter.classList.toggle("is-active", app.travelMode === "kid_scooter");
+  dom.modeScooter.setAttribute("aria-pressed", String(app.travelMode === "kid_scooter"));
+  dom.routeMetromover.classList.toggle("is-active", app.travelMode === "metromover");
+  dom.routeMetromover.setAttribute("aria-pressed", String(app.travelMode === "metromover"));
 }
 
 async function renderRoute(options = {}) {
@@ -702,9 +731,9 @@ async function renderRoute(options = {}) {
       app.routeLine.setLatLngs(route.coordinates);
       app.routeLine.setStyle({
         opacity: 0.95,
-        dashArray: app.travelMode === "shortest" ? "0" : app.travelMode === "scenic" ? "2 8" : "12 8",
+        dashArray: getRouteDashArray(app.travelMode),
       });
-      dom.routeStatus.textContent = `${modeLabel}: ${from.name} -> ${to.name} (${formatRouteSummary(route.distanceM, app.travelMode)})`;
+      dom.routeStatus.textContent = `${modeLabel}: ${from.name} -> ${to.name} (${formatRouteSummary(route, app.travelMode)})`;
       if (shouldFitMap) {
         const bounds = L.latLngBounds(route.coordinates).pad(0.18);
         app.map.fitBounds(bounds, { animate: true, maxZoom: 17 });
@@ -732,6 +761,11 @@ async function renderRoute(options = {}) {
 }
 
 function getLocalRoute(fromCoordinates, toCoordinates, mode) {
+  if (mode === "metromover") return getMetromoverRoute(fromCoordinates, toCoordinates);
+  return getGraphRoute(fromCoordinates, toCoordinates, mode);
+}
+
+function getGraphRoute(fromCoordinates, toCoordinates, mode) {
   if (!app.routingGraph || !app.routeAdjacency || app.routeNodes.length === 0) return null;
   const maxSnapDistanceM = app.routingGraph.max_snap_distance_m || DEFAULT_MAX_SNAP_DISTANCE_METERS;
   const startCandidates = findNearestRouteNodes(fromCoordinates, ROUTE_SNAP_CANDIDATE_LIMIT)
@@ -755,6 +789,79 @@ function getLocalRoute(fromCoordinates, toCoordinates, mode) {
     startSnapM: routeResult.start.distanceM,
     endSnapM: routeResult.end.distanceM,
   };
+}
+
+function getMetromoverRoute(fromCoordinates, toCoordinates) {
+  const walkingRoute = getGraphRoute(fromCoordinates, toCoordinates, "shortest");
+  if (!walkingRoute) return null;
+
+  const stations = getMetromoverStations();
+  if (stations.length < 2) {
+    return { ...walkingRoute, durationMinutes: getTravelMinutes(walkingRoute.distanceM, "shortest") };
+  }
+
+  const startLegs = stations.map((station) => ({
+    station,
+    route: getGraphRoute(fromCoordinates, station.coordinates, "shortest"),
+  })).filter((leg) => leg.route);
+  const endLegs = stations.map((station) => ({
+    station,
+    route: getGraphRoute(station.coordinates, toCoordinates, "shortest"),
+  })).filter((leg) => leg.route);
+
+  const walkingMinutes = getTravelMinutes(walkingRoute.distanceM, "shortest");
+  let best = null;
+  for (const startLeg of startLegs) {
+    for (const endLeg of endLegs) {
+      if (startLeg.station.id === endLeg.station.id) continue;
+      const metroDistanceM = getDistanceMeters(startLeg.station.coordinates, endLeg.station.coordinates);
+      const durationMinutes = getTravelMinutes(startLeg.route.distanceM, "shortest")
+        + getMetromoverMinutes(metroDistanceM)
+        + getTravelMinutes(endLeg.route.distanceM, "shortest");
+      const distanceM = startLeg.route.distanceM + metroDistanceM + endLeg.route.distanceM;
+      if (!best || durationMinutes < best.durationMinutes || (durationMinutes === best.durationMinutes && distanceM < best.distanceM)) {
+        best = { startLeg, endLeg, metroDistanceM, distanceM, durationMinutes };
+      }
+    }
+  }
+
+  if (!best || best.durationMinutes >= walkingMinutes) {
+    return { ...walkingRoute, durationMinutes: walkingMinutes, metromoverUsed: false };
+  }
+
+  return {
+    coordinates: mergeRouteCoordinates(
+      best.startLeg.route.coordinates,
+      [best.startLeg.station.coordinates, best.endLeg.station.coordinates],
+      best.endLeg.route.coordinates
+    ),
+    distanceM: best.distanceM,
+    durationMinutes: best.durationMinutes,
+    metromoverUsed: true,
+    metromoverStartName: best.startLeg.station.name,
+    metromoverEndName: best.endLeg.station.name,
+  };
+}
+
+function getMetromoverStations() {
+  return app.places.filter((place) => place.filterTags?.includes("metromover") && Array.isArray(place.coordinates));
+}
+
+function getMetromoverMinutes(distanceM) {
+  return METROMOVER_WAIT_MINUTES + Math.max(1, Math.round((distanceM / 1000 / METROMOVER_SPEED_KMH) * 60));
+}
+
+function mergeRouteCoordinates(...segments) {
+  const merged = [];
+  for (const segment of segments) {
+    for (const coordinate of segment || []) {
+      const previous = merged[merged.length - 1];
+      if (!previous || previous[0] !== coordinate[0] || previous[1] !== coordinate[1]) {
+        merged.push(coordinate);
+      }
+    }
+  }
+  return merged;
 }
 
 function findNearestRouteNode(coordinates) {
@@ -949,6 +1056,14 @@ function formatDistance(distanceM) {
 }
 
 function formatRouteSummary(distanceM, mode) {
+  if (typeof distanceM === "object") {
+    const route = distanceM;
+    const durationMinutes = route.durationMinutes ?? getTravelMinutes(route.distanceM, mode);
+    const suffix = mode === "metromover"
+      ? route.metromoverUsed ? " | Metromover" : " | walking fastest"
+      : "";
+    return `${formatDistance(route.distanceM)} | ${formatDuration(durationMinutes)}${suffix}`;
+  }
   return `${formatDistance(distanceM)} | ${formatDuration(getTravelMinutes(distanceM, mode))}`;
 }
 
@@ -967,6 +1082,13 @@ function formatDuration(minutes) {
 
 function getTravelModeLabel(mode) {
   return getRoutingProfile(mode).label;
+}
+
+function getRouteDashArray(mode) {
+  if (mode === "shortest") return "0";
+  if (mode === "scenic") return "2 8";
+  if (mode === "metromover") return "8 10";
+  return "12 8";
 }
 
 class MinHeap {
@@ -1114,7 +1236,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=179", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=187", { updateViaCache: "none" })
       .then((registration) => navigator.serviceWorker.ready.then((readyRegistration) => {
         requestOfflineTileCache(readyRegistration || registration);
       }))

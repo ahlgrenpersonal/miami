@@ -3182,6 +3182,47 @@
         "notes": "Nominatim only returned the Bayside Marketplace footprint, so this marker is placed manually near the north marketplace section for suite 219N.",
         "npc_associations": []
       }
+    },
+    "place_id_alice_wainwright_park_outdoor_gym": {
+      "name": "Alice Wainwright Park Outdoor Gym",
+      "coordinates": [
+        25.7476667,
+        -80.2047778
+      ],
+      "tags": [
+        "fitness",
+        "outdoor_gym",
+        "park"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 142,
+        "category": "Outdoor gym",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Alice Wainwright Park, Miami, FL",
+        "distance_from_home_m": 2255,
+        "local_evidence": [
+          "user_coordinate_literal:25°44'51.6\"N 80°12'17.2\"W"
+        ],
+        "scan_evidence": [],
+        "external_evidence": [],
+        "skip_geocode_evidence": [
+          "raw_coordinate_literal"
+        ],
+        "geocode": {
+          "source": "manual_coordinate",
+          "query": "25°44'51.6\"N 80°12'17.2\"W",
+          "display_name": "User-provided coordinate in Alice Wainwright Park",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "Coordinate literal supplied by user; no geocoding API call used.",
+        "npc_associations": []
+      }
     }
   },
   "routines": {
