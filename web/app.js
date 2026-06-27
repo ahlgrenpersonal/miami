@@ -2,7 +2,7 @@ const STATE_URL = "../state.json";
 const ROUTING_GRAPH_URL = "routing_graph.json";
 const ROUTING_GRAPH_MANIFEST_URL = "routing_graph/manifest.json";
 const HOME_PLACE_ID = "place_id_panorama_tower";
-const OFFLINE_TILE_VERSION = "171";
+const OFFLINE_TILE_VERSION = "175";
 const HOME_RADIUS_METERS = 805;
 const DEFAULT_HOME_ZOOM = 15;
 const DEFAULT_MAX_SNAP_DISTANCE_METERS = 500;
@@ -1028,7 +1028,10 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=178", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=179", { updateViaCache: "none" })
+      .then((registration) => navigator.serviceWorker.ready.then((readyRegistration) => {
+        requestOfflineTileCache(readyRegistration || registration);
+      }))
       .catch((error) => {
         console.info("Offline service worker unavailable.", error);
       });
