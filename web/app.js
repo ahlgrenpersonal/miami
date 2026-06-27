@@ -9,6 +9,18 @@ const DEFAULT_MAX_SNAP_DISTANCE_METERS = 500;
 const ROUTE_SNAP_CANDIDATE_LIMIT = 32;
 const METROMOVER_SPEED_KMH = 22;
 const METROMOVER_WAIT_MINUTES = 5;
+const METROMOVER_STATION_LINKS = [
+  ["place_id_metromover_financial_district_station", "place_id_metromover_tenth_street_promenade_station"],
+  ["place_id_metromover_tenth_street_promenade_station", "place_id_metromover_brickell_city_centre_eight_street_station"],
+  ["place_id_metromover_brickell_city_centre_eight_street_station", "place_id_metromover_5th_st_station"],
+  ["place_id_metromover_5th_st_station", "place_id_metromover_riverwalk_station"],
+  ["place_id_metromover_riverwalk_station", "place_id_metromover_miami_avenue_station"],
+  ["place_id_metromover_miami_avenue_station", "place_id_metromover_government_center_station"],
+  ["place_id_metromover_government_center_station", "place_id_metromover_college_bayside_station"],
+  ["place_id_metromover_college_bayside_station", "place_id_metromover_museum_park_station"],
+  ["place_id_metromover_5th_st_station", "place_id_metromover_bayfront_park_station"],
+  ["place_id_metromover_bayfront_park_station", "place_id_metromover_college_bayside_station"],
+];
 const OFFLINE_TILE_BOUNDS = [[25.660, -80.275], [25.835, -80.100]];
 const QA_CANVAS_CAPTURE_DELAY_MS = 1200;
 const ROUTING_PROFILES = {
@@ -401,6 +413,7 @@ function initMap() {
     opacity: 0,
     dashArray: "8 8",
   }).addTo(app.map);
+  app.routeSegmentLines = [];
 
   for (const place of app.places) {
     const marker = L.marker(place.coordinates, {
@@ -712,8 +725,7 @@ async function renderRoute(options = {}) {
 
   if (from && to && app.routeLine) {
     if (app.routingGraphStatus === "loading" || app.routingGraphStatus === "idle") {
-      app.routeLine.setLatLngs([from.coordinates, to.coordinates]);
-      app.routeLine.setStyle({ opacity: 0.35, dashArray: "4 8" });
+      setRoutePreview([from.coordinates, to.coordinates], { opacity: 0.35 });
       dom.routeStatus.textContent = `${modeLabel}: loading local graph...`;
       dom.clearRoute.hidden = false;
       if (shouldFitMap) {
@@ -728,19 +740,14 @@ async function renderRoute(options = {}) {
     const route = getLocalRoute(from.coordinates, to.coordinates, app.travelMode);
     if (requestId !== app.routeRequestId) return;
     if (route) {
-      app.routeLine.setLatLngs(route.coordinates);
-      app.routeLine.setStyle({
-        opacity: 0.95,
-        dashArray: getRouteDashArray(app.travelMode),
-      });
+      renderRouteGeometry(route, app.travelMode);
       dom.routeStatus.textContent = `${modeLabel}: ${from.name} -> ${to.name} (${formatRouteSummary(route, app.travelMode)})`;
       if (shouldFitMap) {
         const bounds = L.latLngBounds(route.coordinates).pad(0.18);
         app.map.fitBounds(bounds, { animate: true, maxZoom: 17 });
       }
     } else {
-      app.routeLine.setLatLngs([from.coordinates, to.coordinates]);
-      app.routeLine.setStyle({ opacity: 0.7, dashArray: "4 8" });
+      setRoutePreview([from.coordinates, to.coordinates], { opacity: 0.7 });
       dom.routeStatus.textContent = `${modeLabel}: direct preview only; local graph unavailable for this pair`;
       if (shouldFitMap) {
         const bounds = L.latLngBounds([from.coordinates, to.coordinates]).pad(0.35);
@@ -749,10 +756,7 @@ async function renderRoute(options = {}) {
     }
     dom.clearRoute.hidden = false;
   } else {
-    if (app.routeLine) {
-      app.routeLine.setLatLngs([]);
-      app.routeLine.setStyle({ opacity: 0 });
-    }
+    clearRouteGeometry();
     const fromText = from ? `From ${from.name}` : "Choose a start";
     const toText = to ? `to ${to.name}` : "choose a destination";
     dom.routeStatus.textContent = `${modeLabel}: ${fromText}, ${toText}`;
@@ -814,13 +818,14 @@ function getMetromoverRoute(fromCoordinates, toCoordinates) {
   for (const startLeg of startLegs) {
     for (const endLeg of endLegs) {
       if (startLeg.station.id === endLeg.station.id) continue;
-      const metroDistanceM = getDistanceMeters(startLeg.station.coordinates, endLeg.station.coordinates);
+      const metroRoute = getMetromoverStationRoute(startLeg.station.id, endLeg.station.id);
+      if (!metroRoute) continue;
       const durationMinutes = getTravelMinutes(startLeg.route.distanceM, "shortest")
-        + getMetromoverMinutes(metroDistanceM)
+        + getMetromoverMinutes(metroRoute.distanceM)
         + getTravelMinutes(endLeg.route.distanceM, "shortest");
-      const distanceM = startLeg.route.distanceM + metroDistanceM + endLeg.route.distanceM;
+      const distanceM = startLeg.route.distanceM + metroRoute.distanceM + endLeg.route.distanceM;
       if (!best || durationMinutes < best.durationMinutes || (durationMinutes === best.durationMinutes && distanceM < best.distanceM)) {
-        best = { startLeg, endLeg, metroDistanceM, distanceM, durationMinutes };
+        best = { startLeg, endLeg, metroRoute, distanceM, durationMinutes };
       }
     }
   }
@@ -832,7 +837,7 @@ function getMetromoverRoute(fromCoordinates, toCoordinates) {
   return {
     coordinates: mergeRouteCoordinates(
       best.startLeg.route.coordinates,
-      [best.startLeg.station.coordinates, best.endLeg.station.coordinates],
+      best.metroRoute.coordinates,
       best.endLeg.route.coordinates
     ),
     distanceM: best.distanceM,
@@ -840,11 +845,117 @@ function getMetromoverRoute(fromCoordinates, toCoordinates) {
     metromoverUsed: true,
     metromoverStartName: best.startLeg.station.name,
     metromoverEndName: best.endLeg.station.name,
+    segments: [
+      { type: "walk", coordinates: best.startLeg.route.coordinates },
+      { type: "metromover", coordinates: best.metroRoute.coordinates },
+      { type: "walk", coordinates: best.endLeg.route.coordinates },
+    ],
   };
+}
+
+function renderRouteGeometry(route, mode) {
+  clearRouteSegments();
+  if (mode === "metromover" && route.metromoverUsed && route.segments?.length) {
+    app.routeLine.setLatLngs([]);
+    app.routeLine.setStyle({ opacity: 0 });
+    for (const segment of route.segments) {
+      const isMetromover = segment.type === "metromover";
+      const line = L.polyline(segment.coordinates, {
+        color: "#d95d39",
+        weight: 5,
+        opacity: 0.95,
+        dashArray: isMetromover ? "2 8" : "0",
+      }).addTo(app.map);
+      app.routeSegmentLines.push(line);
+    }
+    return;
+  }
+  app.routeLine.setLatLngs(route.coordinates);
+  app.routeLine.setStyle({
+    color: "#d95d39",
+    weight: 5,
+    opacity: 0.95,
+    dashArray: getRouteDashArray(mode),
+  });
+}
+
+function setRoutePreview(coordinates, options = {}) {
+  clearRouteSegments();
+  app.routeLine.setLatLngs(coordinates);
+  app.routeLine.setStyle({
+    color: "#d95d39",
+    weight: 5,
+    opacity: options.opacity ?? 0.7,
+    dashArray: "4 8",
+  });
+}
+
+function clearRouteGeometry() {
+  clearRouteSegments();
+  if (app.routeLine) {
+    app.routeLine.setLatLngs([]);
+    app.routeLine.setStyle({ opacity: 0 });
+  }
+}
+
+function clearRouteSegments() {
+  for (const line of app.routeSegmentLines || []) {
+    line.remove();
+  }
+  app.routeSegmentLines = [];
 }
 
 function getMetromoverStations() {
   return app.places.filter((place) => place.filterTags?.includes("metromover") && Array.isArray(place.coordinates));
+}
+
+function getMetromoverStationRoute(fromStationId, toStationId) {
+  if (fromStationId === toStationId) return null;
+  const stationsById = new Map(getMetromoverStations().map((station) => [station.id, station]));
+  const adjacency = new Map();
+  for (const [fromId, toId] of METROMOVER_STATION_LINKS) {
+    const from = stationsById.get(fromId);
+    const to = stationsById.get(toId);
+    if (!from || !to) continue;
+    const distanceM = getDistanceMeters(from.coordinates, to.coordinates);
+    if (!adjacency.has(fromId)) adjacency.set(fromId, []);
+    if (!adjacency.has(toId)) adjacency.set(toId, []);
+    adjacency.get(fromId).push({ id: toId, distanceM });
+    adjacency.get(toId).push({ id: fromId, distanceM });
+  }
+
+  const distances = new Map([[fromStationId, 0]]);
+  const previous = new Map();
+  const queue = new MinHeap();
+  queue.push(fromStationId, 0);
+  while (queue.size) {
+    const current = queue.pop();
+    if (!current) break;
+    if (current.priority > (distances.get(current.id) ?? Infinity)) continue;
+    if (current.id === toStationId) break;
+    for (const edge of adjacency.get(current.id) || []) {
+      const nextDistance = current.priority + edge.distanceM;
+      if (nextDistance < (distances.get(edge.id) ?? Infinity)) {
+        distances.set(edge.id, nextDistance);
+        previous.set(edge.id, current.id);
+        queue.push(edge.id, nextDistance);
+      }
+    }
+  }
+  if (!distances.has(toStationId)) return null;
+
+  const stationIds = [];
+  for (let id = toStationId; id; id = previous.get(id)) {
+    stationIds.push(id);
+    if (id === fromStationId) break;
+  }
+  stationIds.reverse();
+  if (stationIds[0] !== fromStationId) return null;
+
+  return {
+    coordinates: stationIds.map((id) => stationsById.get(id).coordinates),
+    distanceM: distances.get(toStationId),
+  };
 }
 
 function getMetromoverMinutes(distanceM) {
@@ -1236,7 +1347,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=187", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=188", { updateViaCache: "none" })
       .then((registration) => navigator.serviceWorker.ready.then((readyRegistration) => {
         requestOfflineTileCache(readyRegistration || registration);
       }))
