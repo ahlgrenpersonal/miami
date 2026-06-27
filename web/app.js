@@ -40,7 +40,7 @@ const ROUTING_PROFILES = {
   scenic: {
     label: "Scenic",
     speedKmh: WALK_SPEED_KMH,
-    scoreWeights: { waterside: 0.25, waterfront: 0.3, park_path: 0.45, car_free: 0.1, scenic: 0.18, kid_scooter: 0.02, traffic_stress: -0.18 },
+    scoreWeights: { waterside: 0.25, waterfront: 0.3, park_path: 0.45, car_free: 0.1, scenic: 0.18, kid_scooter: 0.02, traffic_stress: -0.18, noise: -0.85 },
     minMultiplier: 0.35,
     maxMultiplier: 2.6,
     hardPenalties: {},

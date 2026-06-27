@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-25T22:21:10Z",
-  "source": "OpenStreetMap Overpass API",
+  "generated_at": "2026-06-27T00:00:00Z",
+  "source": "OpenStreetMap Overpass API; scenic noise scores sampled from BTS National Transportation Noise Map 2022 CONUS road raster where available",
   "simplification": "none; every walkable OSM way node is preserved as a routing node",
   "max_snap_distance_m": 500,
   "bbox": {
@@ -23,7 +23,7 @@
     },
     "scenic": {
       "label": "Scenic",
-      "description": "Distance with bonuses for parks, waterfront-style names, low-stress paths, lighting, and walkable passages. Traffic crossings add fixed cost.",
+      "description": "Distance with bonuses for parks, waterfront-style names, low-stress paths, lighting, and walkable passages. Traffic crossings and static baseline transportation noise add cost.",
       "speed_kmh": 5.0,
       "score_weights": {
         "waterside": 0.25,
@@ -32,7 +32,8 @@
         "car_free": 0.1,
         "scenic": 0.18,
         "kid_scooter": 0.02,
-        "traffic_stress": -0.18
+        "traffic_stress": -0.18,
+        "noise": -0.85
       },
       "min_multiplier": 0.35,
       "max_multiplier": 2.6,
