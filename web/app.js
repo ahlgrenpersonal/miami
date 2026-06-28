@@ -23,6 +23,35 @@ const NOISE_OVERLAY_MIN_SCORE = 0.25;
 const NOISE_OVERLAY_MAX_EDGES = 9000;
 const RADAR_WMS_URL = "https://opengeo.ncep.noaa.gov/geoserver/conus/conus_bref_qcd/ows";
 const RADAR_LAYER_NAME = "conus_bref_qcd";
+const RADAR_CLEAR_AIR_SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="wash" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#cceef4" stop-opacity="0.42"/>
+      <stop offset="0.55" stop-color="#e8f8fb" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#b4dce8" stop-opacity="0.34"/>
+    </linearGradient>
+    <radialGradient id="puff" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.52"/>
+      <stop offset="0.52" stop-color="#ffffff" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1000" height="1000" fill="url(#wash)"/>
+  <g fill="url(#puff)">
+    <ellipse cx="150" cy="170" rx="150" ry="58"/>
+    <ellipse cx="360" cy="300" rx="210" ry="72"/>
+    <ellipse cx="770" cy="210" rx="180" ry="64"/>
+    <ellipse cx="650" cy="590" rx="240" ry="78"/>
+    <ellipse cx="220" cy="770" rx="190" ry="66"/>
+    <ellipse cx="865" cy="835" rx="170" ry="60"/>
+  </g>
+  <g fill="none" stroke="#62b9ca" stroke-opacity="0.24" stroke-width="10">
+    <path d="M-80 260 C 180 160, 360 360, 620 260 S 930 190, 1080 285"/>
+    <path d="M-60 560 C 180 460, 390 650, 630 540 S 900 480, 1060 585"/>
+    <path d="M-40 845 C 180 745, 385 900, 625 820 S 900 730, 1040 830"/>
+  </g>
+</svg>`;
 const WEATHER_REFRESH_MS = 15 * 60 * 1000;
 const METROMOVER_STATION_LINKS = [
   ["place_id_metromover_financial_district_station", "place_id_metromover_tenth_street_promenade_station"],
@@ -131,6 +160,7 @@ const app = {
   noiseOverlayEdges: null,
   noiseOverlayLayer: null,
   radarOverlayEnabled: false,
+  radarBackdropLayer: null,
   radarLayer: null,
   weatherRefreshTimer: null,
   weatherForecastSlots: [],
@@ -479,8 +509,10 @@ function setRadarOverlayEnabled(isEnabled) {
   if (!app.map) return;
   ensureRadarLayer();
   if (isEnabled) {
+    app.radarBackdropLayer.addTo(app.map);
     app.radarLayer.addTo(app.map);
-  } else if (app.radarLayer) {
+  } else {
+    app.radarBackdropLayer?.remove();
     app.radarLayer.remove();
   }
 }
@@ -488,12 +520,18 @@ function setRadarOverlayEnabled(isEnabled) {
 function ensureRadarLayer() {
   if (app.radarLayer) return;
   const refreshToken = Math.floor(Date.now() / (5 * 60 * 1000));
+  const clearAirUrl = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(RADAR_CLEAR_AIR_SVG)}`;
+  app.radarBackdropLayer = L.imageOverlay(clearAirUrl, OFFLINE_TILE_BOUNDS, {
+    opacity: 0.44,
+    interactive: false,
+    zIndex: 235,
+  });
   app.radarLayer = L.tileLayer.wms(RADAR_WMS_URL, {
     layers: RADAR_LAYER_NAME,
     format: "image/png",
     transparent: true,
     version: "1.1.1",
-    opacity: 0.58,
+    opacity: 0.62,
     zIndex: 240,
     uppercase: true,
     _ts: refreshToken,
