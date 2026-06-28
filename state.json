@@ -3258,6 +3258,45 @@
         "npc_associations": []
       }
     },
+    "place_id_rosetta_bakery_echo_brickell": {
+      "name": "Rosetta Bakery Echo Brickell",
+      "coordinates": [
+        25.758155,
+        -80.1923873
+      ],
+      "tags": [
+        "bakery",
+        "dessert",
+        "food"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 158,
+        "category": "Bakery",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "1451 Brickell Ave Cu-2, Miami, FL 33131",
+        "distance_from_home_m": 605,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "nominatim_address_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim",
+          "query": "1451 Brickell Ave, Miami, FL 33131",
+          "display_name": "Echo Brickell, 1451, Brickell Avenue, Brickell, Miami, Miami-Dade County, Florida, 33131, United States",
+          "match_score": 0.85,
+          "osm_type": "way",
+          "osm_id": 1071017393
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
     "place_id_e41_embarcadero_41_brickell": {
       "name": "E41 - Embarcadero 41 Brickell",
       "coordinates": [
