@@ -32,6 +32,7 @@ const METROMOVER_STATION_LINKS = [
   ["place_id_metromover_miami_avenue_station", "place_id_metromover_government_center_station"],
   ["place_id_metromover_government_center_station", "place_id_metromover_college_bayside_station"],
   ["place_id_metromover_college_bayside_station", "place_id_metromover_museum_park_station"],
+  ["place_id_metromover_museum_park_station", "place_id_adrienne_arsht_metromover_station"],
   ["place_id_metromover_riverwalk_station", "place_id_metromover_bayfront_park_station"],
   ["place_id_metromover_bayfront_park_station", "place_id_metromover_college_bayside_station"],
 ];
@@ -105,7 +106,7 @@ const SUPERMARKET_FILTER_TAGS = new Set(["supermarket"]);
 const SCHOOL_FILTER_TAGS = new Set(["academy", "elementary_school", "montessori_school", "preschool", "school"]);
 const PLAYGROUND_FILTER_TAGS = new Set(["playground"]);
 const PARK_FILTER_TAGS = new Set(["beach_park", "dog_park", "nature_preserve", "park"]);
-const METROMOVER_FILTER_TAGS = new Set(["metromover", "metromover_station"]);
+const METROMOVER_FILTER_TAGS = new Set(["metromover"]);
 const INDOOR_FILTER_TAGS = new Set(["childrens_museum", "indoors", "science_museum"]);
 
 const app = {
