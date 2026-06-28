@@ -256,13 +256,13 @@ function bindEvents() {
 
   dom.placesBrandToggle.addEventListener("click", (event) => {
     event.stopPropagation();
-    setPlacesPanelCollapsed(!app.placesPanelCollapsed);
+    togglePlacesPanel();
   });
 
   dom.placesBrandToggle.addEventListener("keydown", (event) => {
     if (event.key !== "Enter" && event.key !== " ") return;
     event.preventDefault();
-    setPlacesPanelCollapsed(!app.placesPanelCollapsed);
+    togglePlacesPanel();
   });
 
   dom.resetFilters.addEventListener("click", () => {
@@ -320,10 +320,7 @@ function bindEvents() {
   dom.modeScooter.addEventListener("click", () => setTravelMode("kid_scooter"));
 
   dom.clearRoute.addEventListener("click", () => {
-    app.routeFromId = null;
-    app.routeToId = null;
-    app.routeAnchorMode = null;
-    renderRoute();
+    clearRouteState();
   });
 }
 
@@ -478,6 +475,28 @@ function setPlacesPanelCollapsed(isCollapsed) {
   dom.placesBrandToggle.setAttribute("aria-label", isCollapsed ? "Expand places" : "Collapse places");
   dom.placesBrandToggle.setAttribute("aria-expanded", String(!isCollapsed));
   window.setTimeout(() => app.map?.invalidateSize(), 120);
+}
+
+function togglePlacesPanel() {
+  const isOpening = app.placesPanelCollapsed;
+  if (isOpening) closeRouteTool();
+  setPlacesPanelCollapsed(!app.placesPanelCollapsed);
+}
+
+function closeRouteTool() {
+  app.selectedId = null;
+  dom.detailSheet.classList.remove("is-open");
+  app.map?.closePopup();
+  clearRouteState();
+  renderMarkers();
+  renderList();
+}
+
+function clearRouteState() {
+  app.routeFromId = null;
+  app.routeToId = null;
+  app.routeAnchorMode = null;
+  renderRoute();
 }
 
 function setNoiseOverlayEnabled(isEnabled) {
@@ -2025,7 +2044,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=199", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=200", { updateViaCache: "none" })
       .then((registration) => navigator.serviceWorker.ready.then((readyRegistration) => {
         requestOfflineTileCache(readyRegistration || registration);
       }))
