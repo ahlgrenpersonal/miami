@@ -23,33 +23,45 @@ const NOISE_OVERLAY_MIN_SCORE = 0.25;
 const NOISE_OVERLAY_MAX_EDGES = 9000;
 const RADAR_WMS_URL = "https://opengeo.ncep.noaa.gov/geoserver/conus/conus_bref_qcd/ows";
 const RADAR_LAYER_NAME = "conus_bref_qcd";
-const RADAR_CLEAR_AIR_SVG = `
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" preserveAspectRatio="none">
+const WEATHER_BASE_TILE_SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" preserveAspectRatio="none">
   <defs>
     <linearGradient id="wash" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#cceef4" stop-opacity="0.42"/>
-      <stop offset="0.55" stop-color="#e8f8fb" stop-opacity="0.2"/>
-      <stop offset="1" stop-color="#b4dce8" stop-opacity="0.34"/>
+      <stop offset="0" stop-color="#b8e9f4" stop-opacity="0.66"/>
+      <stop offset="0.45" stop-color="#f4fbfc" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#88c6dc" stop-opacity="0.58"/>
     </linearGradient>
     <radialGradient id="puff" cx="50%" cy="50%" r="50%">
-      <stop offset="0" stop-color="#ffffff" stop-opacity="0.52"/>
-      <stop offset="0.52" stop-color="#ffffff" stop-opacity="0.24"/>
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.88"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.36"/>
       <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
     </radialGradient>
   </defs>
-  <rect width="1000" height="1000" fill="url(#wash)"/>
-  <g fill="url(#puff)">
-    <ellipse cx="150" cy="170" rx="150" ry="58"/>
-    <ellipse cx="360" cy="300" rx="210" ry="72"/>
-    <ellipse cx="770" cy="210" rx="180" ry="64"/>
-    <ellipse cx="650" cy="590" rx="240" ry="78"/>
-    <ellipse cx="220" cy="770" rx="190" ry="66"/>
-    <ellipse cx="865" cy="835" rx="170" ry="60"/>
+  <rect width="256" height="256" fill="url(#wash)"/>
+  <g fill="#ffffff" fill-opacity="0.16">
+    <path d="M-20 32 C 32 8, 66 38, 108 26 S 170 10, 222 34 S 280 38, 286 16 L286 -8 L-20 -8 Z"/>
+    <path d="M-24 130 C 28 96, 78 148, 130 122 S 194 94, 278 136 L278 168 L-24 170 Z"/>
+    <path d="M-20 238 C 34 204, 78 246, 128 224 S 196 204, 278 236 L278 268 L-20 268 Z"/>
   </g>
-  <g fill="none" stroke="#62b9ca" stroke-opacity="0.24" stroke-width="10">
-    <path d="M-80 260 C 180 160, 360 360, 620 260 S 930 190, 1080 285"/>
-    <path d="M-60 560 C 180 460, 390 650, 630 540 S 900 480, 1060 585"/>
-    <path d="M-40 845 C 180 745, 385 900, 625 820 S 900 730, 1040 830"/>
+  <g fill="url(#puff)">
+    <ellipse cx="48" cy="54" rx="44" ry="18"/>
+    <ellipse cx="132" cy="84" rx="66" ry="22"/>
+    <ellipse cx="214" cy="58" rx="52" ry="18"/>
+    <ellipse cx="80" cy="164" rx="56" ry="20"/>
+    <ellipse cx="188" cy="178" rx="72" ry="22"/>
+    <ellipse cx="34" cy="230" rx="48" ry="18"/>
+  </g>
+  <g fill="none" stroke-linecap="round">
+    <g stroke="#2f9db3" stroke-opacity="0.35" stroke-width="4">
+      <path d="M-24 72 C 32 38, 96 100, 156 68 S 224 44, 280 74"/>
+      <path d="M-18 152 C 42 112, 96 174, 158 142 S 226 126, 282 158"/>
+      <path d="M-14 222 C 42 190, 94 240, 156 212 S 226 190, 280 220"/>
+    </g>
+    <g stroke="#ffffff" stroke-opacity="0.45" stroke-width="2">
+      <path d="M18 72 C 68 52, 110 86, 156 70"/>
+      <path d="M32 152 C 76 132, 118 166, 162 144"/>
+      <path d="M20 222 C 70 202, 112 230, 158 214"/>
+    </g>
   </g>
 </svg>`;
 const WEATHER_REFRESH_MS = 15 * 60 * 1000;
@@ -159,8 +171,8 @@ const app = {
   noiseOverlayEnabled: false,
   noiseOverlayEdges: null,
   noiseOverlayLayer: null,
-  radarOverlayEnabled: false,
-  radarBackdropLayer: null,
+  weatherOverlayEnabled: false,
+  weatherBackdropLayer: null,
   radarLayer: null,
   weatherRefreshTimer: null,
   weatherForecastSlots: [],
@@ -199,7 +211,7 @@ function bindDom() {
   dom.placesBrandToggle = document.querySelector("#places-brand-toggle");
   dom.tagFilters = document.querySelector("#tag-filters");
   dom.noiseFilter = document.querySelector("#noise-filter");
-  dom.radarFilter = document.querySelector("#radar-filter");
+  dom.weatherLayerFilter = document.querySelector("#weather-layer-filter");
   dom.placeList = document.querySelector("#place-list");
   dom.resetFilters = document.querySelector("#reset-filters");
   dom.detailSheet = document.querySelector("#detail-sheet");
@@ -237,8 +249,8 @@ function bindEvents() {
     setNoiseOverlayEnabled(dom.noiseFilter.checked);
   });
 
-  dom.radarFilter.addEventListener("change", () => {
-    setRadarOverlayEnabled(dom.radarFilter.checked);
+  dom.weatherLayerFilter.addEventListener("change", () => {
+    setWeatherOverlayEnabled(dom.weatherLayerFilter.checked);
   });
 
   dom.placesBrandToggle.addEventListener("click", (event) => {
@@ -482,26 +494,26 @@ function setNoiseOverlayEnabled(isEnabled) {
   }
 }
 
-function setRadarOverlayEnabled(isEnabled) {
-  app.radarOverlayEnabled = isEnabled;
-  dom.radarFilter.checked = isEnabled;
+function setWeatherOverlayEnabled(isEnabled) {
+  app.weatherOverlayEnabled = isEnabled;
+  dom.weatherLayerFilter.checked = isEnabled;
   if (!app.map) return;
-  ensureRadarLayer();
+  ensureWeatherOverlayLayer();
   if (isEnabled) {
-    app.radarBackdropLayer.addTo(app.map);
+    app.weatherBackdropLayer.addTo(app.map);
     app.radarLayer.addTo(app.map);
   } else {
-    app.radarBackdropLayer?.remove();
+    app.weatherBackdropLayer?.remove();
     app.radarLayer.remove();
   }
 }
 
-function ensureRadarLayer() {
+function ensureWeatherOverlayLayer() {
   if (app.radarLayer) return;
   const refreshToken = Math.floor(Date.now() / (5 * 60 * 1000));
-  const clearAirUrl = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(RADAR_CLEAR_AIR_SVG)}`;
-  app.radarBackdropLayer = L.imageOverlay(clearAirUrl, OFFLINE_TILE_BOUNDS, {
-    opacity: 0.44,
+  const weatherBaseUrl = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(WEATHER_BASE_TILE_SVG)}`;
+  app.weatherBackdropLayer = L.tileLayer(weatherBaseUrl, {
+    opacity: 0.52,
     interactive: false,
     zIndex: 235,
   });
@@ -514,7 +526,7 @@ function ensureRadarLayer() {
     zIndex: 240,
     uppercase: true,
     _ts: refreshToken,
-    attribution: "NOAA/NWS MRMS radar",
+    attribution: "NOAA/NWS MRMS weather radar",
   });
 }
 
@@ -1995,7 +2007,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=195", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=198", { updateViaCache: "none" })
       .then((registration) => navigator.serviceWorker.ready.then((readyRegistration) => {
         requestOfflineTileCache(readyRegistration || registration);
       }))
