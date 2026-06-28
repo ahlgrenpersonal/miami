@@ -1099,7 +1099,7 @@ function selectPlace(id, options = {}) {
       window.setTimeout(() => marker.openPopup(), 180);
     }
   }
-  renderDetail(place, { fitRouteMap: !preserveMapView });
+  renderDetail(place);
   renderMarkers();
   renderList();
 }
@@ -1115,13 +1115,13 @@ function renderSelectedCircle() {
   app.selectedCircle.setStyle({ opacity: 1, fillOpacity: 0.16 });
 }
 
-function renderDetail(place, options = {}) {
+function renderDetail(place) {
   dom.detailTitleLink.textContent = place.name;
   dom.detailTitleLink.href = getGoogleMapsUrl(place);
   dom.detailTitleLink.title = `Open ${place.name} in Google Maps`;
   dom.detailTitleLink.setAttribute("aria-label", `Open ${place.name} in Google Maps`);
   dom.detailSheet.classList.add("is-open");
-  renderRoute({ fitMap: options.fitRouteMap !== false });
+  renderRoute();
 }
 
 function setTravelMode(mode) {
@@ -1141,43 +1141,28 @@ function syncTravelModeButtons() {
   dom.routeMetromover.setAttribute("aria-pressed", String(app.travelMode === "metromover"));
 }
 
-async function renderRoute(options = {}) {
+async function renderRoute() {
   const requestId = ++app.routeRequestId;
   const from = app.places.find((place) => place.id === app.routeFromId);
   const to = app.places.find((place) => place.id === app.routeToId);
   const modeLabel = getTravelModeLabel(app.travelMode);
-  const shouldFitMap = options.fitMap !== false;
 
   if (from && to && app.routeLine) {
+    clearRouteGeometry();
     if (app.routingGraphStatus === "loading" || app.routingGraphStatus === "idle") {
-      setRoutePreview([from.coordinates, to.coordinates], { opacity: 0.35 });
       dom.routeStatus.textContent = `${modeLabel}: loading local graph...`;
       dom.clearRoute.hidden = false;
-      if (shouldFitMap) {
-        const bounds = L.latLngBounds([from.coordinates, to.coordinates]).pad(0.35);
-        app.map.fitBounds(bounds, { animate: true, maxZoom: 17 });
-      }
       ensureRoutingGraph().then(() => {
-        if (requestId === app.routeRequestId) renderRoute({ fitMap: shouldFitMap });
+        if (requestId === app.routeRequestId) renderRoute();
       });
       return;
     }
     const route = getLocalRoute(from.coordinates, to.coordinates, app.travelMode);
     if (requestId !== app.routeRequestId) return;
     if (route) {
-      renderRouteGeometry(route, app.travelMode);
       dom.routeStatus.textContent = `${modeLabel}: ${from.name} -> ${to.name} (${formatRouteSummary(route, app.travelMode)})`;
-      if (shouldFitMap) {
-        const bounds = L.latLngBounds(route.coordinates).pad(0.18);
-        app.map.fitBounds(bounds, { animate: true, maxZoom: 17 });
-      }
     } else {
-      setRoutePreview([from.coordinates, to.coordinates], { opacity: 0.7 });
       dom.routeStatus.textContent = `${modeLabel}: direct preview only; local graph unavailable for this pair`;
-      if (shouldFitMap) {
-        const bounds = L.latLngBounds([from.coordinates, to.coordinates]).pad(0.35);
-        app.map.fitBounds(bounds, { animate: true, maxZoom: 17 });
-      }
     }
     dom.clearRoute.hidden = false;
   } else {
@@ -2044,7 +2029,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=200", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=201", { updateViaCache: "none" })
       .then((registration) => navigator.serviceWorker.ready.then((readyRegistration) => {
         requestOfflineTileCache(readyRegistration || registration);
       }))
