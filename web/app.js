@@ -133,6 +133,9 @@ const app = {
   radarOverlayEnabled: false,
   radarLayer: null,
   weatherRefreshTimer: null,
+  weatherForecastSlots: [],
+  weatherForecastError: "",
+  weatherPanelOpen: false,
   routeRequestId: 0,
 };
 
@@ -157,6 +160,8 @@ async function init() {
 function bindDom() {
   dom.map = document.querySelector("#map");
   dom.weatherPill = document.querySelector("#weather-pill");
+  dom.weatherPanel = document.querySelector("#weather-panel");
+  dom.weatherForecast = document.querySelector("#weather-forecast");
   dom.placeCount = document.querySelector("#place-count");
   dom.visibleCount = document.querySelector("#visible-count");
   dom.searchInput = document.querySelector("#search-input");
@@ -182,6 +187,17 @@ function bindDom() {
 }
 
 function bindEvents() {
+  dom.weatherPill.addEventListener("click", (event) => {
+    event.stopPropagation();
+    setWeatherPanelOpen(!app.weatherPanelOpen);
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!app.weatherPanelOpen) return;
+    if (dom.weatherPanel.contains(event.target) || dom.weatherPill.contains(event.target)) return;
+    setWeatherPanelOpen(false);
+  });
+
   dom.searchInput.addEventListener("input", () => {
     app.search = normalizeSearchText(dom.searchInput.value);
     renderAll();
@@ -267,7 +283,7 @@ function bindEvents() {
 }
 
 async function refreshWeather() {
-  if (!dom.weatherPill || !app.state?.user_profile?.home_base) return;
+  if (!dom.weatherPill || !dom.weatherPanel || !app.state?.user_profile?.home_base) return;
   window.clearTimeout(app.weatherRefreshTimer);
   try {
     const [lat, lon] = app.state.user_profile.home_base;
@@ -275,10 +291,16 @@ async function refreshWeather() {
     dom.weatherPill.textContent = `${Math.round(weather.temperatureC)}°C · RH ${Math.round(weather.humidityPct)}% · Rain ${Math.round(weather.rainPct)}%`;
     dom.weatherPill.title = "Weather near Panorama Tower";
     dom.weatherPill.classList.remove("is-muted");
+    app.weatherForecastSlots = weather.slots;
+    app.weatherForecastError = "";
+    renderWeatherForecast();
   } catch (error) {
     dom.weatherPill.textContent = "Weather unavailable";
     dom.weatherPill.title = "Weather unavailable";
     dom.weatherPill.classList.add("is-muted");
+    app.weatherForecastSlots = [];
+    app.weatherForecastError = "Weather unavailable";
+    renderWeatherForecast("Weather unavailable");
   } finally {
     app.weatherRefreshTimer = window.setTimeout(refreshWeather, WEATHER_REFRESH_MS);
   }
@@ -289,9 +311,9 @@ async function fetchWeatherSummary(lat, lon) {
     latitude: lat.toFixed(5),
     longitude: lon.toFixed(5),
     current: "temperature_2m,relative_humidity_2m",
-    hourly: "precipitation_probability",
+    hourly: "temperature_2m,relative_humidity_2m,precipitation_probability",
     temperature_unit: "celsius",
-    forecast_hours: "6",
+    forecast_days: "2",
     timezone: "auto",
   });
   const response = await fetch(`https://api.open-meteo.com/v1/forecast?${params.toString()}`, { cache: "no-store" });
@@ -299,17 +321,110 @@ async function fetchWeatherSummary(lat, lon) {
   const data = await response.json();
   const temperatureC = Number(data.current?.temperature_2m);
   const humidityPct = Number(data.current?.relative_humidity_2m);
-  const rainPct = getSecondHighestHourlyValue(data.hourly, "precipitation_probability");
+  const rainPct = getSecondHighestForecastValue(data.hourly, "precipitation_probability", new Date(), 6);
+  const slots = getDaytimeWeatherSlots(data.hourly, new Date());
   if (!Number.isFinite(temperatureC) || !Number.isFinite(humidityPct) || !Number.isFinite(rainPct)) {
     throw new Error("Weather response missing expected values");
   }
-  return { temperatureC, humidityPct, rainPct };
+  return { temperatureC, humidityPct, rainPct, slots };
 }
 
-function getSecondHighestHourlyValue(hourly, field) {
-  const values = hourly?.[field] || [];
+function getSecondHighestForecastValue(hourly, field, now, hours) {
+  const times = hourly?.time || [];
+  const values = [];
+  for (let index = 0; index < times.length; index += 1) {
+    const time = parseWeatherTime(times[index]);
+    if (!time || time < now) continue;
+    const hoursAhead = (time - now) / (60 * 60 * 1000);
+    if (hoursAhead >= hours) continue;
+    values.push(Number(hourly?.[field]?.[index]));
+  }
   const sortedValues = values.map(Number).filter(Number.isFinite).sort((left, right) => right - left);
   return sortedValues[1] ?? sortedValues[0] ?? NaN;
+}
+
+function getDaytimeWeatherSlots(hourly, now) {
+  const times = hourly?.time || [];
+  const slots = [];
+  for (let index = 0; index < times.length; index += 1) {
+    const time = parseWeatherTime(times[index]);
+    if (!time || time < now) continue;
+    const hour = time.getHours();
+    if (hour < 8 || hour > 19) continue;
+    slots.push({
+      time,
+      dateKey: getWeatherDateKey(time),
+      hour,
+      temperatureC: Number(hourly?.temperature_2m?.[index]),
+      humidityPct: Number(hourly?.relative_humidity_2m?.[index]),
+      rainPct: Number(hourly?.precipitation_probability?.[index]),
+    });
+  }
+  return slots.filter((slot) => (
+    Number.isFinite(slot.temperatureC)
+    && Number.isFinite(slot.humidityPct)
+    && Number.isFinite(slot.rainPct)
+  ));
+}
+
+function parseWeatherTime(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function getWeatherDateKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function renderWeatherForecast(message = "") {
+  if (!dom.weatherForecast) return;
+  if (!message && app.weatherForecastError) message = app.weatherForecastError;
+  if (message) {
+    dom.weatherForecast.innerHTML = `<p class="weather-empty">${message}</p>`;
+    return;
+  }
+  if (!app.weatherForecastSlots.length) {
+    dom.weatherForecast.innerHTML = '<p class="weather-empty">Forecast unavailable.</p>';
+    return;
+  }
+  const todayKey = getWeatherDateKey(new Date());
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowKey = getWeatherDateKey(tomorrow);
+  const groups = [
+    { key: todayKey, label: "Today" },
+    { key: tomorrowKey, label: "Tomorrow" },
+  ].map((group) => ({
+    ...group,
+    slots: app.weatherForecastSlots.filter((slot) => slot.dateKey === group.key),
+  }));
+
+  const content = groups.map((group) => `
+    <section class="weather-day">
+      <h3>${group.label}</h3>
+      ${group.slots.length ? group.slots.map((slot) => `
+        <div class="weather-slot">
+          <span>${formatWeatherHour(slot.hour)}</span>
+          <span>${Math.round(slot.temperatureC)}°C</span>
+          <span>H ${Math.round(slot.humidityPct)}%</span>
+          <span>Rain ${Math.round(slot.rainPct)}%</span>
+        </div>
+      `).join("") : '<p class="weather-empty">No remaining 8-19 slots.</p>'}
+    </section>
+  `).join("");
+  dom.weatherForecast.innerHTML = content || '<p class="weather-empty">Forecast unavailable.</p>';
+}
+
+function formatWeatherHour(hour) {
+  return `${String(hour).padStart(2, "0")}:00`;
+}
+
+function setWeatherPanelOpen(isOpen) {
+  app.weatherPanelOpen = isOpen;
+  dom.weatherPanel.hidden = !isOpen;
+  dom.weatherPill.setAttribute("aria-expanded", String(isOpen));
+  if (isOpen) renderWeatherForecast();
 }
 
 function setPlacesPanelCollapsed(isCollapsed) {

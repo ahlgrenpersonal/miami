@@ -80,12 +80,75 @@ button {
   line-height: 1.15;
   text-align: center;
   white-space: nowrap;
-  pointer-events: none;
+  cursor: pointer;
+  pointer-events: auto;
 }
 
 .weather-pill.is-muted {
   color: var(--muted);
   font-weight: 650;
+}
+
+.weather-panel {
+  position: absolute;
+  top: calc(max(12px, env(safe-area-inset-top)) + 42px);
+  right: 12px;
+  z-index: 520;
+  width: min(300px, calc(100vw - 24px));
+  max-height: min(62vh, 520px);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 252, 246, 0.96);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+  pointer-events: auto;
+}
+
+.weather-forecast {
+  max-height: inherit;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.weather-day + .weather-day {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.weather-day h3 {
+  margin: 0 0 6px;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.weather-slot {
+  display: grid;
+  grid-template-columns: 44px repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  align-items: baseline;
+  padding: 5px 0;
+  border-top: 1px solid rgba(32, 49, 45, 0.08);
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.weather-slot:first-of-type {
+  border-top: 0;
+}
+
+.weather-slot span:first-child {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.weather-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
 }
 
 .places-panel,

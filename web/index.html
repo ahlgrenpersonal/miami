@@ -8,13 +8,16 @@
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="vendor/leaflet/leaflet.css?v=175">
-    <link rel="stylesheet" href="styles.css?v=199">
+    <link rel="stylesheet" href="styles.css?v=200">
   </head>
   <body>
     <main class="app-shell">
       <section class="map-stage" aria-label="SPIN Brickell map">
         <div id="map"></div>
-        <div id="weather-pill" class="weather-pill" aria-live="polite">Weather...</div>
+        <button id="weather-pill" class="weather-pill" type="button" aria-expanded="false" aria-controls="weather-panel">Weather...</button>
+        <section id="weather-panel" class="weather-panel" aria-label="Weather forecast" hidden>
+          <div id="weather-forecast" class="weather-forecast">Loading forecast...</div>
+        </section>
 
         <aside id="places-panel" class="places-panel is-collapsed" aria-label="Places">
           <div class="places-brand">
@@ -70,6 +73,6 @@
     </main>
 
     <script src="vendor/leaflet/leaflet.js?v=175"></script>
-    <script src="app.js?v=207"></script>
+    <script src="app.js?v=208"></script>
   </body>
 </html>
