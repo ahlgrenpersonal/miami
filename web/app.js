@@ -166,6 +166,7 @@ function bindDom() {
   dom.visibleCount = document.querySelector("#visible-count");
   dom.searchInput = document.querySelector("#search-input");
   dom.placesPanel = document.querySelector("#places-panel");
+  dom.placesBrandToggle = document.querySelector("#places-brand-toggle");
   dom.togglePlacesPanel = document.querySelector("#toggle-places-panel");
   dom.collapsePlacesBottom = document.querySelector("#collapse-places-bottom");
   dom.tagFilters = document.querySelector("#tag-filters");
@@ -212,7 +213,24 @@ function bindEvents() {
     setRadarOverlayEnabled(dom.radarFilter.checked);
   });
 
-  dom.togglePlacesPanel.addEventListener("click", () => {
+  dom.placesPanel.addEventListener("click", () => {
+    if (!app.placesPanelCollapsed) return;
+    setPlacesPanelCollapsed(false);
+  });
+
+  dom.placesBrandToggle.addEventListener("click", (event) => {
+    event.stopPropagation();
+    setPlacesPanelCollapsed(!app.placesPanelCollapsed);
+  });
+
+  dom.placesBrandToggle.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    setPlacesPanelCollapsed(!app.placesPanelCollapsed);
+  });
+
+  dom.togglePlacesPanel.addEventListener("click", (event) => {
+    event.stopPropagation();
     setPlacesPanelCollapsed(!app.placesPanelCollapsed);
   });
 
@@ -434,6 +452,8 @@ function setPlacesPanelCollapsed(isCollapsed) {
   dom.togglePlacesPanel.title = isCollapsed ? "Expand places" : "Collapse places";
   dom.togglePlacesPanel.setAttribute("aria-label", isCollapsed ? "Expand places" : "Collapse places");
   dom.togglePlacesPanel.setAttribute("aria-expanded", String(!isCollapsed));
+  dom.placesBrandToggle.setAttribute("aria-label", isCollapsed ? "Expand places" : "Collapse places");
+  dom.placesBrandToggle.setAttribute("aria-expanded", String(!isCollapsed));
   dom.collapsePlacesBottom.hidden = isCollapsed;
   window.setTimeout(() => app.map?.invalidateSize(), 120);
 }

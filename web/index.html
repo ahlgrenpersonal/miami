@@ -8,7 +8,7 @@
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="vendor/leaflet/leaflet.css?v=175">
-    <link rel="stylesheet" href="styles.css?v=200">
+    <link rel="stylesheet" href="styles.css?v=201">
   </head>
   <body>
     <main class="app-shell">
@@ -20,7 +20,7 @@
         </section>
 
         <aside id="places-panel" class="places-panel is-collapsed" aria-label="Places">
-          <div class="places-brand">
+          <div id="places-brand-toggle" class="places-brand" role="button" tabindex="0" aria-controls="places-panel" aria-expanded="false" aria-label="Expand places">
             <span class="brand-mark" aria-hidden="true"></span>
             <div>
               <h1>SPIN Brickell</h1>
@@ -73,6 +73,6 @@
     </main>
 
     <script src="vendor/leaflet/leaflet.js?v=175"></script>
-    <script src="app.js?v=209"></script>
+    <script src="app.js?v=210"></script>
   </body>
 </html>

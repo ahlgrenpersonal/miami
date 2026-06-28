@@ -203,10 +203,19 @@ button {
   gap: 10px;
   min-width: 0;
   margin-bottom: 12px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .places-panel.is-collapsed .places-brand {
   margin-bottom: 0;
+}
+
+.places-brand:focus-visible {
+  outline: 3px solid rgba(8, 127, 140, 0.24);
+  outline-offset: 4px;
+  border-radius: 8px;
 }
 
 .places-brand > div {
