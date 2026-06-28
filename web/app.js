@@ -12,8 +12,9 @@ const DEFAULT_MAX_SNAP_DISTANCE_METERS = 500;
 const ROUTE_SNAP_CANDIDATE_LIMIT = 32;
 const METROMOVER_SPEED_KMH = 14.5;
 const METROMOVER_WAIT_MINUTES = 2;
-const WATER_TAXI_WAIT_MINUTES = 5;
+const WATER_TAXI_WAIT_MINUTES = 15;
 const WATER_TAXI_CROSSING_MINUTES = 20;
+const TRANSIT_TRANSFER_MAX_DISTANCE_METERS = 1800;
 const WATER_TAXI_STOP_IDS = [
   "place_id_miami_beach_water_taxi_downtown_miami",
   "place_id_water_taxi_mia_miami_beach",
@@ -1020,35 +1021,233 @@ function getGraphRoute(fromCoordinates, toCoordinates, mode) {
 
 function getMetromoverRoute(fromCoordinates, toCoordinates) {
   const walkingRoute = getGraphRoute(fromCoordinates, toCoordinates, "shortest");
-  if (!walkingRoute) return null;
+  const transitRoute = getBestMultimodalTransitRoute(fromCoordinates, toCoordinates);
+  if (!walkingRoute) return transitRoute;
 
   const walkingMinutes = getTravelMinutes(walkingRoute.distanceM, "shortest");
-  let best = getBestMetromoverCandidate(fromCoordinates, toCoordinates);
-  const waterTaxiCandidate = getBestWaterTaxiCandidate(fromCoordinates, toCoordinates);
-  if (waterTaxiCandidate && (!best || waterTaxiCandidate.durationMinutes < best.durationMinutes
-    || (waterTaxiCandidate.durationMinutes === best.durationMinutes && waterTaxiCandidate.distanceM < best.distanceM))) {
-    best = waterTaxiCandidate;
-  }
-
-  if (!best || best.durationMinutes >= walkingMinutes) {
+  if (!transitRoute || transitRoute.durationMinutes >= walkingMinutes) {
     return { ...walkingRoute, durationMinutes: walkingMinutes, metromoverUsed: false, transitUsed: false };
   }
 
-  return {
-    coordinates: mergeRouteCoordinates(...best.segments.map((segment) => segment.coordinates)),
-    distanceM: best.distanceM,
-    durationMinutes: best.durationMinutes,
-    metromoverUsed: best.type === "metromover",
-    waterTaxiUsed: best.type === "water_taxi",
-    transitUsed: true,
-    transitStartName: best.startName,
-    transitEndName: best.endName,
-    metromoverStartName: best.type === "metromover" ? best.startName : undefined,
-    metromoverEndName: best.type === "metromover" ? best.endName : undefined,
-    waterTaxiStartName: best.type === "water_taxi" ? best.startName : undefined,
-    waterTaxiEndName: best.type === "water_taxi" ? best.endName : undefined,
-    segments: best.segments,
+  return transitRoute;
+}
+
+function getBestMultimodalTransitRoute(fromCoordinates, toCoordinates) {
+  const transitNodes = getTransitNodes(fromCoordinates, toCoordinates);
+  if (transitNodes.length < 4) return null;
+
+  const nodeById = new Map(transitNodes.map((node) => [node.id, node]));
+  const adjacency = new Map(transitNodes.map((node) => [node.id, []]));
+  const routeCache = new Map();
+
+  const addEdge = (fromId, toId, edge) => {
+    if (!adjacency.has(fromId)) adjacency.set(fromId, []);
+    adjacency.get(fromId).push({ toId, edge });
   };
+
+  const getWalkingRoute = (fromNode, toNode) => {
+    const cacheKey = `${fromNode.id}->${toNode.id}`;
+    if (routeCache.has(cacheKey)) return routeCache.get(cacheKey);
+    const route = getGraphRoute(fromNode.coordinates, toNode.coordinates, "shortest");
+    routeCache.set(cacheKey, route);
+    return route;
+  };
+
+  for (const node of transitNodes) {
+    if (node.type === "endpoint") continue;
+    const startRoute = getWalkingRoute(nodeById.get("origin"), node);
+    if (startRoute) {
+      addEdge("origin", node.id, {
+        type: "walk",
+        distanceM: startRoute.distanceM,
+        durationMinutes: getTravelMinutes(startRoute.distanceM, "shortest"),
+        coordinates: startRoute.coordinates,
+        startId: "origin",
+        endId: node.id,
+        endName: node.name,
+      });
+    }
+
+    const endRoute = getWalkingRoute(node, nodeById.get("destination"));
+    if (endRoute) {
+      addEdge(node.id, "destination", {
+        type: "walk",
+        distanceM: endRoute.distanceM,
+        durationMinutes: getTravelMinutes(endRoute.distanceM, "shortest"),
+        coordinates: endRoute.coordinates,
+        startId: node.id,
+        endId: "destination",
+        startName: node.name,
+      });
+    }
+  }
+
+  const transferNodes = transitNodes.filter((node) => node.type !== "endpoint");
+  for (let outer = 0; outer < transferNodes.length; outer += 1) {
+    for (let inner = outer + 1; inner < transferNodes.length; inner += 1) {
+      const fromNode = transferNodes[outer];
+      const toNode = transferNodes[inner];
+      if (getDistanceMeters(fromNode.coordinates, toNode.coordinates) > TRANSIT_TRANSFER_MAX_DISTANCE_METERS) continue;
+      const route = getWalkingRoute(fromNode, toNode);
+      if (!route) continue;
+      const edge = {
+        type: "walk",
+        distanceM: route.distanceM,
+        durationMinutes: getTravelMinutes(route.distanceM, "shortest"),
+        coordinates: route.coordinates,
+        startId: fromNode.id,
+        endId: toNode.id,
+        startName: fromNode.name,
+        endName: toNode.name,
+      };
+      addEdge(fromNode.id, toNode.id, edge);
+      addEdge(toNode.id, fromNode.id, {
+        ...edge,
+        coordinates: [...edge.coordinates].reverse(),
+        startId: toNode.id,
+        endId: fromNode.id,
+        startName: toNode.name,
+        endName: fromNode.name,
+      });
+    }
+  }
+
+  addMetromoverTransitEdges(nodeById, addEdge);
+  addWaterTaxiTransitEdges(nodeById, addEdge);
+
+  const result = findShortestTransitPath(adjacency, "origin", "destination");
+  if (!result?.segments?.length) return null;
+
+  const segments = result.segments;
+  const metromoverSegments = segments.filter((segment) => segment.type === "metromover");
+  const waterTaxiSegments = segments.filter((segment) => segment.type === "water_taxi");
+  const metromoverUsed = metromoverSegments.length > 0;
+  const waterTaxiUsed = waterTaxiSegments.length > 0;
+  const transitWaitMinutes = metromoverUsed ? METROMOVER_WAIT_MINUTES : 0;
+
+  return {
+    coordinates: mergeRouteCoordinates(...segments.map((segment) => segment.coordinates)),
+    distanceM: segments.reduce((sum, segment) => sum + segment.distanceM, 0),
+    durationMinutes: Math.round(segments.reduce((sum, segment) => sum + segment.durationMinutes, 0) + transitWaitMinutes),
+    metromoverUsed,
+    waterTaxiUsed,
+    combinedTransitUsed: metromoverUsed && waterTaxiUsed,
+    transitUsed: true,
+    transitStartName: segments.find((segment) => segment.type !== "walk")?.startName,
+    transitEndName: [...segments].reverse().find((segment) => segment.type !== "walk")?.endName,
+    metromoverStartName: metromoverSegments[0]?.startName,
+    metromoverEndName: metromoverSegments[metromoverSegments.length - 1]?.endName,
+    waterTaxiStartName: waterTaxiSegments[0]?.startName,
+    waterTaxiEndName: waterTaxiSegments[waterTaxiSegments.length - 1]?.endName,
+    segments,
+  };
+}
+
+function getTransitNodes(fromCoordinates, toCoordinates) {
+  const nodes = [
+    { id: "origin", type: "endpoint", name: "Origin", coordinates: fromCoordinates },
+    { id: "destination", type: "endpoint", name: "Destination", coordinates: toCoordinates },
+  ];
+  for (const station of getMetromoverStations()) {
+    nodes.push({ id: station.id, type: "metromover", name: station.name, coordinates: station.coordinates });
+  }
+  for (const stop of getWaterTaxiStops()) {
+    nodes.push({ id: stop.id, type: "water_taxi", name: stop.name, coordinates: stop.coordinates });
+  }
+  return nodes;
+}
+
+function addMetromoverTransitEdges(nodeById, addEdge) {
+  for (const [fromId, toId] of METROMOVER_STATION_LINKS) {
+    const from = nodeById.get(fromId);
+    const to = nodeById.get(toId);
+    if (!from || !to) continue;
+    const distanceM = getDistanceMeters(from.coordinates, to.coordinates);
+    const durationMinutes = getMetromoverEdgeMinutes(distanceM);
+    const forward = {
+      type: "metromover",
+      distanceM,
+      durationMinutes,
+      coordinates: [from.coordinates, to.coordinates],
+      startId: from.id,
+      endId: to.id,
+      startName: from.name,
+      endName: to.name,
+    };
+    addEdge(from.id, to.id, forward);
+    addEdge(to.id, from.id, {
+      ...forward,
+      coordinates: [to.coordinates, from.coordinates],
+      startId: to.id,
+      endId: from.id,
+      startName: to.name,
+      endName: from.name,
+    });
+  }
+}
+
+function addWaterTaxiTransitEdges(nodeById, addEdge) {
+  const stops = WATER_TAXI_STOP_IDS.map((id) => nodeById.get(id)).filter(Boolean);
+  if (stops.length !== 2) return;
+  const [first, second] = stops;
+  const distanceM = getRouteDistance([first.coordinates, second.coordinates]);
+  const durationMinutes = WATER_TAXI_WAIT_MINUTES + WATER_TAXI_CROSSING_MINUTES;
+  const forward = {
+    type: "water_taxi",
+    distanceM,
+    durationMinutes,
+    coordinates: [first.coordinates, second.coordinates],
+    startId: first.id,
+    endId: second.id,
+    startName: first.name,
+    endName: second.name,
+  };
+  addEdge(first.id, second.id, forward);
+  addEdge(second.id, first.id, {
+    ...forward,
+    coordinates: [second.coordinates, first.coordinates],
+    startId: second.id,
+    endId: first.id,
+    startName: second.name,
+    endName: first.name,
+  });
+}
+
+function findShortestTransitPath(adjacency, startId, endId) {
+  const distances = new Map([[startId, 0]]);
+  const previous = new Map();
+  const visited = new Set();
+  const heap = new MinHeap();
+  heap.push(startId, 0);
+
+  while (heap.size > 0) {
+    const current = heap.pop();
+    if (!current || visited.has(current.id)) continue;
+    visited.add(current.id);
+    if (current.id === endId) break;
+
+    for (const next of adjacency.get(current.id) || []) {
+      if (visited.has(next.toId)) continue;
+      const candidate = current.priority + next.edge.durationMinutes;
+      if (candidate < (distances.get(next.toId) ?? Infinity)) {
+        distances.set(next.toId, candidate);
+        previous.set(next.toId, { id: current.id, edge: next.edge });
+        heap.push(next.toId, candidate);
+      }
+    }
+  }
+
+  if (!previous.has(endId)) return null;
+  const segments = [];
+  let currentId = endId;
+  while (currentId !== startId) {
+    const step = previous.get(currentId);
+    if (!step) return null;
+    segments.push(step.edge);
+    currentId = step.id;
+  }
+  segments.reverse();
+  return { segments };
 }
 
 function getBestMetromoverCandidate(fromCoordinates, toCoordinates) {
@@ -1187,6 +1386,11 @@ function clearRouteSegments() {
 
 function getMetromoverStations() {
   return app.places.filter((place) => place.filterTags?.includes("metromover") && Array.isArray(place.coordinates));
+}
+
+function getWaterTaxiStops() {
+  return WATER_TAXI_STOP_IDS.map((id) => app.places.find((place) => place.id === id))
+    .filter((place) => place && Array.isArray(place.coordinates));
 }
 
 function getMetromoverStationRoute(fromStationId, toStationId) {
@@ -1459,7 +1663,7 @@ function formatRouteSummary(distanceM, mode) {
     const route = distanceM;
     const durationMinutes = route.durationMinutes ?? getTravelMinutes(route.distanceM, mode);
     const suffix = mode === "metromover"
-      ? route.waterTaxiUsed ? " | Water taxi" : route.metromoverUsed ? " | Metromover" : " | walking fastest"
+      ? route.waterTaxiUsed && route.metromoverUsed ? " | Water taxi + Metromover" : route.waterTaxiUsed ? " | Water taxi" : route.metromoverUsed ? " | Metromover" : " | walking fastest"
       : "";
     return `${formatDistance(route.distanceM)} | ${formatDuration(durationMinutes)}${suffix}`;
   }
