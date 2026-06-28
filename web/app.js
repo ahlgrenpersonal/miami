@@ -194,6 +194,7 @@ async function init() {
   await loadState();
   initMap();
   renderAll();
+  scheduleRoutingGraphPreload();
   refreshWeather();
   scheduleCanvasQaCapture();
   registerServiceWorker();
@@ -694,6 +695,23 @@ function ensureRoutingGraph() {
     app.routingGraphPromise = loadRoutingGraph();
   }
   return app.routingGraphPromise;
+}
+
+function scheduleRoutingGraphPreload() {
+  const preload = () => {
+    ensureRoutingGraph().then(() => {
+      if (app.routingGraphStatus === "error") {
+        console.info("Local routing graph preload unavailable; direct route preview will be used until the graph loads.");
+      }
+    }).catch((error) => {
+      console.info("Local routing graph preload failed unexpectedly.", error);
+    });
+  };
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(preload, { timeout: 1200 });
+  } else {
+    window.setTimeout(preload, 250);
+  }
 }
 
 async function fetchRoutingGraph() {
@@ -2007,7 +2025,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=198", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=199", { updateViaCache: "none" })
       .then((registration) => navigator.serviceWorker.ready.then((readyRegistration) => {
         requestOfflineTileCache(readyRegistration || registration);
       }))
