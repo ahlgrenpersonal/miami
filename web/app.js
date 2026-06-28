@@ -197,8 +197,6 @@ function bindDom() {
   dom.searchInput = document.querySelector("#search-input");
   dom.placesPanel = document.querySelector("#places-panel");
   dom.placesBrandToggle = document.querySelector("#places-brand-toggle");
-  dom.togglePlacesPanel = document.querySelector("#toggle-places-panel");
-  dom.collapsePlacesBottom = document.querySelector("#collapse-places-bottom");
   dom.tagFilters = document.querySelector("#tag-filters");
   dom.noiseFilter = document.querySelector("#noise-filter");
   dom.radarFilter = document.querySelector("#radar-filter");
@@ -243,11 +241,6 @@ function bindEvents() {
     setRadarOverlayEnabled(dom.radarFilter.checked);
   });
 
-  dom.placesPanel.addEventListener("click", () => {
-    if (!app.placesPanelCollapsed) return;
-    setPlacesPanelCollapsed(false);
-  });
-
   dom.placesBrandToggle.addEventListener("click", (event) => {
     event.stopPropagation();
     setPlacesPanelCollapsed(!app.placesPanelCollapsed);
@@ -257,15 +250,6 @@ function bindEvents() {
     if (event.key !== "Enter" && event.key !== " ") return;
     event.preventDefault();
     setPlacesPanelCollapsed(!app.placesPanelCollapsed);
-  });
-
-  dom.togglePlacesPanel.addEventListener("click", (event) => {
-    event.stopPropagation();
-    setPlacesPanelCollapsed(!app.placesPanelCollapsed);
-  });
-
-  dom.collapsePlacesBottom.addEventListener("click", () => {
-    setPlacesPanelCollapsed(true);
   });
 
   dom.resetFilters.addEventListener("click", () => {
@@ -478,13 +462,8 @@ function setWeatherPanelOpen(isOpen) {
 function setPlacesPanelCollapsed(isCollapsed) {
   app.placesPanelCollapsed = isCollapsed;
   dom.placesPanel.classList.toggle("is-collapsed", isCollapsed);
-  dom.togglePlacesPanel.textContent = isCollapsed ? "+" : "-";
-  dom.togglePlacesPanel.title = isCollapsed ? "Expand places" : "Collapse places";
-  dom.togglePlacesPanel.setAttribute("aria-label", isCollapsed ? "Expand places" : "Collapse places");
-  dom.togglePlacesPanel.setAttribute("aria-expanded", String(!isCollapsed));
   dom.placesBrandToggle.setAttribute("aria-label", isCollapsed ? "Expand places" : "Collapse places");
   dom.placesBrandToggle.setAttribute("aria-expanded", String(!isCollapsed));
-  dom.collapsePlacesBottom.hidden = isCollapsed;
   window.setTimeout(() => app.map?.invalidateSize(), 120);
 }
 
@@ -2016,7 +1995,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=194", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=195", { updateViaCache: "none" })
       .then((registration) => navigator.serviceWorker.ready.then((readyRegistration) => {
         requestOfflineTileCache(readyRegistration || registration);
       }))
