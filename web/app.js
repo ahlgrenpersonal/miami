@@ -469,6 +469,7 @@ function setWeatherPanelOpen(isOpen) {
 }
 
 function setPlacesPanelCollapsed(isCollapsed) {
+  if (!isCollapsed) setWeatherPanelOpen(false);
   app.placesPanelCollapsed = isCollapsed;
   dom.placesPanel.classList.toggle("is-collapsed", isCollapsed);
   dom.placesBrandToggle.setAttribute("aria-label", isCollapsed ? "Expand places" : "Collapse places");
@@ -1952,7 +1953,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=203", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=204", { updateViaCache: "none" })
       .then((registration) => navigator.serviceWorker.ready.then((readyRegistration) => {
         requestOfflineTileCache(readyRegistration || registration);
       }))

@@ -162,7 +162,7 @@
       }
     },
     "place_id_kids_playground": {
-      "name": "Kids Playground",
+      "name": "Alice Wainwright Park Playground",
       "coordinates": [
         25.7475977,
         -80.2057016
@@ -187,7 +187,7 @@
         "skip_geocode_evidence": [],
         "geocode": {
           "source": "manual_coordinate",
-          "query": "Kids Playground 2731 Brickell Ct, Miami, FL 33129",
+          "query": "Alice Wainwright Park Playground 2731 Brickell Ct, Miami, FL 33129",
           "display_name": "Manual coordinate",
           "match_score": 1,
           "osm_type": null,
