@@ -478,8 +478,6 @@ function setPlacesPanelCollapsed(isCollapsed) {
 }
 
 function togglePlacesPanel() {
-  const isOpening = app.placesPanelCollapsed;
-  if (isOpening) closeRouteTool();
   setPlacesPanelCollapsed(!app.placesPanelCollapsed);
 }
 
@@ -1953,7 +1951,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=204", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=205", { updateViaCache: "none" })
       .then((registration) => navigator.serviceWorker.ready.then((readyRegistration) => {
         requestOfflineTileCache(readyRegistration || registration);
       }))
