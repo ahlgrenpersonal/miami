@@ -1160,8 +1160,10 @@ async function renderRoute() {
     const route = getLocalRoute(from.coordinates, to.coordinates, app.travelMode);
     if (requestId !== app.routeRequestId) return;
     if (route) {
+      renderRouteGeometry(route, app.travelMode);
       dom.routeStatus.textContent = `${modeLabel}: ${from.name} -> ${to.name} (${formatRouteSummary(route, app.travelMode)})`;
     } else {
+      setRoutePreview([from.coordinates, to.coordinates], { opacity: 0.7 });
       dom.routeStatus.textContent = `${modeLabel}: direct preview only; local graph unavailable for this pair`;
     }
     dom.clearRoute.hidden = false;
@@ -2029,7 +2031,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=201", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=202", { updateViaCache: "none" })
       .then((registration) => navigator.serviceWorker.ready.then((readyRegistration) => {
         requestOfflineTileCache(readyRegistration || registration);
       }))
