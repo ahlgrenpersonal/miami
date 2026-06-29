@@ -14,7 +14,6 @@ const METROMOVER_SPEED_KMH = 14.5;
 const METROMOVER_WAIT_MINUTES = 2;
 const WATER_TAXI_WAIT_MINUTES = 15;
 const WATER_TAXI_CROSSING_MINUTES = 20;
-const TRANSIT_TRANSFER_MAX_DISTANCE_METERS = 1800;
 const WATER_TAXI_STOP_IDS = [
   "place_id_miami_beach_water_taxi_downtown_miami",
   "place_id_water_taxi_mia_miami_beach",
@@ -1208,119 +1207,29 @@ function getGraphRoute(fromCoordinates, toCoordinates, mode) {
 }
 
 function getMetromoverRoute(fromCoordinates, toCoordinates) {
-  const walkingRoute = getGraphRoute(fromCoordinates, toCoordinates, "shortest");
-  const transitRoute = getBestMultimodalTransitRoute(fromCoordinates, toCoordinates);
-  if (!walkingRoute) return transitRoute;
-
-  const walkingMinutes = getTravelMinutes(walkingRoute.distanceM, "shortest");
-  if (!transitRoute || transitRoute.durationMinutes >= walkingMinutes) {
-    return { ...walkingRoute, durationMinutes: walkingMinutes, metromoverUsed: false, transitUsed: false };
-  }
-
-  return transitRoute;
+  return getUnifiedMultimodalRoute(fromCoordinates, toCoordinates);
 }
 
-function getBestMultimodalTransitRoute(fromCoordinates, toCoordinates) {
-  const transitNodes = getTransitNodes(fromCoordinates, toCoordinates);
-  if (transitNodes.length < 4) return null;
+function getUnifiedMultimodalRoute(fromCoordinates, toCoordinates) {
+  if (!app.routingGraph || !app.routeAdjacency || app.routeNodes.length === 0) return null;
+  const context = createUnifiedMultimodalContext(fromCoordinates, toCoordinates);
+  const result = findShortestUnifiedMultimodalPath(context, context.originId, context.destinationId);
+  if (!result?.edges?.length) return null;
 
-  const nodeById = new Map(transitNodes.map((node) => [node.id, node]));
-  const adjacency = new Map(transitNodes.map((node) => [node.id, []]));
-  const routeCache = new Map();
-
-  const addEdge = (fromId, toId, edge) => {
-    if (!adjacency.has(fromId)) adjacency.set(fromId, []);
-    adjacency.get(fromId).push({ toId, edge });
-  };
-
-  const getWalkingRoute = (fromNode, toNode) => {
-    const cacheKey = `${fromNode.id}->${toNode.id}`;
-    if (routeCache.has(cacheKey)) return routeCache.get(cacheKey);
-    const route = getGraphRoute(fromNode.coordinates, toNode.coordinates, "shortest");
-    routeCache.set(cacheKey, route);
-    return route;
-  };
-
-  for (const node of transitNodes) {
-    if (node.type === "endpoint") continue;
-    const startRoute = getWalkingRoute(nodeById.get("origin"), node);
-    if (startRoute) {
-      addEdge("origin", node.id, {
-        type: "walk",
-        distanceM: startRoute.distanceM,
-        durationMinutes: getTravelMinutes(startRoute.distanceM, "shortest"),
-        coordinates: startRoute.coordinates,
-        startId: "origin",
-        endId: node.id,
-        endName: node.name,
-      });
-    }
-
-    const endRoute = getWalkingRoute(node, nodeById.get("destination"));
-    if (endRoute) {
-      addEdge(node.id, "destination", {
-        type: "walk",
-        distanceM: endRoute.distanceM,
-        durationMinutes: getTravelMinutes(endRoute.distanceM, "shortest"),
-        coordinates: endRoute.coordinates,
-        startId: node.id,
-        endId: "destination",
-        startName: node.name,
-      });
-    }
-  }
-
-  const transferNodes = transitNodes.filter((node) => node.type !== "endpoint");
-  for (let outer = 0; outer < transferNodes.length; outer += 1) {
-    for (let inner = outer + 1; inner < transferNodes.length; inner += 1) {
-      const fromNode = transferNodes[outer];
-      const toNode = transferNodes[inner];
-      if (getDistanceMeters(fromNode.coordinates, toNode.coordinates) > TRANSIT_TRANSFER_MAX_DISTANCE_METERS) continue;
-      const route = getWalkingRoute(fromNode, toNode);
-      if (!route) continue;
-      const edge = {
-        type: "walk",
-        distanceM: route.distanceM,
-        durationMinutes: getTravelMinutes(route.distanceM, "shortest"),
-        coordinates: route.coordinates,
-        startId: fromNode.id,
-        endId: toNode.id,
-        startName: fromNode.name,
-        endName: toNode.name,
-      };
-      addEdge(fromNode.id, toNode.id, edge);
-      addEdge(toNode.id, fromNode.id, {
-        ...edge,
-        coordinates: [...edge.coordinates].reverse(),
-        startId: toNode.id,
-        endId: fromNode.id,
-        startName: toNode.name,
-        endName: fromNode.name,
-      });
-    }
-  }
-
-  addMetromoverTransitEdges(nodeById, addEdge);
-  addWaterTaxiTransitEdges(nodeById, addEdge);
-
-  const result = findShortestTransitPath(adjacency, "origin", "destination");
-  if (!result?.segments?.length) return null;
-
-  const segments = result.segments;
+  const segments = coalesceUnifiedMultimodalSegments(result.edges);
   const metromoverSegments = segments.filter((segment) => segment.type === "metromover");
   const waterTaxiSegments = segments.filter((segment) => segment.type === "water_taxi");
   const metromoverUsed = metromoverSegments.length > 0;
   const waterTaxiUsed = waterTaxiSegments.length > 0;
-  const transitWaitMinutes = metromoverUsed ? METROMOVER_WAIT_MINUTES : 0;
 
   return {
     coordinates: mergeRouteCoordinates(...segments.map((segment) => segment.coordinates)),
     distanceM: segments.reduce((sum, segment) => sum + segment.distanceM, 0),
-    durationMinutes: Math.round(segments.reduce((sum, segment) => sum + segment.durationMinutes, 0) + transitWaitMinutes),
+    durationMinutes: Math.max(1, Math.round(result.durationMinutes)),
     metromoverUsed,
     waterTaxiUsed,
     combinedTransitUsed: metromoverUsed && waterTaxiUsed,
-    transitUsed: true,
+    transitUsed: metromoverUsed || waterTaxiUsed,
     transitStartName: segments.find((segment) => segment.type !== "walk")?.startName,
     transitEndName: [...segments].reverse().find((segment) => segment.type !== "walk")?.endName,
     metromoverStartName: metromoverSegments[0]?.startName,
@@ -1331,77 +1240,164 @@ function getBestMultimodalTransitRoute(fromCoordinates, toCoordinates) {
   };
 }
 
-function getTransitNodes(fromCoordinates, toCoordinates) {
-  const nodes = [
-    { id: "origin", type: "endpoint", name: "Origin", coordinates: fromCoordinates },
-    { id: "destination", type: "endpoint", name: "Destination", coordinates: toCoordinates },
+function createUnifiedMultimodalContext(fromCoordinates, toCoordinates) {
+  const context = {
+    originId: "unified:origin",
+    destinationId: "unified:destination",
+    customAdjacency: new Map(),
+    virtualNodes: new Map(),
+  };
+  addUnifiedVirtualNode(context, context.originId, "endpoint", "Origin", fromCoordinates);
+  addUnifiedVirtualNode(context, context.destinationId, "endpoint", "Destination", toCoordinates);
+
+  const transitNodes = [
+    ...getMetromoverStations().map((place) => ({ id: place.id, type: "metromover", name: place.name, coordinates: place.coordinates })),
+    ...getWaterTaxiStops().map((place) => ({ id: place.id, type: "water_taxi", name: place.name, coordinates: place.coordinates })),
   ];
-  for (const station of getMetromoverStations()) {
-    nodes.push({ id: station.id, type: "metromover", name: station.name, coordinates: station.coordinates });
+  for (const node of transitNodes) {
+    addUnifiedVirtualNode(context, node.id, node.type, node.name, node.coordinates);
   }
-  for (const stop of getWaterTaxiStops()) {
-    nodes.push({ id: stop.id, type: "water_taxi", name: stop.name, coordinates: stop.coordinates });
+
+  addUnifiedEndpointConnectors(context, context.originId, "origin");
+  addUnifiedEndpointConnectors(context, context.destinationId, "destination");
+  for (const node of transitNodes) {
+    addUnifiedTransitConnectors(context, node);
   }
-  return nodes;
+  addUnifiedEndpointTransitConnectors(context, transitNodes);
+  addUnifiedMetromoverRideEdges(context);
+  addUnifiedWaterTaxiRideEdges(context);
+  return context;
 }
 
-function addMetromoverTransitEdges(nodeById, addEdge) {
-  for (const [fromId, toId] of METROMOVER_STATION_LINKS) {
-    const from = nodeById.get(fromId);
-    const to = nodeById.get(toId);
-    if (!from || !to) continue;
-    const distanceM = getDistanceMeters(from.coordinates, to.coordinates);
-    const durationMinutes = getMetromoverEdgeMinutes(distanceM);
-    const forward = {
-      type: "metromover",
-      distanceM,
-      durationMinutes,
-      coordinates: [from.coordinates, to.coordinates],
-      startId: from.id,
-      endId: to.id,
-      startName: from.name,
-      endName: to.name,
-    };
-    addEdge(from.id, to.id, forward);
-    addEdge(to.id, from.id, {
-      ...forward,
-      coordinates: [to.coordinates, from.coordinates],
-      startId: to.id,
-      endId: from.id,
-      startName: to.name,
-      endName: from.name,
+function addUnifiedVirtualNode(context, id, type, name, coordinates) {
+  context.virtualNodes.set(id, { id, type, name, coordinates });
+  if (!context.customAdjacency.has(id)) context.customAdjacency.set(id, []);
+}
+
+function addUnifiedCustomEdge(context, fromId, toId, edge) {
+  if (!context.customAdjacency.has(fromId)) context.customAdjacency.set(fromId, []);
+  context.customAdjacency.get(fromId).push({ toId, edge });
+}
+
+function addUnifiedEndpointConnectors(context, endpointId, endpointRole) {
+  const endpoint = context.virtualNodes.get(endpointId);
+  for (const candidate of getUnifiedConnectableRouteNodes(endpoint.coordinates)) {
+    const routeCoordinates = getUnifiedRouteNodeCoordinates(candidate.id);
+    if (!routeCoordinates) continue;
+    const edge = createUnifiedMultimodalEdge("walk", endpointId, candidate.id, endpoint.coordinates, routeCoordinates, {
+      distanceM: candidate.distanceM,
+      durationMinutes: getExactTravelMinutes(candidate.distanceM, WALK_SPEED_KMH),
+      startName: endpoint.name,
     });
+    if (endpointRole === "origin") {
+      addUnifiedCustomEdge(context, endpointId, candidate.id, edge);
+    } else {
+      addUnifiedCustomEdge(context, candidate.id, endpointId, {
+        ...edge,
+        coordinates: [routeCoordinates, endpoint.coordinates],
+        startId: candidate.id,
+        endId: endpointId,
+        endName: endpoint.name,
+      });
+    }
   }
 }
 
-function addWaterTaxiTransitEdges(nodeById, addEdge) {
-  const stops = WATER_TAXI_STOP_IDS.map((id) => nodeById.get(id)).filter(Boolean);
+function addUnifiedTransitConnectors(context, transitNode) {
+  for (const candidate of getUnifiedConnectableRouteNodes(transitNode.coordinates)) {
+    const routeCoordinates = getUnifiedRouteNodeCoordinates(candidate.id);
+    if (!routeCoordinates) continue;
+    const walkingMinutes = getExactTravelMinutes(candidate.distanceM, WALK_SPEED_KMH);
+    const boardingWaitMinutes = transitNode.type === "metromover" ? METROMOVER_WAIT_MINUTES : 0;
+    addUnifiedCustomEdge(context, candidate.id, transitNode.id, createUnifiedMultimodalEdge("walk", candidate.id, transitNode.id, routeCoordinates, transitNode.coordinates, {
+      distanceM: candidate.distanceM,
+      durationMinutes: walkingMinutes + boardingWaitMinutes,
+      endName: transitNode.name,
+    }));
+    addUnifiedCustomEdge(context, transitNode.id, candidate.id, createUnifiedMultimodalEdge("walk", transitNode.id, candidate.id, transitNode.coordinates, routeCoordinates, {
+      distanceM: candidate.distanceM,
+      durationMinutes: walkingMinutes,
+      startName: transitNode.name,
+    }));
+  }
+}
+
+function addUnifiedEndpointTransitConnectors(context, transitNodes) {
+  for (const endpointId of [context.originId, context.destinationId]) {
+    const endpoint = context.virtualNodes.get(endpointId);
+    for (const transitNode of transitNodes) {
+      const distanceM = getDistanceMeters(endpoint.coordinates, transitNode.coordinates);
+      if (distanceM > 90) continue;
+      const walkingMinutes = getExactTravelMinutes(distanceM, WALK_SPEED_KMH);
+      const boardingWaitMinutes = transitNode.type === "metromover" ? METROMOVER_WAIT_MINUTES : 0;
+      if (endpointId === context.originId) {
+        addUnifiedCustomEdge(context, endpointId, transitNode.id, createUnifiedMultimodalEdge("walk", endpointId, transitNode.id, endpoint.coordinates, transitNode.coordinates, {
+          distanceM,
+          durationMinutes: walkingMinutes + boardingWaitMinutes,
+          startName: endpoint.name,
+          endName: transitNode.name,
+        }));
+      } else {
+        addUnifiedCustomEdge(context, transitNode.id, endpointId, createUnifiedMultimodalEdge("walk", transitNode.id, endpointId, transitNode.coordinates, endpoint.coordinates, {
+          distanceM,
+          durationMinutes: walkingMinutes,
+          startName: transitNode.name,
+          endName: endpoint.name,
+        }));
+      }
+    }
+  }
+}
+
+function addUnifiedMetromoverRideEdges(context) {
+  for (const [fromId, toId] of METROMOVER_STATION_LINKS) {
+    const from = context.virtualNodes.get(fromId);
+    const to = context.virtualNodes.get(toId);
+    if (!from || !to) continue;
+    addUnifiedBidirectionalTransitEdge(context, "metromover", from, to, getMetromoverEdgeMinutes(getDistanceMeters(from.coordinates, to.coordinates)));
+  }
+}
+
+function addUnifiedWaterTaxiRideEdges(context) {
+  const stops = WATER_TAXI_STOP_IDS.map((id) => context.virtualNodes.get(id)).filter(Boolean);
   if (stops.length !== 2) return;
-  const [first, second] = stops;
-  const distanceM = getRouteDistance([first.coordinates, second.coordinates]);
-  const durationMinutes = WATER_TAXI_WAIT_MINUTES + WATER_TAXI_CROSSING_MINUTES;
-  const forward = {
-    type: "water_taxi",
+  addUnifiedBidirectionalTransitEdge(context, "water_taxi", stops[0], stops[1], WATER_TAXI_WAIT_MINUTES + WATER_TAXI_CROSSING_MINUTES);
+}
+
+function addUnifiedBidirectionalTransitEdge(context, type, from, to, durationMinutes) {
+  const distanceM = getDistanceMeters(from.coordinates, to.coordinates);
+  const forward = createUnifiedMultimodalEdge(type, from.id, to.id, from.coordinates, to.coordinates, {
     distanceM,
     durationMinutes,
-    coordinates: [first.coordinates, second.coordinates],
-    startId: first.id,
-    endId: second.id,
-    startName: first.name,
-    endName: second.name,
-  };
-  addEdge(first.id, second.id, forward);
-  addEdge(second.id, first.id, {
+    startName: from.name,
+    endName: to.name,
+  });
+  addUnifiedCustomEdge(context, from.id, to.id, forward);
+  addUnifiedCustomEdge(context, to.id, from.id, {
     ...forward,
-    coordinates: [second.coordinates, first.coordinates],
-    startId: second.id,
-    endId: first.id,
-    startName: second.name,
-    endName: first.name,
+    coordinates: [to.coordinates, from.coordinates],
+    startId: to.id,
+    endId: from.id,
+    startName: to.name,
+    endName: from.name,
   });
 }
 
-function findShortestTransitPath(adjacency, startId, endId) {
+function createUnifiedMultimodalEdge(type, startId, endId, startCoordinates, endCoordinates, options = {}) {
+  const distanceM = options.distanceM ?? getDistanceMeters(startCoordinates, endCoordinates);
+  return {
+    type,
+    distanceM,
+    durationMinutes: options.durationMinutes ?? getExactTravelMinutes(distanceM, WALK_SPEED_KMH),
+    coordinates: [startCoordinates, endCoordinates],
+    startId,
+    endId,
+    startName: options.startName,
+    endName: options.endName,
+  };
+}
+
+function findShortestUnifiedMultimodalPath(context, startId, endId) {
   const distances = new Map([[startId, 0]]);
   const previous = new Map();
   const visited = new Set();
@@ -1414,7 +1410,7 @@ function findShortestTransitPath(adjacency, startId, endId) {
     visited.add(current.id);
     if (current.id === endId) break;
 
-    for (const next of adjacency.get(current.id) || []) {
+    for (const next of getUnifiedMultimodalNeighbors(context, current.id)) {
       if (visited.has(next.toId)) continue;
       const candidate = current.priority + next.edge.durationMinutes;
       if (candidate < (distances.get(next.toId) ?? Infinity)) {
@@ -1426,96 +1422,78 @@ function findShortestTransitPath(adjacency, startId, endId) {
   }
 
   if (!previous.has(endId)) return null;
-  const segments = [];
+  const edges = [];
   let currentId = endId;
   while (currentId !== startId) {
     const step = previous.get(currentId);
     if (!step) return null;
-    segments.push(step.edge);
+    edges.push(step.edge);
     currentId = step.id;
   }
-  segments.reverse();
-  return { segments };
+  edges.reverse();
+  return { edges, durationMinutes: distances.get(endId) };
 }
 
-function getBestMetromoverCandidate(fromCoordinates, toCoordinates) {
-  const stations = getMetromoverStations();
-  if (stations.length < 2) {
-    return null;
-  }
-
-  const startLegs = stations.map((station) => ({
-    station,
-    route: getGraphRoute(fromCoordinates, station.coordinates, "shortest"),
-  })).filter((leg) => leg.route);
-  const endLegs = stations.map((station) => ({
-    station,
-    route: getGraphRoute(station.coordinates, toCoordinates, "shortest"),
-  })).filter((leg) => leg.route);
-
-  let best = null;
-  for (const startLeg of startLegs) {
-    for (const endLeg of endLegs) {
-      if (startLeg.station.id === endLeg.station.id) continue;
-      const metroRoute = getMetromoverStationRoute(startLeg.station.id, endLeg.station.id);
-      if (!metroRoute) continue;
-      const durationMinutes = getTravelMinutes(startLeg.route.distanceM, "shortest")
-        + getMetromoverMinutes(metroRoute)
-        + getTravelMinutes(endLeg.route.distanceM, "shortest");
-      const distanceM = startLeg.route.distanceM + metroRoute.distanceM + endLeg.route.distanceM;
-      if (!best || durationMinutes < best.durationMinutes || (durationMinutes === best.durationMinutes && distanceM < best.distanceM)) {
-        best = {
-          type: "metromover",
-          startName: startLeg.station.name,
-          endName: endLeg.station.name,
-          distanceM,
-          durationMinutes,
-          segments: [
-            { type: "walk", coordinates: startLeg.route.coordinates },
-            { type: "metromover", coordinates: metroRoute.coordinates },
-            { type: "walk", coordinates: endLeg.route.coordinates },
-          ],
-        };
-      }
-    }
-  }
-  return best;
-}
-
-function getBestWaterTaxiCandidate(fromCoordinates, toCoordinates) {
-  const stops = WATER_TAXI_STOP_IDS.map((id) => app.places.find((place) => place.id === id))
-    .filter((place) => place && Array.isArray(place.coordinates));
-  if (stops.length !== 2) return null;
-
-  let best = null;
-  for (const [startStop, endStop] of [[stops[0], stops[1]], [stops[1], stops[0]]]) {
-    const startRoute = getGraphRoute(fromCoordinates, startStop.coordinates, "shortest");
-    const endRoute = getGraphRoute(endStop.coordinates, toCoordinates, "shortest");
-    if (!startRoute || !endRoute) continue;
-
-    const waterCoordinates = [startStop.coordinates, endStop.coordinates];
-    const waterDistanceM = getRouteDistance(waterCoordinates);
-    const durationMinutes = getTravelMinutes(startRoute.distanceM, "shortest")
-      + WATER_TAXI_WAIT_MINUTES
-      + WATER_TAXI_CROSSING_MINUTES
-      + getTravelMinutes(endRoute.distanceM, "shortest");
-    const distanceM = startRoute.distanceM + waterDistanceM + endRoute.distanceM;
-    if (!best || durationMinutes < best.durationMinutes || (durationMinutes === best.durationMinutes && distanceM < best.distanceM)) {
-      best = {
-        type: "water_taxi",
-        startName: startStop.name,
-        endName: endStop.name,
+function getUnifiedMultimodalNeighbors(context, nodeId) {
+  const neighbors = [...(context.customAdjacency.get(nodeId) || [])];
+  if (!app.routingGraph?.nodes?.[nodeId]) return neighbors;
+  const fromCoordinates = getUnifiedRouteNodeCoordinates(nodeId);
+  for (const next of app.routeAdjacency.get(nodeId) || []) {
+    const toCoordinates = getUnifiedRouteNodeCoordinates(next.toId);
+    if (!toCoordinates) continue;
+    const distanceM = next.edge.distance_m || getDistanceMeters(fromCoordinates, toCoordinates);
+    neighbors.push({
+      toId: next.toId,
+      edge: createUnifiedMultimodalEdge("walk", nodeId, next.toId, fromCoordinates, toCoordinates, {
         distanceM,
-        durationMinutes,
-        segments: [
-          { type: "walk", coordinates: startRoute.coordinates },
-          { type: "water_taxi", coordinates: waterCoordinates },
-          { type: "walk", coordinates: endRoute.coordinates },
-        ],
-      };
-    }
+        durationMinutes: getExactTravelMinutes(distanceM, WALK_SPEED_KMH),
+      }),
+    });
   }
-  return best;
+  return neighbors;
+}
+
+function coalesceUnifiedMultimodalSegments(edges) {
+  const segments = [];
+  let walkSegment = null;
+  const flushWalk = () => {
+    if (walkSegment) segments.push(walkSegment);
+    walkSegment = null;
+  };
+
+  for (const edge of edges) {
+    if (edge.type !== "walk") {
+      flushWalk();
+      segments.push({ ...edge });
+      continue;
+    }
+    if (!walkSegment) {
+      walkSegment = { ...edge, coordinates: [...edge.coordinates] };
+      continue;
+    }
+    walkSegment.distanceM += edge.distanceM;
+    walkSegment.durationMinutes += edge.durationMinutes;
+    walkSegment.coordinates = mergeRouteCoordinates(walkSegment.coordinates, edge.coordinates);
+    walkSegment.endId = edge.endId;
+    walkSegment.endName = edge.endName || walkSegment.endName;
+  }
+  flushWalk();
+  return segments;
+}
+
+function getUnifiedConnectableRouteNodes(coordinates) {
+  const maxSnapDistanceM = app.routingGraph.max_snap_distance_m || DEFAULT_MAX_SNAP_DISTANCE_METERS;
+  return findNearestRouteNodes(coordinates, ROUTE_SNAP_CANDIDATE_LIMIT)
+    .filter((node) => node.distanceM <= maxSnapDistanceM);
+}
+
+function getUnifiedRouteNodeCoordinates(nodeId) {
+  const node = app.routingGraph?.nodes?.[nodeId];
+  return node ? [node.lat, node.lon] : null;
+}
+
+function getExactTravelMinutes(distanceM, speedKmh) {
+  return (distanceM / 1000 / speedKmh) * 60;
 }
 
 function renderRouteGeometry(route, mode) {
@@ -1579,63 +1557,6 @@ function getMetromoverStations() {
 function getWaterTaxiStops() {
   return WATER_TAXI_STOP_IDS.map((id) => app.places.find((place) => place.id === id))
     .filter((place) => place && Array.isArray(place.coordinates));
-}
-
-function getMetromoverStationRoute(fromStationId, toStationId) {
-  if (fromStationId === toStationId) return null;
-  const stationsById = new Map(getMetromoverStations().map((station) => [station.id, station]));
-  const adjacency = new Map();
-  for (const [fromId, toId] of METROMOVER_STATION_LINKS) {
-    const from = stationsById.get(fromId);
-    const to = stationsById.get(toId);
-    if (!from || !to) continue;
-    const distanceM = getDistanceMeters(from.coordinates, to.coordinates);
-    const durationMinutes = getMetromoverEdgeMinutes(distanceM);
-    if (!adjacency.has(fromId)) adjacency.set(fromId, []);
-    if (!adjacency.has(toId)) adjacency.set(toId, []);
-    adjacency.get(fromId).push({ id: toId, distanceM, durationMinutes });
-    adjacency.get(toId).push({ id: fromId, distanceM, durationMinutes });
-  }
-
-  const costs = new Map([[fromStationId, 0]]);
-  const distances = new Map([[fromStationId, 0]]);
-  const previous = new Map();
-  const queue = new MinHeap();
-  queue.push(fromStationId, 0);
-  while (queue.size) {
-    const current = queue.pop();
-    if (!current) break;
-    if (current.priority > (costs.get(current.id) ?? Infinity)) continue;
-    if (current.id === toStationId) break;
-    for (const edge of adjacency.get(current.id) || []) {
-      const nextCost = current.priority + edge.durationMinutes;
-      if (nextCost < (costs.get(edge.id) ?? Infinity)) {
-        costs.set(edge.id, nextCost);
-        distances.set(edge.id, (distances.get(current.id) || 0) + edge.distanceM);
-        previous.set(edge.id, current.id);
-        queue.push(edge.id, nextCost);
-      }
-    }
-  }
-  if (!costs.has(toStationId)) return null;
-
-  const stationIds = [];
-  for (let id = toStationId; id; id = previous.get(id)) {
-    stationIds.push(id);
-    if (id === fromStationId) break;
-  }
-  stationIds.reverse();
-  if (stationIds[0] !== fromStationId) return null;
-
-  return {
-    coordinates: stationIds.map((id) => stationsById.get(id).coordinates),
-    distanceM: distances.get(toStationId),
-    durationMinutes: costs.get(toStationId),
-  };
-}
-
-function getMetromoverMinutes(route) {
-  return METROMOVER_WAIT_MINUTES + Math.round(route.durationMinutes);
 }
 
 function getMetromoverEdgeMinutes(distanceM) {
@@ -2031,7 +1952,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=202", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=203", { updateViaCache: "none" })
       .then((registration) => navigator.serviceWorker.ready.then((readyRegistration) => {
         requestOfflineTileCache(readyRegistration || registration);
       }))

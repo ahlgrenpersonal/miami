@@ -48,12 +48,32 @@ async def collect_routes():
                   })),
                 };
               };
+              const routeRenderStyles = async (fromId, toId = home.id) => {
+                const from = byId(fromId);
+                const to = byId(toId);
+                app.travelMode = "metromover";
+                app.routeFromId = from.id;
+                app.routeToId = to.id;
+                renderRoute();
+                await new Promise((resolve) => setTimeout(resolve, 50));
+                return app.routeSegmentLines.map((line) => ({
+                  dashArray: line.options.dashArray || null,
+                  color: line.options.color,
+                }));
+              };
               return [
                 routeDetails("place_id_avo_miami"),
                 routeDetails("place_id_trader_joes_miami_beach"),
                 routeDetails("place_id_maurice_gibb_memorial_park"),
                 routeDetails("place_id_water_taxi_mia_miami_beach"),
                 routeDetails("place_id_trader_joes_miami_beach", "place_id_bayfront_park_playground"),
+                {
+                  fromId: "place_id_panorama_tower",
+                  fromName: "Panorama Tower",
+                  toId: "place_id_bayfront_park_playground",
+                  toName: "Bayfront Park Playground",
+                  renderStyles: await routeRenderStyles("place_id_panorama_tower", "place_id_bayfront_park_playground"),
+                },
               ];
             }
             """
@@ -107,7 +127,20 @@ def main():
         for route in routes[:4]:
             assert_home_route(route)
         assert_multimodal(routes[4])
+        style_route = routes[5]
+        assert len(style_route["renderStyles"]) >= 3, f"expected multiple route segments: {style_route}"
+        assert style_route["renderStyles"][0]["dashArray"] is None, f"first walking leg should be solid: {style_route}"
+        assert style_route["renderStyles"][-1]["dashArray"] is None, f"last walking leg should be solid: {style_route}"
+        assert any(style["dashArray"] == "2 8" for style in style_route["renderStyles"][1:-1]), (
+            f"middle transit legs should be dotted: {style_route}"
+        )
         for route in routes:
+            if "segments" not in route:
+                print(
+                    f"PASS {route['fromName']} -> {route['toName']}: "
+                    f"render styles {route['renderStyles']}"
+                )
+                continue
             print(
                 f"PASS {route['fromName']} -> {route['toName']}: "
                 f"{route['minutes']} min, {[segment['type'] for segment in route['segments']]}"
