@@ -3809,6 +3809,125 @@
         "npc_associations": []
       }
     },
+    "place_id_crazy_about_you": {
+      "name": "Crazy About You",
+      "coordinates": [
+        25.7620008,
+        -80.1889886
+      ],
+      "tags": [
+        "american_restaurant",
+        "food",
+        "restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 159,
+        "category": "American restaurant",
+        "rating": 4.8,
+        "rating_count": 19509,
+        "price": null,
+        "status": null,
+        "address": "1155 Brickell Bay Dr PH101, Miami, FL 33131",
+        "distance_from_home_m": 206,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_shortlink",
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Crazy About You 1155 Brickell Bay Dr PH101, Miami, FL 33131",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_carrot_express": {
+      "name": "Carrot Express",
+      "coordinates": [
+        25.7623151,
+        -80.1902638
+      ],
+      "tags": [
+        "food",
+        "health_food_restaurant",
+        "restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 160,
+        "category": "Restaurant",
+        "rating": 4.8,
+        "rating_count": 750,
+        "price": null,
+        "status": null,
+        "address": "1111 Brickell Ave, Miami, FL 33131",
+        "distance_from_home_m": 112,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_shortlink",
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Carrot Express 1111 Brickell Ave, Miami, FL 33131",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_mary_brickell_village": {
+      "name": "Mary Brickell Village",
+      "coordinates": [
+        25.765,
+        -80.1938889
+      ],
+      "tags": [
+        "brickell",
+        "indoors",
+        "shopping_mall"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 161,
+        "category": "Shopping mall",
+        "rating": 4.5,
+        "rating_count": 5609,
+        "price": null,
+        "status": null,
+        "address": "901 S Miami Ave, Miami, FL 33130",
+        "distance_from_home_m": 393,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Mary Brickell Village 901 S Miami Ave, Miami, FL 33130",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
     "place_id_trader_joes_miami_beach": {
       "name": "Trader Joe's",
       "coordinates": [
