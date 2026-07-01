@@ -3928,6 +3928,272 @@
         "npc_associations": []
       }
     },
+    "place_id_historic_virginia_key_beach_park": {
+      "name": "Historic Virginia Key Beach Park",
+      "coordinates": [
+        25.7363104,
+        -80.1561885
+      ],
+      "tags": [
+        "beach_park",
+        "park"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 162,
+        "category": "City park",
+        "rating": 4.5,
+        "rating_count": 9403,
+        "price": null,
+        "status": null,
+        "address": "4020 Virginia Beach Dr, Miami, FL 33149",
+        "distance_from_home_m": 4559,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Historic Virginia Key Beach Park 4020 Virginia Beach Dr, Miami, FL 33149",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_virginia_key_beach_playground": {
+      "name": "Virginia Key Beach Playground",
+      "coordinates": [
+        25.735687,
+        -80.155716
+      ],
+      "tags": [
+        "playground"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 163,
+        "category": "Playground",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "4000 Virginia Beach Dr, Miami, FL 33149",
+        "distance_from_home_m": 4640,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_address_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "4000 Virginia Beach Dr, Miami, FL 33149",
+          "display_name": "Google Maps address lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "Google Maps did not expose a separate playground POI; coordinate is the supplied address point.",
+        "npc_associations": []
+      }
+    },
+    "place_id_rusty_pelican_miami": {
+      "name": "Rusty Pelican Miami",
+      "coordinates": [
+        25.7478443,
+        -80.1753116
+      ],
+      "tags": [
+        "food",
+        "restaurant",
+        "seafood_restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 164,
+        "category": "Seafood restaurant",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "3201 Rickenbacker Cwy, Key Biscayne, FL 33149",
+        "distance_from_home_m": 2292,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Rusty Pelican Miami 3201 Rickenbacker Cwy, Key Biscayne, FL 33149",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_virginia_key_swimming_beach_lifeguards": {
+      "name": "Virginia Key Swimming Beach with Lifeguards",
+      "coordinates": [
+        25.7448986,
+        -80.1436005
+      ],
+      "tags": [
+        "beach",
+        "park"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 165,
+        "category": "Beach",
+        "rating": 4.5,
+        "rating_count": 18,
+        "price": null,
+        "status": null,
+        "address": "Virginia Key, Miami, FL 33149",
+        "distance_from_home_m": 5118,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Swimming Beach with Lifeguards Virginia Key, Miami, FL 33149",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_craft_key_biscayne": {
+      "name": "CRAFT Key Biscayne",
+      "coordinates": [
+        25.6961221,
+        -80.164003
+      ],
+      "tags": [
+        "food",
+        "restaurant"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 166,
+        "category": "Restaurant",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "260 Crandon Blvd Suite 14, Key Biscayne, FL 33149",
+        "distance_from_home_m": 7926,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "CRAFT Key Biscayne 260 Crandon Blvd Suite 14, Key Biscayne, FL 33149",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_raccoon_coffee_kitchen": {
+      "name": "Raccoon Coffee & Kitchen",
+      "coordinates": [
+        25.7673544,
+        -80.1885062
+      ],
+      "tags": [
+        "coffee_shop",
+        "food"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 167,
+        "category": "Coffee shop",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "609 Brickell Ave, Miami, FL 33131",
+        "distance_from_home_m": 490,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Raccoon Coffee & Kitchen 609 Brickell Ave, Miami, FL 33131",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_true_baristas_coffee_truck_777_brickell": {
+      "name": "True Baristas Coffee Truck | 777 Brickell",
+      "coordinates": [
+        25.766409,
+        -80.189904
+      ],
+      "tags": [
+        "coffee_shop",
+        "food"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 168,
+        "category": "Coffee shop",
+        "rating": 4.3,
+        "rating_count": 82,
+        "price": "$",
+        "status": null,
+        "address": "777 Brickell Ave Ste 110, Miami, FL 33131",
+        "distance_from_home_m": 349,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "google_maps_lookup"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "True Baristas Coffee Truck | 777 Brickell 777 Brickell Ave Ste 110, Miami, FL 33131",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
     "place_id_trader_joes_miami_beach": {
       "name": "Trader Joe's",
       "coordinates": [
