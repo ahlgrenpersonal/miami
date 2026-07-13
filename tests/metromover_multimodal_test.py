@@ -72,6 +72,31 @@ async def collect_routes():
                   fromName: "Panorama Tower",
                   toId: "place_id_bayfront_park_playground",
                   toName: "Bayfront Park Playground",
+                  timings: {
+                    walking6km: getTravelMinutes(6000, "shortest"),
+                    metromoverWalking6km: getTravelMinutes(6000, "metromover"),
+                    scooter8km: getTravelMinutes(8000, "kid_scooter"),
+                    scooterJustOver8km: getTravelMinutes(8001, "kid_scooter"),
+                    scooter16km: getTravelMinutes(16000, "kid_scooter"),
+                    scooterJustOver16km: getTravelMinutes(16001, "kid_scooter"),
+                  },
+                  newPlaceRoutes: [
+                    "place_id_crandon_beach",
+                    "place_id_el_chiringuito_ocean_view",
+                    "place_id_cape_florida_beach",
+                    "place_id_cape_florida_lighthouse",
+                    "place_id_rosa_sky",
+                    "place_id_21st_street_lifeguard_tower",
+                  ].map((placeId) => {
+                    const place = byId(placeId);
+                    const route = getGraphRoute(home.coordinates, place.coordinates, "shortest");
+                    return {
+                      placeId,
+                      placeName: place.name,
+                      routable: Boolean(route),
+                      distanceM: route ? Math.round(route.distanceM) : null,
+                    };
+                  }),
                   renderStyles: await routeRenderStyles("place_id_panorama_tower", "place_id_bayfront_park_playground"),
                 },
               ];
@@ -128,6 +153,16 @@ def main():
             assert_home_route(route)
         assert_multimodal(routes[4])
         style_route = routes[5]
+        assert style_route["timings"] == {
+            "walking6km": 60,
+            "metromoverWalking6km": 60,
+            "scooter8km": 30,
+            "scooterJustOver8km": 33,
+            "scooter16km": 63,
+            "scooterJustOver16km": 68,
+        }, f"unexpected walking or scooter timing model: {style_route['timings']}"
+        failed_places = [place for place in style_route["newPlaceRoutes"] if not place["routable"]]
+        assert not failed_places, f"new places without a local route from Panorama Tower: {failed_places}"
         assert len(style_route["renderStyles"]) >= 3, f"expected multiple route segments: {style_route}"
         assert style_route["renderStyles"][0]["dashArray"] is None, f"first walking leg should be solid: {style_route}"
         assert style_route["renderStyles"][-1]["dashArray"] is None, f"last walking leg should be solid: {style_route}"

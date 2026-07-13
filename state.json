@@ -4194,6 +4194,186 @@
         "npc_associations": []
       }
     },
+    "place_id_crandon_beach": {
+      "name": "Crandon Beach",
+      "coordinates": [25.7066667, -80.1519444],
+      "tags": ["beach", "park"],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 169,
+        "category": "Beach",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "4000 Crandon Blvd, Key Biscayne, FL 33149",
+        "distance_from_home_m": 7385,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": ["google_maps_lookup"],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Crandon Beach 4000 Crandon Blvd, Key Biscayne, FL 33149",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_el_chiringuito_ocean_view": {
+      "name": "El Chiringuito Ocean View",
+      "coordinates": [25.7095537, -80.1522242],
+      "tags": ["food", "restaurant"],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 170,
+        "category": "Restaurant",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Crandon Park, 4000 Crandon Blvd, Key Biscayne, FL 33149",
+        "distance_from_home_m": 7098,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": ["google_maps_lookup"],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "El Chiringuito Ocean View Crandon Park, 4000 Crandon Blvd, Key Biscayne, FL 33149",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_cape_florida_beach": {
+      "name": "Cape Florida Beach",
+      "coordinates": [25.6676026, -80.1550678],
+      "tags": ["beach", "park"],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 171,
+        "category": "Beach",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "1200 Crandon Blvd, Key Biscayne, FL 33149",
+        "distance_from_home_m": 11216,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": ["google_maps_lookup"],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Cape Florida Beach 1200 Crandon Blvd, Key Biscayne, FL 33149",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "Inside Bill Baggs Cape Florida State Park.",
+        "npc_associations": []
+      }
+    },
+    "place_id_cape_florida_lighthouse": {
+      "name": "Cape Florida Lighthouse",
+      "coordinates": [25.6665986, -80.1559585],
+      "tags": ["park", "tourist_attraction"],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 172,
+        "category": "Lighthouse",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "1200 Crandon Blvd, Key Biscayne, FL 33149",
+        "distance_from_home_m": 11295,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": ["google_maps_lookup"],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Cape Florida Lighthouse 1200 Crandon Blvd, Key Biscayne, FL 33149",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "Inside Bill Baggs Cape Florida State Park.",
+        "npc_associations": []
+      }
+    },
+    "place_id_rosa_sky": {
+      "name": "Rosa Sky",
+      "coordinates": [25.7668472, -80.196175],
+      "tags": ["bar", "food", "restaurant"],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 173,
+        "category": "Rooftop bar",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "115 SW 8th St, 22nd Floor, Miami, FL 33130",
+        "distance_from_home_m": 696,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": ["google_maps_lookup"],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Rosa Sky 115 SW 8th St, 22nd Floor, Miami, FL 33130",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
+    "place_id_21st_street_lifeguard_tower": {
+      "name": "21st Street Lifeguard Tower",
+      "coordinates": [25.7954632, -80.1259219],
+      "tags": ["beach"],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 174,
+        "category": "Lifeguard tower",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "21st Street Beach, Miami Beach, FL 33139",
+        "distance_from_home_m": 7384,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": ["google_maps_lookup"],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "21st Street Lifeguard Tower, Miami Beach, FL 33139",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    },
     "place_id_trader_joes_miami_beach": {
       "name": "Trader Joe's",
       "coordinates": [

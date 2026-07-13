@@ -4,9 +4,10 @@ const ROUTING_GRAPH_MANIFEST_URL = "routing_graph/manifest.json";
 const HOME_PLACE_ID = "place_id_panorama_tower";
 const OFFLINE_TILE_VERSION = "177";
 const WALK_SPEED_KMH = 6;
-const KID_SCOOTER_SPEED_KMH = 12;
-const KID_SCOOTER_BREAK_INTERVAL_MINUTES = 20;
-const KID_SCOOTER_BREAK_DURATION_MINUTES = 5;
+const KID_SCOOTER_SPEED_KMH = 16;
+const KID_SCOOTER_BREAK_INTERVAL_MINUTES = 30;
+const KID_SCOOTER_FIRST_BREAK_MINUTES = 3;
+const KID_SCOOTER_LATER_BREAK_MINUTES = 5;
 const DEFAULT_HOME_ZOOM = 15;
 const DEFAULT_MAX_SNAP_DISTANCE_METERS = 500;
 const ROUTE_SNAP_CANDIDATE_LIMIT = 32;
@@ -109,7 +110,7 @@ const ROUTING_PROFILES = {
   },
   metromover: {
     label: "Metromover",
-    speedKmh: 5,
+    speedKmh: WALK_SPEED_KMH,
     scoreWeights: {},
     minMultiplier: 1,
     maxMultiplier: 1,
@@ -1784,7 +1785,10 @@ function getTravelMinutes(distanceM, mode) {
   const movingMinutes = Math.max(1, Math.round(exactMovingMinutes));
   if (mode !== "kid_scooter") return movingMinutes;
   const breakCount = Math.floor(Math.max(0, exactMovingMinutes - 0.001) / KID_SCOOTER_BREAK_INTERVAL_MINUTES);
-  return movingMinutes + breakCount * KID_SCOOTER_BREAK_DURATION_MINUTES;
+  const breakMinutes = breakCount === 0
+    ? 0
+    : KID_SCOOTER_FIRST_BREAK_MINUTES + (breakCount - 1) * KID_SCOOTER_LATER_BREAK_MINUTES;
+  return movingMinutes + breakMinutes;
 }
 
 function formatDuration(minutes) {
@@ -1951,7 +1955,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=205", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=206", { updateViaCache: "none" })
       .then((registration) => navigator.serviceWorker.ready.then((readyRegistration) => {
         requestOfflineTileCache(readyRegistration || registration);
       }))

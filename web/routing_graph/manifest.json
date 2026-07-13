@@ -14,7 +14,7 @@
     "shortest": {
       "label": "Shortest",
       "description": "Shortest locally routable walking distance.",
-      "speed_kmh": 5.0,
+      "speed_kmh": 6.0,
       "score_weights": {},
       "min_multiplier": 1.0,
       "max_multiplier": 1.0,
@@ -24,7 +24,7 @@
     "scenic": {
       "label": "Scenic",
       "description": "Distance with bonuses for parks, waterfront-style names, low-stress paths, lighting, and walkable passages. Traffic crossings and static baseline transportation noise add cost.",
-      "speed_kmh": 5.0,
+      "speed_kmh": 6.0,
       "score_weights": {
         "waterside": 0.25,
         "waterfront": 0.3,
@@ -46,7 +46,7 @@
     "kid_scooter": {
       "label": "Kid scooter",
       "description": "Distance with strong penalties for high-stress roads, rough surfaces, and traffic crossings, plus bonuses for cycleways and footways. Steps are a mild carry penalty.",
-      "speed_kmh": 10.0,
+      "speed_kmh": 16.0,
       "score_weights": {
         "kid_scooter": 0.78,
         "scooter": 0.22,
