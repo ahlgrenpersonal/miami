@@ -65,6 +65,42 @@ async def collect_routes():
                   color: line.options.color,
                 }));
               };
+              const testRouteReplacement = async () => {
+                app.travelMode = "shortest";
+                clearRouteState();
+                selectPlace("place_id_avo_miami");
+                dom.routeHome.click();
+                const homeRequestBefore = app.routeRequestId;
+                selectPlace("place_id_trader_joes_miami_beach");
+                await new Promise((resolve) => setTimeout(resolve, 50));
+                const homeResult = {
+                  fromId: app.routeFromId,
+                  toId: app.routeToId,
+                  selectedId: app.selectedId,
+                  anchorMode: app.routeAnchorMode,
+                  rerendered: app.routeRequestId > homeRequestBefore,
+                  status: dom.routeStatus.textContent,
+                };
+
+                clearRouteState();
+                selectPlace("place_id_avo_miami");
+                dom.routeLocation.click();
+                selectPlace("place_id_trader_joes_miami_beach");
+                const initialLocationToId = app.routeToId;
+                const locationRequestBefore = app.routeRequestId;
+                selectPlace("place_id_maurice_gibb_memorial_park");
+                await new Promise((resolve) => setTimeout(resolve, 50));
+                const locationResult = {
+                  fromId: app.routeFromId,
+                  initialToId: initialLocationToId,
+                  toId: app.routeToId,
+                  selectedId: app.selectedId,
+                  anchorMode: app.routeAnchorMode,
+                  rerendered: app.routeRequestId > locationRequestBefore,
+                  status: dom.routeStatus.textContent,
+                };
+                return { home: homeResult, location: locationResult };
+              };
               return [
                 routeDetails("place_id_avo_miami"),
                 routeDetails("place_id_trader_joes_miami_beach"),
@@ -86,11 +122,13 @@ async def collect_routes():
                   timings: {
                     walking6km: getTravelMinutes(6000, "shortest"),
                     metromoverWalking6km: getTravelMinutes(6000, "metromover"),
-                    scooter8km: getTravelMinutes(8000, "kid_scooter"),
-                    scooterJustOver8km: getTravelMinutes(8001, "kid_scooter"),
-                    scooter16km: getTravelMinutes(16000, "kid_scooter"),
-                    scooterJustOver16km: getTravelMinutes(16001, "kid_scooter"),
+                    scooterSpeedKmh: KID_SCOOTER_SPEED_KMH,
+                    scooter7km: getTravelMinutes(7000, "kid_scooter"),
+                    scooterJustOver7km: getTravelMinutes(7001, "kid_scooter"),
+                    scooter14km: getTravelMinutes(14000, "kid_scooter"),
+                    scooterJustOver14km: getTravelMinutes(14001, "kid_scooter"),
                   },
+                  selectionRouting: await testRouteReplacement(),
                   transportFilter: TAG_FILTERS.find((filter) => filter.tag === "transport") || null,
                   transportPlaceIds: app.places
                     .filter((place) => place.filterTags.includes("transport"))
@@ -274,11 +312,38 @@ def main():
         assert style_route["timings"] == {
             "walking6km": 60,
             "metromoverWalking6km": 60,
-            "scooter8km": 30,
-            "scooterJustOver8km": 33,
-            "scooter16km": 63,
-            "scooterJustOver16km": 68,
+            "scooterSpeedKmh": 14,
+            "scooter7km": 30,
+            "scooterJustOver7km": 33,
+            "scooter14km": 63,
+            "scooterJustOver14km": 68,
         }, f"unexpected walking or scooter timing model: {style_route['timings']}"
+        home_replacement = style_route["selectionRouting"]["home"]
+        assert home_replacement == {
+            "fromId": "place_id_panorama_tower",
+            "toId": "place_id_trader_joes_miami_beach",
+            "selectedId": "place_id_trader_joes_miami_beach",
+            "anchorMode": "home",
+            "rerendered": True,
+            "status": home_replacement["status"],
+        }, f"Route Home did not replace its destination: {home_replacement}"
+        assert "Panorama Tower -> Trader Joe's" in home_replacement["status"], (
+            f"Route Home status did not update to the clicked place: {home_replacement}"
+        )
+        location_replacement = style_route["selectionRouting"]["location"]
+        assert location_replacement == {
+            "fromId": "place_id_avo_miami",
+            "initialToId": "place_id_trader_joes_miami_beach",
+            "toId": "place_id_maurice_gibb_memorial_park",
+            "selectedId": "place_id_maurice_gibb_memorial_park",
+            "anchorMode": "location",
+            "rerendered": True,
+            "status": location_replacement["status"],
+        }, f"Route Location did not preserve A and replace B with C: {location_replacement}"
+        assert "Avo Miami -> Maurice Gibb Memorial Park" in location_replacement["status"], (
+            f"Route Location status did not update from A to C: {location_replacement}"
+        )
+
         assert style_route["transportFilter"] == {"tag": "transport", "label": "Transport"}, (
             f"Transport filter definition is wrong: {style_route['transportFilter']}"
         )

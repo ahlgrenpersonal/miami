@@ -4,7 +4,7 @@ const ROUTING_GRAPH_MANIFEST_URL = "routing_graph/manifest.json";
 const HOME_PLACE_ID = "place_id_panorama_tower";
 const OFFLINE_TILE_VERSION = "177";
 const WALK_SPEED_KMH = 6;
-const KID_SCOOTER_SPEED_KMH = 16;
+const KID_SCOOTER_SPEED_KMH = 14;
 const KID_SCOOTER_BREAK_INTERVAL_MINUTES = 30;
 const KID_SCOOTER_FIRST_BREAK_MINUTES = 3;
 const KID_SCOOTER_LATER_BREAK_MINUTES = 5;
@@ -350,7 +350,7 @@ function bindEvents() {
     if (!app.selectedId) return;
     app.routeFromId = HOME_PLACE_ID;
     app.routeToId = app.selectedId;
-    app.routeAnchorMode = null;
+    app.routeAnchorMode = "home";
     renderRoute();
   });
 
@@ -362,7 +362,7 @@ function bindEvents() {
     } else if (!hasActiveRoute() || (app.selectedId !== app.routeFromId && app.selectedId !== app.routeToId)) {
       app.routeFromId = HOME_PLACE_ID;
       app.routeToId = app.selectedId;
-      app.routeAnchorMode = null;
+      app.routeAnchorMode = "home";
     }
     syncTravelModeButtons();
     renderRoute();
@@ -1121,13 +1121,22 @@ function hasLocationRouteAnchor() {
   return app.routeAnchorMode === "location" && Boolean(app.routeFromId);
 }
 
+function hasHomeRouteAnchor() {
+  return app.routeAnchorMode === "home" && app.routeFromId === HOME_PLACE_ID;
+}
+
 function selectPlace(id, options = {}) {
   if (options.source === "list") {
     setPlacesPanelCollapsed(true);
   }
   const wasSelected = app.selectedId === id;
-  const shouldUpdateAnchoredRoute = hasLocationRouteAnchor() && id !== app.routeFromId;
-  if (shouldUpdateAnchoredRoute) {
+  const shouldUpdateLocationRoute = hasLocationRouteAnchor() && id !== app.routeFromId;
+  const shouldUpdateHomeRoute = hasHomeRouteAnchor() && id !== HOME_PLACE_ID;
+  const shouldUpdateAnchoredRoute = shouldUpdateLocationRoute || shouldUpdateHomeRoute;
+  if (shouldUpdateLocationRoute) {
+    app.routeToId = id;
+  } else if (shouldUpdateHomeRoute) {
+    app.routeFromId = HOME_PLACE_ID;
     app.routeToId = id;
   }
   const preserveMapView = (hasActiveRoute() || shouldUpdateAnchoredRoute) && !options.forceMapMove;
@@ -2154,7 +2163,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=211", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=212", { updateViaCache: "none" })
       .then((registration) => navigator.serviceWorker.ready.then((readyRegistration) => {
         requestOfflineTileCache(readyRegistration || registration);
       }))
