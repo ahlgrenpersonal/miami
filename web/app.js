@@ -15,9 +15,62 @@ const METROMOVER_SPEED_KMH = 14.5;
 const METROMOVER_WAIT_MINUTES = 2;
 const WATER_TAXI_WAIT_MINUTES = 15;
 const WATER_TAXI_CROSSING_MINUTES = 20;
+const BRICKELL_TROLLEY_WAIT_MINUTES = 10;
+const BRICKELL_TROLLEY_RIDE_MINUTES = 35;
+const SOUTH_BEACH_TROLLEY_WAIT_MINUTES = 10;
+const SOUTH_BEACH_TROLLEY_DOCK_NODE_ID = "transit:south_beach_trolley:water_taxi";
+const SOUTH_BEACH_TROLLEY_MIDPOINT_ID = "place_id_south_beach_trolley_alton_10th";
+const SOUTH_BEACH_TROLLEY_SOFI_ID = "place_id_south_beach_trolley_south_pointe";
 const WATER_TAXI_STOP_IDS = [
   "place_id_miami_beach_water_taxi_downtown_miami",
   "place_id_water_taxi_mia_miami_beach",
+];
+const BRICKELL_TROLLEY_STOP_IDS = [
+  "place_id_brickell_trolley_city_hall",
+  "place_id_brickell_trolley_panorama_stop",
+];
+const BRICKELL_TROLLEY_ROUTE_COORDINATES = [
+  [25.7278427, -80.2345222],
+  [25.7302728, -80.2358311],
+  [25.7319948, -80.2338463],
+  [25.7341352, -80.2310568],
+  [25.7356533, -80.2289218],
+  [25.7369944, -80.2270442],
+  [25.7378420, -80.2253920],
+  [25.7386735, -80.2237934],
+  [25.7391563, -80.2228492],
+  [25.7407603, -80.2199095],
+  [25.7430777, -80.2164656],
+  [25.7414201, -80.2133328],
+  [25.7438287, -80.2153713],
+  [25.7458457, -80.2124423],
+  [25.7469186, -80.2109510],
+  [25.7477769, -80.2096742],
+  [25.7495043, -80.2071959],
+  [25.7509741, -80.2027112],
+  [25.7517305, -80.2016491],
+  [25.7527497, -80.2001041],
+  [25.7538280, -80.1986021],
+  [25.7555017, -80.1961881],
+  [25.7574919, -80.1932913],
+  [25.7589456, -80.1924545],
+  [25.7620570, -80.1916498],
+];
+const SOUTH_BEACH_TROLLEY_ROUTE_COORDINATES = [
+  [25.7933281, -80.1450799],
+  [25.795444, -80.143459],
+  [25.794545, -80.141492],
+  [25.791873, -80.14138],
+  [25.790141, -80.141337],
+  [25.787533, -80.141254],
+  [25.785364, -80.141187],
+  [25.783694, -80.141125],
+  [25.780669, -80.141042],
+  [25.778334, -80.140961],
+  [25.775676, -80.139725],
+  [25.773302, -80.140205],
+  [25.770618, -80.138406],
+  [25.768169, -80.135921],
 ];
 const NOISE_OVERLAY_MIN_SCORE = 0.25;
 const NOISE_OVERLAY_MAX_EDGES = 9000;
@@ -109,7 +162,7 @@ const ROUTING_PROFILES = {
     fixedPenaltiesM: { traffic_crossing: 42 },
   },
   metromover: {
-    label: "Metromover",
+    label: "Transport",
     speedKmh: WALK_SPEED_KMH,
     scoreWeights: {},
     minMultiplier: 1,
@@ -125,7 +178,7 @@ const TAG_FILTERS = [
   { tag: "schools", label: "Schools" },
   { tag: "playgrounds", label: "Playgrounds" },
   { tag: "parks", label: "Parks" },
-  { tag: "metromover", label: "Metromover" },
+  { tag: "transport", label: "Transport" },
   { tag: "indoors", label: "Indoors" },
 ];
 const FOOD_FILTER_TAGS = new Set([
@@ -148,7 +201,7 @@ const SUPERMARKET_FILTER_TAGS = new Set(["supermarket"]);
 const SCHOOL_FILTER_TAGS = new Set(["academy", "elementary_school", "montessori_school", "preschool", "school"]);
 const PLAYGROUND_FILTER_TAGS = new Set(["playground"]);
 const PARK_FILTER_TAGS = new Set(["beach_park", "dog_park", "nature_preserve", "park"]);
-const METROMOVER_FILTER_TAGS = new Set(["metromover"]);
+const TRANSPORT_FILTER_TAGS = new Set(["metromover", "water_taxi", "brickell_trolley", "south_beach_trolley", "transit", "transportation"]);
 const INDOOR_FILTER_TAGS = new Set(["childrens_museum", "indoors", "science_museum"]);
 
 const app = {
@@ -967,8 +1020,8 @@ function getMarkerIcon(place) {
     classes.push("is-playground");
   } else if (place.filterTags.includes("parks")) {
     classes.push("is-park");
-  } else if (place.filterTags.includes("metromover")) {
-    classes.push("is-metromover");
+  } else if (place.filterTags.includes("transport")) {
+    classes.push("is-transport");
   } else if (place.filterTags.includes("indoors")) {
     classes.push("is-indoors");
   }
@@ -1160,7 +1213,7 @@ async function renderRoute() {
     if (requestId !== app.routeRequestId) return;
     if (route) {
       renderRouteGeometry(route, app.travelMode);
-      dom.routeStatus.textContent = `${modeLabel}: ${from.name} -> ${to.name} (${formatRouteSummary(route, app.travelMode)})`;
+      dom.routeStatus.textContent = formatRouteStatus(modeLabel, from, to, route, app.travelMode);
     } else {
       setRoutePreview([from.coordinates, to.coordinates], { opacity: 0.7 });
       dom.routeStatus.textContent = `${modeLabel}: direct preview only; local graph unavailable for this pair`;
@@ -1219,8 +1272,12 @@ function getUnifiedMultimodalRoute(fromCoordinates, toCoordinates) {
   const segments = coalesceUnifiedMultimodalSegments(result.edges);
   const metromoverSegments = segments.filter((segment) => segment.type === "metromover");
   const waterTaxiSegments = segments.filter((segment) => segment.type === "water_taxi");
+  const brickellTrolleySegments = segments.filter((segment) => segment.type === "brickell_trolley");
+  const southBeachTrolleySegments = segments.filter((segment) => segment.type === "south_beach_trolley");
   const metromoverUsed = metromoverSegments.length > 0;
   const waterTaxiUsed = waterTaxiSegments.length > 0;
+  const brickellTrolleyUsed = brickellTrolleySegments.length > 0;
+  const southBeachTrolleyUsed = southBeachTrolleySegments.length > 0;
 
   return {
     coordinates: mergeRouteCoordinates(...segments.map((segment) => segment.coordinates)),
@@ -1228,15 +1285,22 @@ function getUnifiedMultimodalRoute(fromCoordinates, toCoordinates) {
     durationMinutes: Math.max(1, Math.round(result.durationMinutes)),
     metromoverUsed,
     waterTaxiUsed,
+    brickellTrolleyUsed,
+    southBeachTrolleyUsed,
     combinedTransitUsed: metromoverUsed && waterTaxiUsed,
-    transitUsed: metromoverUsed || waterTaxiUsed,
+    transitUsed: metromoverUsed || waterTaxiUsed || brickellTrolleyUsed || southBeachTrolleyUsed,
     transitStartName: segments.find((segment) => segment.type !== "walk")?.startName,
     transitEndName: [...segments].reverse().find((segment) => segment.type !== "walk")?.endName,
     metromoverStartName: metromoverSegments[0]?.startName,
     metromoverEndName: metromoverSegments[metromoverSegments.length - 1]?.endName,
     waterTaxiStartName: waterTaxiSegments[0]?.startName,
     waterTaxiEndName: waterTaxiSegments[waterTaxiSegments.length - 1]?.endName,
+    brickellTrolleyStartName: brickellTrolleySegments[0]?.startName,
+    brickellTrolleyEndName: brickellTrolleySegments[brickellTrolleySegments.length - 1]?.endName,
+    southBeachTrolleyStartName: southBeachTrolleySegments[0]?.startName,
+    southBeachTrolleyEndName: southBeachTrolleySegments[southBeachTrolleySegments.length - 1]?.endName,
     segments,
+    itinerary: createTransportItinerary(result.edges),
   };
 }
 
@@ -1253,6 +1317,8 @@ function createUnifiedMultimodalContext(fromCoordinates, toCoordinates) {
   const transitNodes = [
     ...getMetromoverStations().map((place) => ({ id: place.id, type: "metromover", name: place.name, coordinates: place.coordinates })),
     ...getWaterTaxiStops().map((place) => ({ id: place.id, type: "water_taxi", name: place.name, coordinates: place.coordinates })),
+    ...getBrickellTrolleyStops().map((place) => ({ id: place.id, type: "brickell_trolley", name: place.name, coordinates: place.coordinates })),
+    ...getSouthBeachTrolleyStops().map((place) => ({ id: place.id, type: "south_beach_trolley", name: place.name, coordinates: place.coordinates })),
   ];
   for (const node of transitNodes) {
     addUnifiedVirtualNode(context, node.id, node.type, node.name, node.coordinates);
@@ -1266,6 +1332,8 @@ function createUnifiedMultimodalContext(fromCoordinates, toCoordinates) {
   addUnifiedEndpointTransitConnectors(context, transitNodes);
   addUnifiedMetromoverRideEdges(context);
   addUnifiedWaterTaxiRideEdges(context);
+  addUnifiedBrickellTrolleyRideEdges(context);
+  addUnifiedSouthBeachTrolleyRideEdges(context);
   return context;
 }
 
@@ -1308,10 +1376,12 @@ function addUnifiedTransitConnectors(context, transitNode) {
     const routeCoordinates = getUnifiedRouteNodeCoordinates(candidate.id);
     if (!routeCoordinates) continue;
     const walkingMinutes = getExactTravelMinutes(candidate.distanceM, WALK_SPEED_KMH);
-    const boardingWaitMinutes = transitNode.type === "metromover" ? METROMOVER_WAIT_MINUTES : 0;
+    const boardingWaitMinutes = getTransitBoardingWaitMinutes(transitNode.type);
     addUnifiedCustomEdge(context, candidate.id, transitNode.id, createUnifiedMultimodalEdge("walk", candidate.id, transitNode.id, routeCoordinates, transitNode.coordinates, {
       distanceM: candidate.distanceM,
       durationMinutes: walkingMinutes + boardingWaitMinutes,
+      movingDurationMinutes: walkingMinutes,
+      waitMinutes: boardingWaitMinutes,
       endName: transitNode.name,
     }));
     addUnifiedCustomEdge(context, transitNode.id, candidate.id, createUnifiedMultimodalEdge("walk", transitNode.id, candidate.id, transitNode.coordinates, routeCoordinates, {
@@ -1329,11 +1399,13 @@ function addUnifiedEndpointTransitConnectors(context, transitNodes) {
       const distanceM = getDistanceMeters(endpoint.coordinates, transitNode.coordinates);
       if (distanceM > 90) continue;
       const walkingMinutes = getExactTravelMinutes(distanceM, WALK_SPEED_KMH);
-      const boardingWaitMinutes = transitNode.type === "metromover" ? METROMOVER_WAIT_MINUTES : 0;
+      const boardingWaitMinutes = getTransitBoardingWaitMinutes(transitNode.type);
       if (endpointId === context.originId) {
         addUnifiedCustomEdge(context, endpointId, transitNode.id, createUnifiedMultimodalEdge("walk", endpointId, transitNode.id, endpoint.coordinates, transitNode.coordinates, {
           distanceM,
           durationMinutes: walkingMinutes + boardingWaitMinutes,
+          movingDurationMinutes: walkingMinutes,
+          waitMinutes: boardingWaitMinutes,
           startName: endpoint.name,
           endName: transitNode.name,
         }));
@@ -1361,34 +1433,88 @@ function addUnifiedMetromoverRideEdges(context) {
 function addUnifiedWaterTaxiRideEdges(context) {
   const stops = WATER_TAXI_STOP_IDS.map((id) => context.virtualNodes.get(id)).filter(Boolean);
   if (stops.length !== 2) return;
-  addUnifiedBidirectionalTransitEdge(context, "water_taxi", stops[0], stops[1], WATER_TAXI_WAIT_MINUTES + WATER_TAXI_CROSSING_MINUTES);
+  addUnifiedBidirectionalTransitEdge(context, "water_taxi", stops[0], stops[1], WATER_TAXI_CROSSING_MINUTES);
 }
 
-function addUnifiedBidirectionalTransitEdge(context, type, from, to, durationMinutes) {
-  const distanceM = getDistanceMeters(from.coordinates, to.coordinates);
-  const forward = createUnifiedMultimodalEdge(type, from.id, to.id, from.coordinates, to.coordinates, {
+function addUnifiedBrickellTrolleyRideEdges(context) {
+  const stops = BRICKELL_TROLLEY_STOP_IDS.map((id) => context.virtualNodes.get(id)).filter(Boolean);
+  if (stops.length !== 2) return;
+  addUnifiedBidirectionalTransitEdge(
+    context,
+    "brickell_trolley",
+    stops[0],
+    stops[1],
+    BRICKELL_TROLLEY_RIDE_MINUTES,
+    BRICKELL_TROLLEY_ROUTE_COORDINATES,
+  );
+}
+
+function addUnifiedSouthBeachTrolleyRideEdges(context) {
+  const dock = context.virtualNodes.get(SOUTH_BEACH_TROLLEY_DOCK_NODE_ID);
+  const midpoint = context.virtualNodes.get(SOUTH_BEACH_TROLLEY_MIDPOINT_ID);
+  const sofi = context.virtualNodes.get(SOUTH_BEACH_TROLLEY_SOFI_ID);
+  if (!dock || !midpoint || !sofi) return;
+
+  const midpointIndex = SOUTH_BEACH_TROLLEY_ROUTE_COORDINATES.findIndex(
+    (coordinates) => coordinates[0] === midpoint.coordinates[0] && coordinates[1] === midpoint.coordinates[1],
+  );
+  if (midpointIndex < 0) return;
+  const dockToMidpoint = SOUTH_BEACH_TROLLEY_ROUTE_COORDINATES.slice(0, midpointIndex + 1);
+  const midpointToSofi = SOUTH_BEACH_TROLLEY_ROUTE_COORDINATES.slice(midpointIndex);
+  addUnifiedDirectedTransitEdge(context, "south_beach_trolley", dock, midpoint, 12, dockToMidpoint);
+  addUnifiedDirectedTransitEdge(context, "south_beach_trolley", midpoint, sofi, 11, midpointToSofi);
+  addUnifiedDirectedTransitEdge(context, "south_beach_trolley", sofi, midpoint, 7, [...midpointToSofi].reverse());
+  addUnifiedDirectedTransitEdge(context, "south_beach_trolley", midpoint, dock, 16, [...dockToMidpoint].reverse());
+}
+
+function getTransitBoardingWaitMinutes(type) {
+  if (type === "metromover") return METROMOVER_WAIT_MINUTES;
+  if (type === "water_taxi") return WATER_TAXI_WAIT_MINUTES;
+  if (type === "brickell_trolley") return BRICKELL_TROLLEY_WAIT_MINUTES;
+  if (type === "south_beach_trolley") return SOUTH_BEACH_TROLLEY_WAIT_MINUTES;
+  return 0;
+}
+
+function addUnifiedBidirectionalTransitEdge(
+  context,
+  type,
+  from,
+  to,
+  durationMinutes,
+  routeCoordinates = [from.coordinates, to.coordinates],
+) {
+  addUnifiedDirectedTransitEdge(context, type, from, to, durationMinutes, routeCoordinates);
+  addUnifiedDirectedTransitEdge(context, type, to, from, durationMinutes, [...routeCoordinates].reverse());
+}
+
+function addUnifiedDirectedTransitEdge(
+  context,
+  type,
+  from,
+  to,
+  durationMinutes,
+  routeCoordinates = [from.coordinates, to.coordinates],
+) {
+  const distanceM = getRouteDistance(routeCoordinates);
+  const edge = createUnifiedMultimodalEdge(type, from.id, to.id, from.coordinates, to.coordinates, {
     distanceM,
     durationMinutes,
     startName: from.name,
     endName: to.name,
   });
-  addUnifiedCustomEdge(context, from.id, to.id, forward);
-  addUnifiedCustomEdge(context, to.id, from.id, {
-    ...forward,
-    coordinates: [to.coordinates, from.coordinates],
-    startId: to.id,
-    endId: from.id,
-    startName: to.name,
-    endName: from.name,
-  });
+  edge.coordinates = routeCoordinates;
+  addUnifiedCustomEdge(context, from.id, to.id, edge);
 }
 
 function createUnifiedMultimodalEdge(type, startId, endId, startCoordinates, endCoordinates, options = {}) {
   const distanceM = options.distanceM ?? getDistanceMeters(startCoordinates, endCoordinates);
+  const durationMinutes = options.durationMinutes ?? getExactTravelMinutes(distanceM, WALK_SPEED_KMH);
   return {
     type,
     distanceM,
-    durationMinutes: options.durationMinutes ?? getExactTravelMinutes(distanceM, WALK_SPEED_KMH),
+    durationMinutes,
+    movingDurationMinutes: options.movingDurationMinutes ?? durationMinutes,
+    waitMinutes: options.waitMinutes ?? 0,
     coordinates: [startCoordinates, endCoordinates],
     startId,
     endId,
@@ -1481,6 +1607,54 @@ function coalesceUnifiedMultimodalSegments(edges) {
   return segments;
 }
 
+function createTransportItinerary(edges) {
+  const itinerary = [];
+  let walkingMinutes = 0;
+  let waitingMinutes = 0;
+
+  const flushWalking = () => {
+    if (walkingMinutes > 0.05) {
+      itinerary.push({ type: "walk", label: "Walk", minutes: Math.max(1, Math.round(walkingMinutes)) });
+    }
+    if (waitingMinutes > 0.05) {
+      itinerary.push({ type: "wait", label: "Wait", minutes: Math.max(1, Math.round(waitingMinutes)) });
+    }
+    walkingMinutes = 0;
+    waitingMinutes = 0;
+  };
+
+  for (const edge of edges) {
+    if (edge.type === "walk") {
+      walkingMinutes += edge.movingDurationMinutes ?? Math.max(0, edge.durationMinutes - (edge.waitMinutes || 0));
+      waitingMinutes += edge.waitMinutes || 0;
+      continue;
+    }
+
+    flushWalking();
+    const label = getTransitTypeLabel(edge.type);
+    const previous = itinerary[itinerary.length - 1];
+    if (previous?.type === edge.type) {
+      previous.minutes += edge.durationMinutes;
+    } else {
+      itinerary.push({ type: edge.type, label, minutes: edge.durationMinutes });
+    }
+  }
+  flushWalking();
+
+  return itinerary.map((step) => ({
+    ...step,
+    minutes: Math.max(1, Math.round(step.minutes)),
+  }));
+}
+
+function getTransitTypeLabel(type) {
+  if (type === "metromover") return "Metromover";
+  if (type === "water_taxi") return "Water taxi";
+  if (type === "brickell_trolley") return "Brickell Trolley";
+  if (type === "south_beach_trolley") return "South Beach Trolley";
+  return "Transport";
+}
+
 function getUnifiedConnectableRouteNodes(coordinates) {
   const maxSnapDistanceM = app.routingGraph.max_snap_distance_m || DEFAULT_MAX_SNAP_DISTANCE_METERS;
   return findNearestRouteNodes(coordinates, ROUTE_SNAP_CANDIDATE_LIMIT)
@@ -1504,12 +1678,14 @@ function renderRouteGeometry(route, mode) {
     for (const segment of route.segments) {
       const isMetromover = segment.type === "metromover";
       const isWaterTaxi = segment.type === "water_taxi";
+      const isBrickellTrolley = segment.type === "brickell_trolley";
+      const isSouthBeachTrolley = segment.type === "south_beach_trolley";
       const lineOptions = {
-        color: isWaterTaxi ? "#0b8ea0" : "#d95d39",
+        color: isWaterTaxi ? "#0b8ea0" : isBrickellTrolley ? "#7a5a2e" : isSouthBeachTrolley ? "#4f63a8" : "#d95d39",
         weight: 5,
         opacity: 0.95,
       };
-      if (isMetromover || isWaterTaxi) lineOptions.dashArray = "2 8";
+      if (isMetromover || isWaterTaxi || isBrickellTrolley || isSouthBeachTrolley) lineOptions.dashArray = "2 8";
       const line = L.polyline(segment.coordinates, lineOptions).addTo(app.map);
       app.routeSegmentLines.push(line);
     }
@@ -1551,12 +1727,32 @@ function clearRouteSegments() {
 }
 
 function getMetromoverStations() {
-  return app.places.filter((place) => place.filterTags?.includes("metromover") && Array.isArray(place.coordinates));
+  return app.places.filter((place) => place.tags?.includes("metromover") && Array.isArray(place.coordinates));
 }
 
 function getWaterTaxiStops() {
   return WATER_TAXI_STOP_IDS.map((id) => app.places.find((place) => place.id === id))
     .filter((place) => place && Array.isArray(place.coordinates));
+}
+
+function getBrickellTrolleyStops() {
+  return BRICKELL_TROLLEY_STOP_IDS.map((id) => app.places.find((place) => place.id === id))
+    .filter((place) => place && Array.isArray(place.coordinates));
+}
+
+function getSouthBeachTrolleyStops() {
+  const dock = app.places.find((place) => place.id === "place_id_water_taxi_mia_miami_beach");
+  const midpoint = app.places.find((place) => place.id === SOUTH_BEACH_TROLLEY_MIDPOINT_ID);
+  const sofi = app.places.find((place) => place.id === SOUTH_BEACH_TROLLEY_SOFI_ID);
+  return [
+    dock && {
+      id: SOUTH_BEACH_TROLLEY_DOCK_NODE_ID,
+      name: "Water Taxi / South Beach Trolley",
+      coordinates: dock.coordinates,
+    },
+    midpoint,
+    sofi,
+  ].filter((place) => place && Array.isArray(place.coordinates));
 }
 
 function getMetromoverEdgeMinutes(distanceM) {
@@ -1767,18 +1963,21 @@ function formatDistance(distanceM) {
   return `${(distanceM / 1000).toFixed(1)} km`;
 }
 
+function formatRouteStatus(modeLabel, from, to, route, mode) {
+  const summary = modeLabel + ": " + from.name + " -> " + to.name + " (" + formatRouteSummary(route, mode) + ")";
+  if (mode !== "metromover" || !route.itinerary?.length) return summary;
+  const path = route.itinerary.map((step) => step.label + " " + step.minutes + "m").join(" -> ");
+  return summary + String.fromCharCode(10) + "Path: " + path;
+}
+
 function formatRouteSummary(distanceM, mode) {
   if (typeof distanceM === "object") {
     const route = distanceM;
     const durationMinutes = route.durationMinutes ?? getTravelMinutes(route.distanceM, mode);
-    const suffix = mode === "metromover"
-      ? route.waterTaxiUsed && route.metromoverUsed ? " | Water taxi + Metromover" : route.waterTaxiUsed ? " | Water taxi" : route.metromoverUsed ? " | Metromover" : " | walking fastest"
-      : "";
-    return `${formatDistance(route.distanceM)} | ${formatDuration(durationMinutes)}${suffix}`;
+    return formatDistance(route.distanceM) + " | " + formatDuration(durationMinutes);
   }
-  return `${formatDistance(distanceM)} | ${formatDuration(getTravelMinutes(distanceM, mode))}`;
+  return formatDistance(distanceM) + " | " + formatDuration(getTravelMinutes(distanceM, mode));
 }
-
 function getTravelMinutes(distanceM, mode) {
   const speedKmh = getRoutingProfile(mode).speedKmh || 5;
   const exactMovingMinutes = (distanceM / 1000 / speedKmh) * 60;
@@ -1891,7 +2090,7 @@ function getFilterTags(place) {
   const hasSchool = hasAnyTag(rawTags, SCHOOL_FILTER_TAGS) || /\b(school|academy|montessori|preschool)\b/.test(text);
   const hasPlayground = hasAnyTag(rawTags, PLAYGROUND_FILTER_TAGS);
   const hasPark = hasAnyTag(rawTags, PARK_FILTER_TAGS);
-  const hasMetromover = hasAnyTag(rawTags, METROMOVER_FILTER_TAGS);
+  const hasTransport = hasAnyTag(rawTags, TRANSPORT_FILTER_TAGS) || /\b(metromover|water taxi|trolley)\b/.test(text);
   const hasIndoors = hasAnyTag(rawTags, INDOOR_FILTER_TAGS);
 
   if (hasFood) filterTags.push("food");
@@ -1900,7 +2099,7 @@ function getFilterTags(place) {
   if (hasSchool) filterTags.push("schools");
   if (hasPlayground) filterTags.push("playgrounds");
   if (hasPark) filterTags.push("parks");
-  if (hasMetromover) filterTags.push("metromover");
+  if (hasTransport) filterTags.push("transport");
   if (hasIndoors) filterTags.push("indoors");
   return filterTags;
 }
@@ -1955,7 +2154,7 @@ function escapeHtml(value) {
 function registerServiceWorker() {
   if (new URLSearchParams(window.location.search).get("no-sw") === "1") return;
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js?v=206", { updateViaCache: "none" })
+    navigator.serviceWorker.register("sw.js?v=211", { updateViaCache: "none" })
       .then((registration) => navigator.serviceWorker.ready.then((readyRegistration) => {
         requestOfflineTileCache(readyRegistration || registration);
       }))

@@ -3696,7 +3696,7 @@
       }
     },
     "place_id_water_taxi_mia_miami_beach": {
-      "name": "Water Taxi MIA",
+      "name": "Water Taxi / South Beach Trolley",
       "coordinates": [
         25.7933281,
         -80.1450799
@@ -3723,13 +3723,13 @@
         "skip_geocode_evidence": [],
         "geocode": {
           "source": "google_maps_lookup",
-          "query": "Water Taxi MIA 18 Street &, Purdy Ave, Miami Beach, FL 33139",
+          "query": "Water Taxi / South Beach Trolley 18 Street &, Purdy Ave, Miami Beach, FL 33139",
           "display_name": "Google Maps place lookup",
           "match_score": 1,
           "osm_type": null,
           "osm_id": null
         },
-        "notes": "Miami Beach side of the Miami Beach water taxi.",
+        "notes": "Shared Miami Beach water-taxi and South Beach Trolley transfer point; the stops are about 76 m apart.",
         "npc_associations": []
       }
     },
@@ -4284,36 +4284,6 @@
         "npc_associations": []
       }
     },
-    "place_id_cape_florida_lighthouse": {
-      "name": "Cape Florida Lighthouse",
-      "coordinates": [25.6665986, -80.1559585],
-      "tags": ["park", "tourist_attraction"],
-      "meta": {
-        "source_list": "Curated",
-        "source_ordinal": 172,
-        "category": "Lighthouse",
-        "rating": null,
-        "rating_count": null,
-        "price": null,
-        "status": null,
-        "address": "1200 Crandon Blvd, Key Biscayne, FL 33149",
-        "distance_from_home_m": 11295,
-        "local_evidence": [],
-        "scan_evidence": [],
-        "external_evidence": ["google_maps_lookup"],
-        "skip_geocode_evidence": [],
-        "geocode": {
-          "source": "google_maps_lookup",
-          "query": "Cape Florida Lighthouse 1200 Crandon Blvd, Key Biscayne, FL 33149",
-          "display_name": "Google Maps place lookup",
-          "match_score": 1,
-          "osm_type": null,
-          "osm_id": null
-        },
-        "notes": "Inside Bill Baggs Cape Florida State Park.",
-        "npc_associations": []
-      }
-    },
     "place_id_rosa_sky": {
       "name": "Rosa Sky",
       "coordinates": [25.7668472, -80.196175],
@@ -4410,8 +4380,128 @@
         "notes": "",
         "npc_associations": []
       }
+    },
+    "place_id_brickell_trolley_panorama_stop": {
+      "name": "Brickell Trolley - Panorama Tower",
+      "coordinates": [25.7620570063591, -80.19164979457855],
+      "tags": ["brickell_trolley", "transit"],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 175,
+        "category": "Brickell Trolley stop",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Brickell Ave & SE 12th St, Miami, FL 33131",
+        "distance_from_home_m": 184,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": ["transitland_gtfs"],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "transitland_gtfs",
+          "query": "Brickell Ave & SE 12 St, Miami, FL",
+          "display_name": "BRICKELL AV & SE 12 ST",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "Panorama-side stop for the free City of Miami Brickell Trolley.",
+        "npc_associations": []
+      }
+    },
+    "place_id_brickell_trolley_city_hall": {
+      "name": "Brickell Trolley - City Hall",
+      "coordinates": [25.72784274816513, -80.2345222234726],
+      "tags": ["brickell_trolley", "transit"],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 176,
+        "category": "Brickell Trolley stop",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "3500 Pan American Dr, Miami, FL 33133",
+        "distance_from_home_m": 5920,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": ["transitland_gtfs"],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "transitland_gtfs",
+          "query": "Pan American Dr #3500 City Hall, Miami, FL",
+          "display_name": "PAN AMERICAN DR@#3500 (CITY HALL)",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "City Hall terminus for the free City of Miami Brickell Trolley.",
+        "npc_associations": []
+      }
     }
-  },
+,
+    "place_id_south_beach_trolley_alton_10th": {
+      "name": "South Beach Trolley - Alton & 10th",
+      "coordinates": [25.780669, -80.141042],
+      "tags": ["south_beach_trolley", "transit"],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 177,
+        "category": "South Beach Trolley stop",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Alton Rd & 10th St, Miami Beach, FL 33139",
+        "distance_from_home_m": 5310,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": ["miami_beach_gtfs"],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "miami_beach_gtfs",
+          "query": "Alton Rd & 10th St, Miami Beach, FL 33139",
+          "display_name": "ALTON RD & 10 ST",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "Midpoint stop on the free South Beach Trolley loops.",
+        "npc_associations": []
+      }
+    },
+    "place_id_south_beach_trolley_south_pointe": {
+      "name": "South Beach Trolley - South Pointe",
+      "coordinates": [25.768169, -80.135921],
+      "tags": ["south_beach_trolley", "transit"],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 178,
+        "category": "South Beach Trolley stop",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "South Pointe Dr & Washington Ave, Miami Beach, FL 33139",
+        "distance_from_home_m": 5487,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": ["miami_beach_gtfs"],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "miami_beach_gtfs",
+          "query": "South Pointe Dr & Washington Ave, Miami Beach, FL 33139",
+          "display_name": "SOUTH POINTE DR & WASHINGTON AV",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "SoFi stop on the free South Beach Trolley loops.",
+        "npc_associations": []
+      }
+    }  },
   "routines": {
     "morning_local_scan": {
       "time_window": "06:00-10:00",

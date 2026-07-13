@@ -339,7 +339,7 @@ h1 {
   --chip-ink: #20312d;
 }
 
-.chip-metromover {
+.chip-transport {
   --chip-bg: #c8ccd0;
   --chip-ink: #20312d;
 }
@@ -536,6 +536,7 @@ h1 {
   color: var(--muted);
   font-size: 12px;
   line-height: 1.35;
+  white-space: pre-line;
 }
 
 .clear-route {
@@ -589,7 +590,7 @@ h1 {
   background: #49a85f;
 }
 
-.spin-marker.is-metromover {
+.spin-marker.is-transport {
   background: #c8ccd0;
 }
 
