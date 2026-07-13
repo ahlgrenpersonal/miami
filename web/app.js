@@ -18,6 +18,8 @@ const WATER_TAXI_CROSSING_MINUTES = 20;
 const BRICKELL_TROLLEY_WAIT_MINUTES = 10;
 const BRICKELL_TROLLEY_RIDE_MINUTES = 35;
 const SOUTH_BEACH_TROLLEY_WAIT_MINUTES = 10;
+const BISCAYNE_TROLLEY_WAIT_MINUTES = 8;
+const LITTLE_HAVANA_TROLLEY_WAIT_MINUTES = 8;
 const SOUTH_BEACH_TROLLEY_DOCK_NODE_ID = "transit:south_beach_trolley:water_taxi";
 const SOUTH_BEACH_TROLLEY_MIDPOINT_ID = "place_id_south_beach_trolley_alton_10th";
 const SOUTH_BEACH_TROLLEY_SOFI_ID = "place_id_south_beach_trolley_south_pointe";
@@ -71,6 +73,99 @@ const SOUTH_BEACH_TROLLEY_ROUTE_COORDINATES = [
   [25.773302, -80.140205],
   [25.770618, -80.138406],
   [25.768169, -80.135921],
+];
+const BRICKELL_STATION_TROLLEYS_ID = "place_id_brickell_station_trolleys";
+const DOMINO_PARK_TROLLEY_ID = "place_id_domino_park_calle_ocho_trolley";
+const BISCAYNE_TROLLEY_PANORAMA_ID = "transit:biscayne:panorama";
+const BISCAYNE_TROLLEY_VIRTUAL_STOPS = [
+  { id: "transit:biscayne:brickell-terminal", name: "Biscayne Trolley - Brickell Station", coordinates: [25.763335, -80.19532] },
+  { id: BISCAYNE_TROLLEY_PANORAMA_ID, name: "Biscayne Trolley - Panorama Tower", coordinates: [25.7620570063591, -80.19164979457855] },
+  { id: "transit:biscayne:bayside-northbound", name: "Biscayne Trolley - Bayside", coordinates: [25.776525, -80.187488] },
+  { id: "transit:biscayne:edgewater-northbound", name: "Biscayne Trolley - Edgewater", coordinates: [25.79383, -80.18888] },
+  { id: "transit:biscayne:midtown-northbound", name: "Biscayne Trolley - Midtown", coordinates: [25.80974, -80.192358] },
+  { id: "transit:biscayne:design-district", name: "Biscayne Trolley - Design District", coordinates: [25.811188, -80.19119] },
+  { id: "transit:biscayne:midtown-southbound", name: "Biscayne Trolley - Midtown", coordinates: [25.809102, -80.19538] },
+  { id: "transit:biscayne:edgewater-southbound", name: "Biscayne Trolley - Edgewater", coordinates: [25.791889, -80.187249] },
+  { id: "transit:biscayne:bayside-southbound", name: "Biscayne Trolley - Bayside", coordinates: [25.777444, -80.188432] },
+];
+const BISCAYNE_TROLLEY_LINKS = [
+  {
+    fromId: "transit:biscayne:brickell-terminal",
+    toId: BISCAYNE_TROLLEY_PANORAMA_ID,
+    minutes: 8,
+    coordinates: [[25.763335, -80.19532], [25.76148, -80.19401], [25.758948, -80.192459], [25.7620570063591, -80.19164979457855]],
+  },
+  {
+    fromId: BISCAYNE_TROLLEY_PANORAMA_ID,
+    toId: "transit:biscayne:bayside-northbound",
+    minutes: 11,
+    coordinates: [[25.7620570063591, -80.19164979457855], [25.763855, -80.191151], [25.767802, -80.190079], [25.77415, -80.18707], [25.776525, -80.187488]],
+  },
+  {
+    fromId: "transit:biscayne:bayside-northbound",
+    toId: "transit:biscayne:edgewater-northbound",
+    minutes: 11,
+    coordinates: [[25.776525, -80.187488], [25.78075, -80.18914], [25.78742, -80.18906], [25.79383, -80.18888]],
+  },
+  {
+    fromId: "transit:biscayne:edgewater-northbound",
+    toId: "transit:biscayne:midtown-northbound",
+    minutes: 13,
+    coordinates: [[25.79383, -80.18888], [25.7973, -80.18895], [25.80115, -80.18906], [25.804175, -80.1916], [25.806597, -80.193089], [25.80974, -80.192358]],
+  },
+  {
+    fromId: "transit:biscayne:midtown-northbound",
+    toId: "transit:biscayne:design-district",
+    minutes: 2,
+    coordinates: [[25.80974, -80.192358], [25.811188, -80.19119]],
+  },
+  {
+    fromId: "transit:biscayne:design-district",
+    toId: "transit:biscayne:midtown-southbound",
+    minutes: 5,
+    coordinates: [[25.811188, -80.19119], [25.81061, -80.19285], [25.809102, -80.19538]],
+  },
+  {
+    fromId: "transit:biscayne:midtown-southbound",
+    toId: "transit:biscayne:edgewater-southbound",
+    minutes: 16,
+    coordinates: [[25.809102, -80.19538], [25.808167, -80.193984], [25.807017, -80.193136], [25.804266, -80.193787], [25.803996, -80.189448], [25.79791, -80.189157], [25.793892, -80.189095], [25.791889, -80.187249]],
+  },
+  {
+    fromId: "transit:biscayne:edgewater-southbound",
+    toId: "transit:biscayne:bayside-southbound",
+    minutes: 11,
+    coordinates: [[25.791889, -80.187249], [25.78966, -80.188499], [25.78451, -80.189612], [25.779876, -80.189216], [25.777444, -80.188432]],
+  },
+  {
+    fromId: "transit:biscayne:bayside-southbound",
+    toId: "transit:biscayne:brickell-terminal",
+    minutes: 14,
+    coordinates: [[25.777444, -80.188432], [25.774652, -80.187871], [25.772674, -80.189257], [25.770908, -80.190191], [25.767255, -80.190986], [25.767466, -80.19297], [25.763335, -80.19532]],
+  },
+];
+const LITTLE_HAVANA_TROLLEY_VIRTUAL_STOPS = [
+  { id: "transit:little-havana:west-terminal", name: "Little Havana Trolley - West Terminal", coordinates: [25.774508, -80.256102] },
+];
+const LITTLE_HAVANA_TROLLEY_LINKS = [
+  {
+    fromId: BRICKELL_STATION_TROLLEYS_ID,
+    toId: "transit:little-havana:west-terminal",
+    minutes: 45,
+    coordinates: [[25.76478, -80.195571], [25.766013, -80.197284], [25.7673, -80.19775], [25.769196, -80.200082], [25.771762, -80.200865], [25.774085, -80.202027], [25.77387, -80.20596], [25.7737, -80.21166], [25.773421, -80.21952], [25.7728, -80.22509], [25.77249, -80.236933], [25.772217, -80.246245], [25.771944, -80.254354], [25.772737, -80.255382], [25.774508, -80.256102]],
+  },
+  {
+    fromId: "transit:little-havana:west-terminal",
+    toId: DOMINO_PARK_TROLLEY_ID,
+    minutes: 16,
+    coordinates: [[25.774508, -80.256102], [25.771256, -80.255537], [25.764606, -80.254464], [25.764837, -80.24713], [25.76507, -80.23937], [25.76532, -80.23094], [25.765492, -80.224329], [25.76563, -80.2193]],
+  },
+  {
+    fromId: DOMINO_PARK_TROLLEY_ID,
+    toId: BRICKELL_STATION_TROLLEYS_ID,
+    minutes: 10,
+    coordinates: [[25.76563, -80.2193], [25.76579, -80.2141], [25.76587, -80.20907], [25.765982, -80.205446], [25.76619, -80.19788], [25.763555, -80.197398], [25.76478, -80.195571]],
+  },
 ];
 const NOISE_OVERLAY_MIN_SCORE = 0.25;
 const NOISE_OVERLAY_MAX_EDGES = 9000;
@@ -201,7 +296,7 @@ const SUPERMARKET_FILTER_TAGS = new Set(["supermarket"]);
 const SCHOOL_FILTER_TAGS = new Set(["academy", "elementary_school", "montessori_school", "preschool", "school"]);
 const PLAYGROUND_FILTER_TAGS = new Set(["playground"]);
 const PARK_FILTER_TAGS = new Set(["beach_park", "dog_park", "nature_preserve", "park"]);
-const TRANSPORT_FILTER_TAGS = new Set(["metromover", "water_taxi", "brickell_trolley", "south_beach_trolley", "transit", "transportation"]);
+const TRANSPORT_FILTER_TAGS = new Set(["metromover", "water_taxi", "brickell_trolley", "south_beach_trolley", "biscayne_trolley", "little_havana_trolley", "transit", "transportation"]);
 const INDOOR_FILTER_TAGS = new Set(["childrens_museum", "indoors", "science_museum"]);
 
 const app = {
@@ -1283,10 +1378,14 @@ function getUnifiedMultimodalRoute(fromCoordinates, toCoordinates) {
   const waterTaxiSegments = segments.filter((segment) => segment.type === "water_taxi");
   const brickellTrolleySegments = segments.filter((segment) => segment.type === "brickell_trolley");
   const southBeachTrolleySegments = segments.filter((segment) => segment.type === "south_beach_trolley");
+  const biscayneTrolleySegments = segments.filter((segment) => segment.type === "biscayne_trolley");
+  const littleHavanaTrolleySegments = segments.filter((segment) => segment.type === "little_havana_trolley");
   const metromoverUsed = metromoverSegments.length > 0;
   const waterTaxiUsed = waterTaxiSegments.length > 0;
   const brickellTrolleyUsed = brickellTrolleySegments.length > 0;
   const southBeachTrolleyUsed = southBeachTrolleySegments.length > 0;
+  const biscayneTrolleyUsed = biscayneTrolleySegments.length > 0;
+  const littleHavanaTrolleyUsed = littleHavanaTrolleySegments.length > 0;
 
   return {
     coordinates: mergeRouteCoordinates(...segments.map((segment) => segment.coordinates)),
@@ -1296,8 +1395,10 @@ function getUnifiedMultimodalRoute(fromCoordinates, toCoordinates) {
     waterTaxiUsed,
     brickellTrolleyUsed,
     southBeachTrolleyUsed,
+    biscayneTrolleyUsed,
+    littleHavanaTrolleyUsed,
     combinedTransitUsed: metromoverUsed && waterTaxiUsed,
-    transitUsed: metromoverUsed || waterTaxiUsed || brickellTrolleyUsed || southBeachTrolleyUsed,
+    transitUsed: metromoverUsed || waterTaxiUsed || brickellTrolleyUsed || southBeachTrolleyUsed || biscayneTrolleyUsed || littleHavanaTrolleyUsed,
     transitStartName: segments.find((segment) => segment.type !== "walk")?.startName,
     transitEndName: [...segments].reverse().find((segment) => segment.type !== "walk")?.endName,
     metromoverStartName: metromoverSegments[0]?.startName,
@@ -1308,6 +1409,10 @@ function getUnifiedMultimodalRoute(fromCoordinates, toCoordinates) {
     brickellTrolleyEndName: brickellTrolleySegments[brickellTrolleySegments.length - 1]?.endName,
     southBeachTrolleyStartName: southBeachTrolleySegments[0]?.startName,
     southBeachTrolleyEndName: southBeachTrolleySegments[southBeachTrolleySegments.length - 1]?.endName,
+    biscayneTrolleyStartName: biscayneTrolleySegments[0]?.startName,
+    biscayneTrolleyEndName: biscayneTrolleySegments[biscayneTrolleySegments.length - 1]?.endName,
+    littleHavanaTrolleyStartName: littleHavanaTrolleySegments[0]?.startName,
+    littleHavanaTrolleyEndName: littleHavanaTrolleySegments[littleHavanaTrolleySegments.length - 1]?.endName,
     segments,
     itinerary: createTransportItinerary(result.edges),
   };
@@ -1328,6 +1433,8 @@ function createUnifiedMultimodalContext(fromCoordinates, toCoordinates) {
     ...getWaterTaxiStops().map((place) => ({ id: place.id, type: "water_taxi", name: place.name, coordinates: place.coordinates })),
     ...getBrickellTrolleyStops().map((place) => ({ id: place.id, type: "brickell_trolley", name: place.name, coordinates: place.coordinates })),
     ...getSouthBeachTrolleyStops().map((place) => ({ id: place.id, type: "south_beach_trolley", name: place.name, coordinates: place.coordinates })),
+    ...getBiscayneTrolleyStops().map((place) => ({ id: place.id, type: "biscayne_trolley", name: place.name, coordinates: place.coordinates })),
+    ...getLittleHavanaTrolleyStops().map((place) => ({ id: place.id, type: "little_havana_trolley", name: place.name, coordinates: place.coordinates })),
   ];
   for (const node of transitNodes) {
     addUnifiedVirtualNode(context, node.id, node.type, node.name, node.coordinates);
@@ -1343,6 +1450,8 @@ function createUnifiedMultimodalContext(fromCoordinates, toCoordinates) {
   addUnifiedWaterTaxiRideEdges(context);
   addUnifiedBrickellTrolleyRideEdges(context);
   addUnifiedSouthBeachTrolleyRideEdges(context);
+  addUnifiedBiscayneTrolleyRideEdges(context);
+  addUnifiedLittleHavanaTrolleyRideEdges(context);
   return context;
 }
 
@@ -1476,11 +1585,30 @@ function addUnifiedSouthBeachTrolleyRideEdges(context) {
   addUnifiedDirectedTransitEdge(context, "south_beach_trolley", midpoint, dock, 16, [...dockToMidpoint].reverse());
 }
 
+function addUnifiedBiscayneTrolleyRideEdges(context) {
+  addUnifiedDirectedTrolleyLinks(context, "biscayne_trolley", BISCAYNE_TROLLEY_LINKS);
+}
+
+function addUnifiedLittleHavanaTrolleyRideEdges(context) {
+  addUnifiedDirectedTrolleyLinks(context, "little_havana_trolley", LITTLE_HAVANA_TROLLEY_LINKS);
+}
+
+function addUnifiedDirectedTrolleyLinks(context, type, links) {
+  for (const link of links) {
+    const from = context.virtualNodes.get(link.fromId);
+    const to = context.virtualNodes.get(link.toId);
+    if (!from || !to) continue;
+    addUnifiedDirectedTransitEdge(context, type, from, to, link.minutes, link.coordinates);
+  }
+}
+
 function getTransitBoardingWaitMinutes(type) {
   if (type === "metromover") return METROMOVER_WAIT_MINUTES;
   if (type === "water_taxi") return WATER_TAXI_WAIT_MINUTES;
   if (type === "brickell_trolley") return BRICKELL_TROLLEY_WAIT_MINUTES;
   if (type === "south_beach_trolley") return SOUTH_BEACH_TROLLEY_WAIT_MINUTES;
+  if (type === "biscayne_trolley") return BISCAYNE_TROLLEY_WAIT_MINUTES;
+  if (type === "little_havana_trolley") return LITTLE_HAVANA_TROLLEY_WAIT_MINUTES;
   return 0;
 }
 
@@ -1661,6 +1789,8 @@ function getTransitTypeLabel(type) {
   if (type === "water_taxi") return "Water taxi";
   if (type === "brickell_trolley") return "Brickell Trolley";
   if (type === "south_beach_trolley") return "South Beach Trolley";
+  if (type === "biscayne_trolley") return "Biscayne Trolley";
+  if (type === "little_havana_trolley") return "Little Havana Trolley";
   return "Transport";
 }
 
@@ -1684,17 +1814,21 @@ function renderRouteGeometry(route, mode) {
   if (mode === "metromover" && route.transitUsed && route.segments?.length) {
     app.routeLine.setLatLngs([]);
     app.routeLine.setStyle({ opacity: 0 });
+    const transitColors = {
+      metromover: "#d95d39",
+      water_taxi: "#0b8ea0",
+      brickell_trolley: "#7a5a2e",
+      south_beach_trolley: "#4f63a8",
+      biscayne_trolley: "#c75f20",
+      little_havana_trolley: "#c23b54",
+    };
     for (const segment of route.segments) {
-      const isMetromover = segment.type === "metromover";
-      const isWaterTaxi = segment.type === "water_taxi";
-      const isBrickellTrolley = segment.type === "brickell_trolley";
-      const isSouthBeachTrolley = segment.type === "south_beach_trolley";
       const lineOptions = {
-        color: isWaterTaxi ? "#0b8ea0" : isBrickellTrolley ? "#7a5a2e" : isSouthBeachTrolley ? "#4f63a8" : "#d95d39",
+        color: transitColors[segment.type] || "#d95d39",
         weight: 5,
         opacity: 0.95,
       };
-      if (isMetromover || isWaterTaxi || isBrickellTrolley || isSouthBeachTrolley) lineOptions.dashArray = "2 8";
+      if (segment.type !== "walk") lineOptions.dashArray = "2 8";
       const line = L.polyline(segment.coordinates, lineOptions).addTo(app.map);
       app.routeSegmentLines.push(line);
     }
@@ -1761,6 +1895,20 @@ function getSouthBeachTrolleyStops() {
     },
     midpoint,
     sofi,
+  ].filter((place) => place && Array.isArray(place.coordinates));
+}
+
+function getBiscayneTrolleyStops() {
+  return BISCAYNE_TROLLEY_VIRTUAL_STOPS.filter((place) => Array.isArray(place.coordinates));
+}
+
+function getLittleHavanaTrolleyStops() {
+  const brickellStation = app.places.find((place) => place.id === BRICKELL_STATION_TROLLEYS_ID);
+  const dominoPark = app.places.find((place) => place.id === DOMINO_PARK_TROLLEY_ID);
+  return [
+    brickellStation,
+    ...LITTLE_HAVANA_TROLLEY_VIRTUAL_STOPS,
+    dominoPark,
   ].filter((place) => place && Array.isArray(place.coordinates));
 }
 

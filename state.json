@@ -2815,7 +2815,7 @@
       }
     },
     "place_id_collection_at_midtown_miami": {
-      "name": "Collection at Midtown Miami",
+      "name": "The Shops at Midtown Miami",
       "coordinates": [
         25.8092319,
         -80.1943415
@@ -2839,7 +2839,7 @@
         "skip_geocode_evidence": [],
         "geocode": {
           "source": "nominatim",
-          "query": "3401 N Miami Ave, Miami, FL 33127",
+          "query": "The Shops at Midtown Miami, 3401 N Miami Ave, Miami, FL 33127",
           "display_name": "3401, North Miami Avenue, Midtown, Miami, Miami-Dade County, Florida, 33127, United States",
           "match_score": 0.82,
           "osm_type": "way",
@@ -3033,8 +3033,8 @@
     "place_id_disco_donkey_smash_burgers": {
       "name": "Disco Donkey: Smash Burgers",
       "coordinates": [
-        25.7735568,
-        -80.1901174
+        25.7735275,
+        -80.1899869
       ],
       "tags": [
         "burger",
@@ -3053,15 +3053,17 @@
         "distance_from_home_m": 1140,
         "local_evidence": [],
         "scan_evidence": [],
-        "external_evidence": [],
+        "external_evidence": [
+          "google_maps_lookup"
+        ],
         "skip_geocode_evidence": [],
         "geocode": {
-          "source": "nominatim_address",
-          "query": "209 SE 1st St, Miami, FL 33131",
-          "display_name": "209, Southeast 1st Street, Downtown Miami, Miami, Miami-Dade County, Florida, 33131, United States",
-          "match_score": 0.85,
-          "osm_type": "node",
-          "osm_id": 6085440630
+          "source": "google_maps_lookup",
+          "query": "Disco Donkey: Smash Burgers, 209 SE 1st St, Miami, FL 33131",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
         },
         "notes": "",
         "npc_associations": []
@@ -4381,14 +4383,104 @@
         "npc_associations": []
       }
     },
+    "place_id_brickell_station_trolleys": {
+      "name": "Brickell Station Trolleys",
+      "coordinates": [25.76478, -80.195571],
+      "tags": ["biscayne_trolley", "little_havana_trolley", "transit"],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 190,
+        "category": "Biscayne and Little Havana Trolley stop",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "SW 1st Ct, Miami, FL 33131",
+        "distance_from_home_m": 539,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": ["miami_dade_gtfs"],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "miami_dade_gtfs",
+          "query": "Brickell Station West Side, Miami, FL",
+          "display_name": "BRICKELL STATION (WEST SIDE)",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "Shared Brickell terminal for the free Biscayne and Little Havana trolley routes.",
+        "npc_associations": []
+      }
+    },
+    "place_id_domino_park_calle_ocho_trolley": {
+      "name": "Domino Park / Calle Ocho Trolley",
+      "coordinates": [25.76563, -80.2193],
+      "tags": ["park", "little_havana_trolley", "transit"],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 191,
+        "category": "Park and Little Havana Trolley stop",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "801 SW 15th Ave, Miami, FL 33135",
+        "distance_from_home_m": 2901,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": ["miami_dade_gtfs"],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "miami_dade_gtfs",
+          "query": "SW 8 St and SW 15 Ave, Miami, FL",
+          "display_name": "SW 8 ST & SW 15 AVE",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "Little Havana Trolley stop beside Maximo Gomez Park on Calle Ocho.",
+        "npc_associations": []
+      }
+    },
+    "place_id_margaret_pace_park": {
+      "name": "Margaret Pace Park",
+      "coordinates": [25.79298, -80.185958],
+      "tags": ["park", "playground"],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 192,
+        "category": "Park and playground",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "1745 N Bayshore Dr, Miami, FL 33132",
+        "distance_from_home_m": 3330,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": ["official_city_lookup"],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "official_city_lookup",
+          "query": "Margaret Pace Park, 1745 N Bayshore Dr, Miami, FL 33132",
+          "display_name": "City of Miami park location",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "Edgewater waterfront park with a children's playground.",
+        "npc_associations": []
+      }
+    },
     "place_id_brickell_trolley_panorama_stop": {
-      "name": "Brickell Trolley - Panorama Tower",
+      "name": "Panorama Trolleys - Brickell / Biscayne",
       "coordinates": [25.7620570063591, -80.19164979457855],
-      "tags": ["brickell_trolley", "transit"],
+      "tags": ["brickell_trolley", "biscayne_trolley", "transit"],
       "meta": {
         "source_list": "Curated",
         "source_ordinal": 175,
-        "category": "Brickell Trolley stop",
+        "category": "Brickell and Biscayne Trolley stop",
         "rating": null,
         "rating_count": null,
         "price": null,
@@ -4397,17 +4489,17 @@
         "distance_from_home_m": 184,
         "local_evidence": [],
         "scan_evidence": [],
-        "external_evidence": ["transitland_gtfs"],
+        "external_evidence": ["transitland_gtfs", "miami_dade_gtfs"],
         "skip_geocode_evidence": [],
         "geocode": {
-          "source": "transitland_gtfs",
+          "source": "miami_dade_gtfs",
           "query": "Brickell Ave & SE 12 St, Miami, FL",
           "display_name": "BRICKELL AV & SE 12 ST",
           "match_score": 1,
           "osm_type": null,
           "osm_id": null
         },
-        "notes": "Panorama-side stop for the free City of Miami Brickell Trolley.",
+        "notes": "Panorama-side stop shared by the free Brickell and Biscayne trolley routes.",
         "npc_associations": []
       }
     },

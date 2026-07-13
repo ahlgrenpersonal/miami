@@ -39,6 +39,8 @@ async def collect_routes():
                   metromoverUsed: Boolean(route?.metromoverUsed),
                   brickellTrolleyUsed: Boolean(route?.brickellTrolleyUsed),
                   southBeachTrolleyUsed: Boolean(route?.southBeachTrolleyUsed),
+                  biscayneTrolleyUsed: Boolean(route?.biscayneTrolleyUsed),
+                  littleHavanaTrolleyUsed: Boolean(route?.littleHavanaTrolleyUsed),
                   combinedTransitUsed: Boolean(route?.combinedTransitUsed),
                   itinerary: route?.itinerary || [],
                   statusText: route ? formatRouteStatus("Transport", from, to, route, "metromover") : null,
@@ -157,6 +159,11 @@ async def collect_routes():
                     "place_id_brickell_trolley_city_hall",
                     "place_id_south_beach_trolley_alton_10th",
                     "place_id_south_beach_trolley_south_pointe",
+                    "place_id_brickell_station_trolleys",
+                    "place_id_domino_park_calle_ocho_trolley",
+                    "place_id_margaret_pace_park",
+                    "place_id_collection_at_midtown_miami",
+                    "place_id_miami_design_district",
                   ].map((placeId) => {
                     const place = byId(placeId);
                     const route = getGraphRoute(home.coordinates, place.coordinates, "shortest");
@@ -173,6 +180,21 @@ async def collect_routes():
                     "place_id_water_taxi_mia_miami_beach",
                     "place_id_south_pointe_beach",
                   ),
+                  biscayneTrolleyRenderStyles: await routeRenderStyles(
+                    "place_id_panorama_tower",
+                    "place_id_miami_design_district",
+                  ),
+                  newTrolleyRoutes: {
+                    edgewater: routeDetails("place_id_panorama_tower", "place_id_margaret_pace_park"),
+                    midtown: routeDetails("place_id_panorama_tower", "place_id_collection_at_midtown_miami"),
+                    designDistrict: routeDetails("place_id_panorama_tower", "place_id_miami_design_district"),
+                    bayside: routeDetails("place_id_panorama_tower", "place_id_bayside_marketplace"),
+                    littleHavanaHome: routeDetails("place_id_domino_park_calle_ocho_trolley"),
+                    littleHavanaOutbound: routeDetails(
+                      "place_id_panorama_tower",
+                      "place_id_domino_park_calle_ocho_trolley",
+                    ),
+                  },
                 },
               ];
             }
@@ -189,6 +211,28 @@ async def collect_routes():
         )
         await page.wait_for_timeout(250)
         await page.screenshot(path=PROJECT_ROOT / ".tmp" / "south-beach-trolley-qa.png")
+        await page.evaluate(
+            """
+            () => {
+              app.travelMode = "metromover";
+              app.routeFromId = "place_id_panorama_tower";
+              app.routeToId = "place_id_miami_design_district";
+              renderRoute();
+            }
+            """
+        )
+        await page.wait_for_timeout(250)
+        await page.evaluate(
+            """
+            () => {
+              const bounds = L.latLngBounds([]);
+              for (const line of app.routeSegmentLines) bounds.extend(line.getBounds());
+              if (bounds.isValid()) app.map.fitBounds(bounds, { padding: [70, 70], animate: false });
+            }
+            """
+        )
+        await page.wait_for_timeout(250)
+        await page.screenshot(path=PROJECT_ROOT / ".tmp" / "biscayne-trolley-qa.png")
         await page.set_viewport_size({"width": 390, "height": 844})
         await page.evaluate(
             """
@@ -350,8 +394,8 @@ def main():
         assert style_route["transportPlaceIds"] == style_route["expectedTransportPlaceIds"], (
             f"Transport filter does not exactly cover transit-tagged places: {style_route}"
         )
-        assert len(style_route["transportPlaceIds"]) == 17, (
-            f"expected 17 combined transport markers, got {style_route['transportPlaceIds']}"
+        assert len(style_route["transportPlaceIds"]) == 19, (
+            f"expected 19 combined transport markers, got {style_route['transportPlaceIds']}"
         )
         required_transport_ids = {
             "place_id_water_taxi_mia_miami_beach",
@@ -360,6 +404,8 @@ def main():
             "place_id_brickell_trolley_city_hall",
             "place_id_south_beach_trolley_alton_10th",
             "place_id_south_beach_trolley_south_pointe",
+            "place_id_brickell_station_trolleys",
+            "place_id_domino_park_calle_ocho_trolley",
         }
         assert required_transport_ids.issubset(style_route["transportPlaceIds"]), (
             f"Transport filter is missing boat or trolley markers: {style_route['transportPlaceIds']}"
@@ -396,6 +442,47 @@ def main():
             style["dashArray"] == "2 8" and style["color"] == "#4f63a8"
             for style in style_route["southBeachTrolleyRenderStyles"][1:-1]
         ), f"South Beach trolley ride should be a dotted blue line: {style_route}"
+
+        new_trolley_routes = style_route["newTrolleyRoutes"]
+        for area in ("edgewater", "midtown", "designDistrict"):
+            route = new_trolley_routes[area]
+            assert route["biscayneTrolleyUsed"], f"{area} did not choose Biscayne Trolley: {route}"
+            assert any(segment["type"] == "biscayne_trolley" for segment in route["segments"]), (
+                f"{area} route has no Biscayne Trolley segment: {route}"
+            )
+            assert any(step["type"] == "wait" and step["minutes"] == 8 for step in route["itinerary"]), (
+                f"{area} route has no 8-minute Biscayne wait: {route}"
+            )
+
+        bayside_route = new_trolley_routes["bayside"]
+        assert bayside_route["metromoverUsed"], f"Bayside should choose Metromover: {bayside_route}"
+        assert not bayside_route["biscayneTrolleyUsed"], (
+            f"Biscayne Trolley should not displace faster Metromover service to Bayside: {bayside_route}"
+        )
+
+        little_havana_home = new_trolley_routes["littleHavanaHome"]
+        assert little_havana_home["littleHavanaTrolleyUsed"], (
+            f"Domino Park -> home did not choose Little Havana Trolley: {little_havana_home}"
+        )
+        assert any(step["type"] == "little_havana_trolley" and step["minutes"] == 10
+                   for step in little_havana_home["itinerary"]), (
+            f"Domino Park return does not use the 10-minute trolley segment: {little_havana_home}"
+        )
+        little_havana_outbound = new_trolley_routes["littleHavanaOutbound"]
+        assert not little_havana_outbound["littleHavanaTrolleyUsed"], (
+            f"outbound route incorrectly forced the slow one-way Little Havana loop: {little_havana_outbound}"
+        )
+
+        assert style_route["biscayneTrolleyRenderStyles"][0]["dashArray"] is None, (
+            f"first Biscayne walking leg should be solid: {style_route}"
+        )
+        assert style_route["biscayneTrolleyRenderStyles"][-1]["dashArray"] is None, (
+            f"last Biscayne walking leg should be solid: {style_route}"
+        )
+        assert any(
+            style["dashArray"] == "2 8" and style["color"] == "#c75f20"
+            for style in style_route["biscayneTrolleyRenderStyles"][1:-1]
+        ), f"Biscayne trolley ride should be a dotted orange line: {style_route}"
         for route in routes:
             if "segments" not in route:
                 print(
