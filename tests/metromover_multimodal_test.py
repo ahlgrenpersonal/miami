@@ -130,6 +130,14 @@ async def collect_routes():
                     scooter14km: getTravelMinutes(14000, "kid_scooter"),
                     scooterJustOver14km: getTravelMinutes(14001, "kid_scooter"),
                   },
+                  waitAssumptions: {
+                    metromover: METROMOVER_WAIT_MINUTES,
+                    waterTaxi: WATER_TAXI_WAIT_MINUTES,
+                    brickellTrolley: BRICKELL_TROLLEY_WAIT_MINUTES,
+                    southBeachTrolley: SOUTH_BEACH_TROLLEY_WAIT_MINUTES,
+                    biscayneTrolley: BISCAYNE_TROLLEY_WAIT_MINUTES,
+                    littleHavanaTrolley: LITTLE_HAVANA_TROLLEY_WAIT_MINUTES,
+                  },
                   selectionRouting: await testRouteReplacement(),
                   transportFilter: TAG_FILTERS.find((filter) => filter.tag === "transport") || null,
                   transportPlaceIds: app.places
@@ -362,6 +370,14 @@ def main():
             "scooter14km": 63,
             "scooterJustOver14km": 68,
         }, f"unexpected walking or scooter timing model: {style_route['timings']}"
+        assert style_route["waitAssumptions"] == {
+            "metromover": 2.5,
+            "waterTaxi": 15,
+            "brickellTrolley": 10,
+            "southBeachTrolley": 10,
+            "biscayneTrolley": 7.5,
+            "littleHavanaTrolley": 7.5,
+        }, f"unexpected sourced transport waits: {style_route['waitAssumptions']}"
         home_replacement = style_route["selectionRouting"]["home"]
         assert home_replacement == {
             "fromId": "place_id_panorama_tower",

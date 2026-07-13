@@ -12,14 +12,25 @@ const DEFAULT_HOME_ZOOM = 15;
 const DEFAULT_MAX_SNAP_DISTANCE_METERS = 500;
 const ROUTE_SNAP_CANDIDATE_LIMIT = 32;
 const METROMOVER_SPEED_KMH = 14.5;
-const METROMOVER_WAIT_MINUTES = 2;
+// Weekend outer-loop service is every 5 minutes, so random arrival averages a 2.5-minute wait.
+// Source: https://www.miamidade.gov/transit/googletransit/current/google_transit.zip
+const METROMOVER_WAIT_MINUTES = 2.5;
+// Weekday daytime boats are hourly; a planned arrival 10-20 minutes early is modeled as 15 minutes.
+// The same official schedule gives a consistent 20-minute crossing.
+// Source: https://www.miamibeachfl.gov/city-hall/transportation/water-taxi/
 const WATER_TAXI_WAIT_MINUTES = 15;
 const WATER_TAXI_CROSSING_MINUTES = 20;
+// Weekend Brickell service is roughly every 20 minutes, so random arrival averages about 10 minutes.
+// Source: https://www.miamidade.gov/transit/googletransit/current/google_transit.zip
 const BRICKELL_TROLLEY_WAIT_MINUTES = 10;
 const BRICKELL_TROLLEY_RIDE_MINUTES = 35;
+// Miami Beach publishes approximately 20-minute South Beach service, giving a 10-minute average wait.
+// Source: https://www.miamibeachfl.gov/city-hall/transportation/trolley/south-beach-trolley/
 const SOUTH_BEACH_TROLLEY_WAIT_MINUTES = 10;
-const BISCAYNE_TROLLEY_WAIT_MINUTES = 8;
-const LITTLE_HAVANA_TROLLEY_WAIT_MINUTES = 8;
+// Weekend Biscayne and Little Havana service is every 15 minutes, so random arrival averages 7.5 minutes.
+// Source: https://www.miamidade.gov/transit/googletransit/current/google_transit.zip
+const BISCAYNE_TROLLEY_WAIT_MINUTES = 7.5;
+const LITTLE_HAVANA_TROLLEY_WAIT_MINUTES = 7.5;
 const SOUTH_BEACH_TROLLEY_DOCK_NODE_ID = "transit:south_beach_trolley:water_taxi";
 const SOUTH_BEACH_TROLLEY_MIDPOINT_ID = "place_id_south_beach_trolley_alton_10th";
 const SOUTH_BEACH_TROLLEY_SOFI_ID = "place_id_south_beach_trolley_south_pointe";
