@@ -2348,7 +2348,8 @@ function getPopupHtml(place) {
 
 function getGoogleMapsUrl(place) {
   const address = place.meta?.address;
-  const searchText = address ? `${place.name}, ${address}` : `${place.name}, Miami FL`;
+  const searchText = place.meta?.google_maps_query
+    || (address ? `${place.name}, ${address}` : `${place.name}, Miami FL`);
   return `https://www.google.com/maps/search/${encodeURIComponent(searchText)}`;
 }
 

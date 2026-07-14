@@ -4,6 +4,7 @@ import socketserver
 import subprocess
 import sys
 from pathlib import Path
+from urllib.parse import quote
 
 from playwright.async_api import async_playwright
 
@@ -144,6 +145,23 @@ async def collect_routes():
                     .filter((place) => place.filterTags.includes("transport"))
                     .map((place) => place.id)
                     .sort(),
+                  trolleyGoogleMapsLinks: app.places
+                    .filter((place) => (place.tags || []).some((tag) => [
+                      "brickell_trolley",
+                      "south_beach_trolley",
+                      "biscayne_trolley",
+                      "little_havana_trolley",
+                    ].includes(tag)))
+                    .map((place) => {
+                      renderDetail(place);
+                      return {
+                        id: place.id,
+                        query: place.meta?.google_maps_query || null,
+                        url: getGoogleMapsUrl(place),
+                        renderedUrl: dom.detailTitleLink.href,
+                      };
+                    })
+                    .sort((a, b) => a.id.localeCompare(b.id)),
                   expectedTransportPlaceIds: app.places
                     .filter((place) => (place.tags || []).some((tag) => TRANSPORT_FILTER_TAGS.has(tag)))
                     .map((place) => place.id)
@@ -426,6 +444,35 @@ def main():
         assert required_transport_ids.issubset(style_route["transportPlaceIds"]), (
             f"Transport filter is missing boat or trolley markers: {style_route['transportPlaceIds']}"
         )
+        expected_trolley_queries = {
+            "place_id_brickell_station_trolleys": "Brickell Station, 1001 SW 1st Ave, Miami, FL 33130",
+            "place_id_brickell_trolley_city_hall": "Miami City Hall, 3500 Pan American Dr, Miami, FL 33133",
+            "place_id_brickell_trolley_panorama_stop": "Brickell Ave & SE 12th St, Miami, FL 33131",
+            "place_id_domino_park_calle_ocho_trolley": (
+                "Maximo Gomez Park / Domino Park, 801 SW 15th Ave, Miami, FL 33135"
+            ),
+            "place_id_south_beach_trolley_alton_10th": "Alton Rd & 10th St, Miami Beach, FL 33139",
+            "place_id_south_beach_trolley_south_pointe": (
+                "South Pointe Dr & Washington Ave, Miami Beach, FL 33139"
+            ),
+        }
+        actual_trolley_links = {
+            link["id"]: link for link in style_route["trolleyGoogleMapsLinks"]
+        }
+        assert set(actual_trolley_links) == set(expected_trolley_queries), (
+            f"Trolley Google Maps audit is incomplete: {actual_trolley_links}"
+        )
+        for place_id, query in expected_trolley_queries.items():
+            link = actual_trolley_links[place_id]
+            assert link["query"] == query, f"Unexpected Google Maps query for {place_id}: {link}"
+            expected_url = "https://www.google.com/maps/search/" + quote(
+                query,
+                safe="-_.!~*'()",
+            )
+            assert link["url"] == expected_url, f"Incorrect Google Maps URL for {place_id}: {link}"
+            assert link["renderedUrl"] == expected_url, (
+                f"Selecting {place_id} did not wire its title to Google Maps: {link}"
+            )
         assert style_route["metromoverStationIds"] == style_route["rawMetromoverIds"], (
             f"non-Metromover transport nodes leaked into the rail graph: {style_route}"
         )
