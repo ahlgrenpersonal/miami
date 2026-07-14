@@ -8,6 +8,26 @@ const KID_SCOOTER_SPEED_KMH = 14;
 const KID_SCOOTER_BREAK_INTERVAL_MINUTES = 30;
 const KID_SCOOTER_FIRST_BREAK_MINUTES = 3;
 const KID_SCOOTER_LATER_BREAK_MINUTES = 5;
+// Model a weekend pedestrian encounter with the movable Brickell Avenue span as a fixed
+// three-minute expected wait. Combining weekend on-demand operation, a roughly 10-16 minute
+// full closure, and observed opening/blockage frequency gives a practical 2-4 minute expected-
+// delay band; three minutes is its midpoint. A Miami River Commission study measured 3.5-4
+// minutes just to raise the span, while recent FL511-derived weekend observations found both
+// more openings and materially more blocked time than weekdays. Revalidate against:
+// https://www.law.cornell.edu/cfr/text/33/117.305
+// https://www.miamirivercommission.org/PDF/Agenda%2007.15.2024/Brickell%20Bridge%20Action%20Items/2022-12-06%20Hyatt%20Pedestrian%20Bridge%20Traffic%20Statement%20SS.pdf
+// https://www.reddit.com/r/isBridgeUp/comments/1t7djuf/week_3_update_from_the_solo_dev_behind_isbridgeup/
+// https://www.reddit.com/r/isBridgeUp/comments/1ty4cy2/week_7_update_from_the_solo_dev_behind_isbridgeup/
+const BRICKELL_DRAWBRIDGE_WAIT_MINUTES = 3;
+// These are the two roadway and two sidewalk center-span edges in the bundled unsimplified
+// OSM graph. Using gate edges charges one wait per crossing without penalizing the Riverwalk
+// underneath. Graph traversal is bidirectional, so each stored edge covers both directions.
+const BRICKELL_DRAWBRIDGE_GATE_EDGES = new Set([
+  "osm:9173470943|osm:9173470946",
+  "osm:9173470945|osm:9173470944",
+  "osm:9173470948|osm:9173470947",
+  "osm:9173470949|osm:9173470950",
+]);
 const DEFAULT_HOME_ZOOM = 15;
 const DEFAULT_MAX_SNAP_DISTANCE_METERS = 500;
 const ROUTE_SNAP_CANDIDATE_LIMIT = 32;
@@ -1124,10 +1144,10 @@ function getMarkerIcon(place) {
     classes.push("is-food");
   } else if (place.filterTags.includes("playgrounds")) {
     classes.push("is-playground");
-  } else if (place.filterTags.includes("parks")) {
-    classes.push("is-park");
   } else if (place.filterTags.includes("transport")) {
     classes.push("is-transport");
+  } else if (place.filterTags.includes("parks")) {
+    classes.push("is-park");
   } else if (place.filterTags.includes("indoors")) {
     classes.push("is-indoors");
   }
@@ -1366,9 +1386,16 @@ function getGraphRoute(fromCoordinates, toCoordinates, mode) {
     ...routeResult.nodeIds.map((id) => [nodesById[id].lat, nodesById[id].lon]),
     toCoordinates,
   ];
+  const distanceM = getRouteDistance(coordinates);
+  const bridgeWaitMinutes = routeResult.edges.reduce(
+    (sum, edge) => sum + getBrickellDrawbridgeWaitMinutes(edge),
+    0,
+  );
   return {
     coordinates,
-    distanceM: getRouteDistance(coordinates),
+    distanceM,
+    durationMinutes: getTravelMinutes(distanceM, mode) + bridgeWaitMinutes,
+    bridgeWaitMinutes,
     startSnapM: routeResult.start.distanceM,
     endSnapM: routeResult.end.distanceM,
   };
@@ -1716,11 +1743,15 @@ function getUnifiedMultimodalNeighbors(context, nodeId) {
     const toCoordinates = getUnifiedRouteNodeCoordinates(next.toId);
     if (!toCoordinates) continue;
     const distanceM = next.edge.distance_m || getDistanceMeters(fromCoordinates, toCoordinates);
+    const movingDurationMinutes = getExactTravelMinutes(distanceM, WALK_SPEED_KMH);
+    const bridgeWaitMinutes = getBrickellDrawbridgeWaitMinutes(next.edge);
     neighbors.push({
       toId: next.toId,
       edge: createUnifiedMultimodalEdge("walk", nodeId, next.toId, fromCoordinates, toCoordinates, {
         distanceM,
-        durationMinutes: getExactTravelMinutes(distanceM, WALK_SPEED_KMH),
+        durationMinutes: movingDurationMinutes + bridgeWaitMinutes,
+        movingDurationMinutes,
+        waitMinutes: bridgeWaitMinutes,
       }),
     });
   }
@@ -1999,7 +2030,7 @@ function findShortestPathBetweenCandidates(startCandidates, endCandidates, mode)
       const candidate = current.priority + getEdgeCost(next.edge, mode);
       if (candidate < (distances.get(next.toId) ?? Infinity)) {
         distances.set(next.toId, candidate);
-        previous.set(next.toId, current.id);
+        previous.set(next.toId, { id: current.id, edge: next.edge });
         sourceByNode.set(next.toId, sourceByNode.get(current.id));
         heap.push(next.toId, candidate);
       }
@@ -2008,14 +2039,19 @@ function findShortestPathBetweenCandidates(startCandidates, endCandidates, mode)
 
   if (!bestEnd) return null;
   const nodeIds = [bestEnd.id];
+  const edges = [];
   let currentId = bestEnd.id;
   while (previous.get(currentId)) {
-    currentId = previous.get(currentId);
+    const step = previous.get(currentId);
+    edges.push(step.edge);
+    currentId = step.id;
     nodeIds.push(currentId);
   }
   nodeIds.reverse();
+  edges.reverse();
   return {
     nodeIds,
+    edges,
     start: sourceByNode.get(nodeIds[0]),
     end: bestEnd.end,
   };
@@ -2060,8 +2096,9 @@ function findShortestPath(startId, endId, mode) {
 function getEdgeCost(edge, mode) {
   const distance = edge.distance_m || 1;
   const profile = getRoutingProfile(mode);
+  const bridgePenaltyM = getBrickellDrawbridgePenaltyM(edge, profile);
   const hardPenalty = getHardPenalty(edge, profile.hardPenalties || {});
-  if (hardPenalty) return distance * hardPenalty;
+  if (hardPenalty) return distance * hardPenalty + bridgePenaltyM;
 
   let score = 0;
   for (const [field, weight] of Object.entries(profile.scoreWeights || {})) {
@@ -2071,7 +2108,21 @@ function getEdgeCost(edge, mode) {
     profile.minMultiplier ?? 0.35,
     Math.min(profile.maxMultiplier ?? 3, 1 - score)
   );
-  return distance * multiplier + getFixedPenalty(edge, profile.fixedPenaltiesM || {});
+  return distance * multiplier + getFixedPenalty(edge, profile.fixedPenaltiesM || {}) + bridgePenaltyM;
+}
+
+function getBrickellDrawbridgeWaitMinutes(edge) {
+  if (!edge) return 0;
+  return BRICKELL_DRAWBRIDGE_GATE_EDGES.has(`${edge.from}|${edge.to}`)
+    ? BRICKELL_DRAWBRIDGE_WAIT_MINUTES
+    : 0;
+}
+
+function getBrickellDrawbridgePenaltyM(edge, profile) {
+  const waitMinutes = getBrickellDrawbridgeWaitMinutes(edge);
+  if (!waitMinutes) return 0;
+  const speedKmh = profile.speedKmh || WALK_SPEED_KMH;
+  return speedKmh * 1000 * waitMinutes / 60;
 }
 
 function getRoutingProfile(mode) {

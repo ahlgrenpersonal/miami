@@ -460,15 +460,24 @@ def main():
         ), f"South Beach trolley ride should be a dotted blue line: {style_route}"
 
         new_trolley_routes = style_route["newTrolleyRoutes"]
-        for area in ("edgewater", "midtown", "designDistrict"):
+        for area in ("edgewater", "midtown"):
             route = new_trolley_routes[area]
-            assert route["biscayneTrolleyUsed"], f"{area} did not choose Biscayne Trolley: {route}"
-            assert any(segment["type"] == "biscayne_trolley" for segment in route["segments"]), (
-                f"{area} route has no Biscayne Trolley segment: {route}"
+            assert route["metromoverUsed"], f"{area} did not choose the faster Metromover route: {route}"
+            assert not route["biscayneTrolleyUsed"], (
+                f"{area} incorrectly forced the slower Biscayne Trolley: {route}"
             )
-            assert any(step["type"] == "wait" and step["minutes"] == 8 for step in route["itinerary"]), (
-                f"{area} route has no 8-minute Biscayne wait: {route}"
-            )
+
+        design_district_route = new_trolley_routes["designDistrict"]
+        assert design_district_route["biscayneTrolleyUsed"], (
+            f"Design District did not choose Biscayne Trolley: {design_district_route}"
+        )
+        assert any(segment["type"] == "biscayne_trolley" for segment in design_district_route["segments"]), (
+            f"Design District route has no Biscayne Trolley segment: {design_district_route}"
+        )
+        assert any(
+            step["type"] == "wait" and step["minutes"] == 8
+            for step in design_district_route["itinerary"]
+        ), f"Design District route has no 8-minute Biscayne wait: {design_district_route}"
 
         bayside_route = new_trolley_routes["bayside"]
         assert bayside_route["metromoverUsed"], f"Bayside should choose Metromover: {bayside_route}"
