@@ -1,4 +1,4 @@
-const CACHE_NAME = "spin-brickell-v242";
+const CACHE_NAME = "spin-brickell-v243";
 const TILE_VERSION = "177";
 const TILE_CACHE_NAME = `spin-brickell-tiles-v${TILE_VERSION}`;
 const TILE_MANIFEST_URL = `./tiles/offline/manifest.json?v=${TILE_VERSION}`;

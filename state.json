@@ -4638,7 +4638,39 @@
         "notes": "SoFi stop on the free South Beach Trolley loops.",
         "npc_associations": []
       }
-    }  },
+    },
+    "place_id_gangnam_korean_restaurant": {
+      "name": "Gangnam Korean Restaurant",
+      "coordinates": [25.768353, -80.191544],
+      "tags": ["food", "korean", "restaurant"],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 194,
+        "category": "Korean restaurant",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "35 SE 6th Street, Suite 105, Miami, FL 33131",
+        "google_maps_query": "Gangnam Korean Restaurant, 35 SE 6th Street, Suite 105, Miami, FL 33131",
+        "distance_from_home_m": 572,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": ["google_maps_lookup"],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "google_maps_lookup",
+          "query": "Gangnam Korean Restaurant, 35 SE 6th Street, Suite 105, Miami, FL 33131",
+          "display_name": "Google Maps place lookup",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "",
+        "npc_associations": []
+      }
+    }
+  },
   "routines": {
     "morning_local_scan": {
       "time_window": "06:00-10:00",
