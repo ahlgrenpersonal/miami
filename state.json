@@ -89,6 +89,45 @@
         "npc_associations": []
       }
     },
+    "place_id_coral_way_trolley_prima_casa": {
+      "name": "Coral Way Trolley - SW 27th / SW 28th Road",
+      "coordinates": [
+        25.754429,
+        -80.209591
+      ],
+      "tags": [
+        "coral_way_trolley",
+        "transit"
+      ],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 193,
+        "category": "Coral Way Trolley stop",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "SW 3rd Ave & SW 27th / SW 28th Rd, Miami, FL 33129",
+        "google_maps_query": "SW 3rd Ave & SW 27th Rd, Miami, FL 33129",
+        "distance_from_home_m": 2164,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": [
+          "miami_dade_gtfs"
+        ],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "miami_dade_gtfs",
+          "query": "SW 3rd Ave & SW 27th Rd / SW 28th Rd, Miami, FL",
+          "display_name": "SW 3 AV & SW 27 RD / SW 3 AV & SW 28 RD",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "One visible marker for the westbound SW 27th Road and eastbound SW 28th Road stops serving La Prima Casa.",
+        "npc_associations": []
+      }
+    },
     "place_id_hobie_island_beach_park": {
       "name": "Hobie Island Beach Park",
       "coordinates": [

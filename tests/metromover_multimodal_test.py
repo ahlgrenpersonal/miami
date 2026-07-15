@@ -42,6 +42,7 @@ async def collect_routes():
                   southBeachTrolleyUsed: Boolean(route?.southBeachTrolleyUsed),
                   biscayneTrolleyUsed: Boolean(route?.biscayneTrolleyUsed),
                   littleHavanaTrolleyUsed: Boolean(route?.littleHavanaTrolleyUsed),
+                  coralWayTrolleyUsed: Boolean(route?.coralWayTrolleyUsed),
                   combinedTransitUsed: Boolean(route?.combinedTransitUsed),
                   itinerary: route?.itinerary || [],
                   statusText: route ? formatRouteStatus("Transport", from, to, route, "metromover") : null,
@@ -53,6 +54,29 @@ async def collect_routes():
                     endName: segment.endName,
                     minutes: Math.round(segment.durationMinutes),
                   })),
+                };
+              };
+              const auditCoralWayReturn = () => {
+                const from = byId("place_id_la_prima_casa_montessori_roads_campus");
+                const context = createUnifiedMultimodalContext(from.coordinates, home.coordinates);
+                const boarding = (context.customAdjacency.get(context.originId) || [])
+                  .find((next) => next.toId === CORAL_WAY_TROLLEY_SCHOOL_EASTBOUND_NODE_ID);
+                const ride = (context.customAdjacency.get(CORAL_WAY_TROLLEY_SCHOOL_EASTBOUND_NODE_ID) || [])
+                  .find((next) => next.toId === CORAL_WAY_TROLLEY_BRICKELL_NODE_ID);
+                const tail = findShortestUnifiedMultimodalPath(
+                  context,
+                  CORAL_WAY_TROLLEY_BRICKELL_NODE_ID,
+                  context.destinationId,
+                );
+                return {
+                  boardingWaitMinutes: boarding?.edge.waitMinutes ?? null,
+                  boardingWalkMinutes: boarding?.edge.movingDurationMinutes ?? null,
+                  rideMinutes: ride?.edge.durationMinutes ?? null,
+                  rideStartId: ride?.edge.startId ?? null,
+                  rideEndId: ride?.edge.endId ?? null,
+                  candidateMinutes: boarding && ride && tail
+                    ? boarding.edge.durationMinutes + ride.edge.durationMinutes + tail.durationMinutes
+                    : null,
                 };
               };
               const routeRenderStyles = async (fromId, toId = home.id) => {
@@ -138,6 +162,8 @@ async def collect_routes():
                     southBeachTrolley: SOUTH_BEACH_TROLLEY_WAIT_MINUTES,
                     biscayneTrolley: BISCAYNE_TROLLEY_WAIT_MINUTES,
                     littleHavanaTrolley: LITTLE_HAVANA_TROLLEY_WAIT_MINUTES,
+                    coralWayToSchool: CORAL_WAY_TROLLEY_TO_SCHOOL_WAIT_MINUTES,
+                    coralWayToHome: CORAL_WAY_TROLLEY_TO_HOME_WAIT_MINUTES,
                   },
                   selectionRouting: await testRouteReplacement(),
                   transportFilter: TAG_FILTERS.find((filter) => filter.tag === "transport") || null,
@@ -151,6 +177,7 @@ async def collect_routes():
                       "south_beach_trolley",
                       "biscayne_trolley",
                       "little_havana_trolley",
+                      "coral_way_trolley",
                     ].includes(tag)))
                     .map((place) => {
                       renderDetail(place);
@@ -190,6 +217,7 @@ async def collect_routes():
                     "place_id_margaret_pace_park",
                     "place_id_collection_at_midtown_miami",
                     "place_id_miami_design_district",
+                    "place_id_coral_way_trolley_prima_casa",
                   ].map((placeId) => {
                     const place = byId(placeId);
                     const route = getGraphRoute(home.coordinates, place.coordinates, "shortest");
@@ -210,6 +238,10 @@ async def collect_routes():
                     "place_id_panorama_tower",
                     "place_id_miami_design_district",
                   ),
+                  coralWayTrolleyRenderStyles: await routeRenderStyles(
+                    "place_id_panorama_tower",
+                    "place_id_la_prima_casa_montessori_roads_campus",
+                  ),
                   newTrolleyRoutes: {
                     edgewater: routeDetails("place_id_panorama_tower", "place_id_margaret_pace_park"),
                     midtown: routeDetails("place_id_panorama_tower", "place_id_collection_at_midtown_miami"),
@@ -220,6 +252,15 @@ async def collect_routes():
                       "place_id_panorama_tower",
                       "place_id_domino_park_calle_ocho_trolley",
                     ),
+                    coralWaySchoolOutbound: routeDetails(
+                      "place_id_panorama_tower",
+                      "place_id_la_prima_casa_montessori_roads_campus",
+                    ),
+                    coralWaySchoolReturn: routeDetails(
+                      "place_id_la_prima_casa_montessori_roads_campus",
+                      "place_id_panorama_tower",
+                    ),
+                    coralWayReturnGraph: auditCoralWayReturn(),
                   },
                 },
               ];
@@ -260,6 +301,29 @@ async def collect_routes():
         await page.wait_for_timeout(250)
         await page.screenshot(path=PROJECT_ROOT / ".tmp" / "biscayne-trolley-qa.png")
         await page.set_viewport_size({"width": 390, "height": 844})
+        await page.evaluate(
+            """
+            () => {
+              app.travelMode = "metromover";
+              app.routeFromId = "place_id_panorama_tower";
+              app.routeToId = "place_id_la_prima_casa_montessori_roads_campus";
+              renderRoute();
+              selectPlace("place_id_la_prima_casa_montessori_roads_campus");
+              setPlacesPanelCollapsed(true);
+              const bounds = L.latLngBounds([]);
+              for (const line of app.routeSegmentLines) bounds.extend(line.getBounds());
+              if (bounds.isValid()) {
+                app.map.fitBounds(bounds, {
+                  paddingTopLeft: [20, 90],
+                  paddingBottomRight: [20, 315],
+                  animate: false,
+                });
+              }
+            }
+            """
+        )
+        await page.wait_for_timeout(250)
+        await page.screenshot(path=PROJECT_ROOT / ".tmp" / "coral-way-school-route-qa.png")
         await page.evaluate(
             """
             () => {
@@ -395,6 +459,8 @@ def main():
             "southBeachTrolley": 10,
             "biscayneTrolley": 7.5,
             "littleHavanaTrolley": 7.5,
+            "coralWayToSchool": 5,
+            "coralWayToHome": 10,
         }, f"unexpected sourced transport waits: {style_route['waitAssumptions']}"
         home_replacement = style_route["selectionRouting"]["home"]
         assert home_replacement == {
@@ -428,8 +494,8 @@ def main():
         assert style_route["transportPlaceIds"] == style_route["expectedTransportPlaceIds"], (
             f"Transport filter does not exactly cover transit-tagged places: {style_route}"
         )
-        assert len(style_route["transportPlaceIds"]) == 19, (
-            f"expected 19 combined transport markers, got {style_route['transportPlaceIds']}"
+        assert len(style_route["transportPlaceIds"]) == 20, (
+            f"expected 20 combined transport markers, got {style_route['transportPlaceIds']}"
         )
         required_transport_ids = {
             "place_id_water_taxi_mia_miami_beach",
@@ -440,6 +506,7 @@ def main():
             "place_id_south_beach_trolley_south_pointe",
             "place_id_brickell_station_trolleys",
             "place_id_domino_park_calle_ocho_trolley",
+            "place_id_coral_way_trolley_prima_casa",
         }
         assert required_transport_ids.issubset(style_route["transportPlaceIds"]), (
             f"Transport filter is missing boat or trolley markers: {style_route['transportPlaceIds']}"
@@ -455,6 +522,7 @@ def main():
             "place_id_south_beach_trolley_south_pointe": (
                 "South Pointe Dr & Washington Ave, Miami Beach, FL 33139"
             ),
+            "place_id_coral_way_trolley_prima_casa": "SW 3rd Ave & SW 27th Rd, Miami, FL 33129",
         }
         actual_trolley_links = {
             link["id"]: link for link in style_route["trolleyGoogleMapsLinks"]
@@ -544,6 +612,71 @@ def main():
         assert not little_havana_outbound["littleHavanaTrolleyUsed"], (
             f"outbound route incorrectly forced the slow one-way Little Havana loop: {little_havana_outbound}"
         )
+
+        coral_way_outbound = new_trolley_routes["coralWaySchoolOutbound"]
+        assert coral_way_outbound["coralWayTrolleyUsed"], (
+            f"Panorama -> La Prima Casa did not choose Coral Way Trolley: {coral_way_outbound}"
+        )
+        assert [step["type"] for step in coral_way_outbound["itinerary"]] == [
+            "walk",
+            "wait",
+            "coral_way_trolley",
+            "walk",
+        ], f"unexpected school outbound itinerary: {coral_way_outbound}"
+        assert coral_way_outbound["itinerary"][1]["minutes"] == 5, (
+            f"school outbound did not use timed five-minute wait: {coral_way_outbound}"
+        )
+        assert coral_way_outbound["itinerary"][2]["minutes"] == 9, (
+            f"school outbound ride did not use official 8.5-minute timing: {coral_way_outbound}"
+        )
+        assert any(
+            segment["startId"] == "transit:coral-way:brickell-station"
+            and segment["endId"] == "transit:coral-way:prima-casa-westbound"
+            for segment in coral_way_outbound["segments"]
+        ), f"school outbound did not use the westbound SW 27th Road stop: {coral_way_outbound}"
+
+        coral_way_return = new_trolley_routes["coralWaySchoolReturn"]
+        coral_way_return_graph = new_trolley_routes["coralWayReturnGraph"]
+        assert not coral_way_return["coralWayTrolleyUsed"], (
+            f"return should remain a 23-minute walk when it beats the trolley candidate: {coral_way_return}"
+        )
+        assert coral_way_return["itinerary"] == [
+            {"type": "walk", "label": "Walk", "minutes": 23},
+        ], f"unexpected selected school return itinerary: {coral_way_return}"
+        assert coral_way_return_graph["boardingWaitMinutes"] == 10, (
+            f"school return graph does not use the average ten-minute wait: {coral_way_return_graph}"
+        )
+        assert 8.4 < coral_way_return_graph["rideMinutes"] < 8.5, (
+            f"school return graph does not use official 8.4-minute ride: {coral_way_return_graph}"
+        )
+        assert coral_way_return_graph["rideStartId"] == "transit:coral-way:prima-casa-eastbound", (
+            f"school return graph does not start at the SW 28th Road stop: {coral_way_return_graph}"
+        )
+        assert coral_way_return_graph["rideEndId"] == "transit:coral-way:brickell-station", (
+            f"school return graph does not reach Brickell Station: {coral_way_return_graph}"
+        )
+        assert coral_way_return_graph["candidateMinutes"] > coral_way_return["minutes"], (
+            f"shortest-time selection should beat the modeled trolley return: "
+            f"{coral_way_return_graph} vs {coral_way_return}"
+        )
+
+        coral_way_markers = [
+            place for place in style_route["transportPlaceIds"]
+            if place == "place_id_coral_way_trolley_prima_casa"
+        ]
+        assert coral_way_markers == ["place_id_coral_way_trolley_prima_casa"], (
+            f"Coral Way school stops were not merged into one visible marker: {coral_way_markers}"
+        )
+        assert style_route["coralWayTrolleyRenderStyles"][0]["dashArray"] is None, (
+            f"first Coral Way walking leg should be solid: {style_route}"
+        )
+        assert style_route["coralWayTrolleyRenderStyles"][-1]["dashArray"] is None, (
+            f"last Coral Way walking leg should be solid: {style_route}"
+        )
+        assert any(
+            style["dashArray"] == "2 8" and style["color"] == "#8a6d1d"
+            for style in style_route["coralWayTrolleyRenderStyles"][1:-1]
+        ), f"Coral Way trolley ride should be a dotted ochre line: {style_route}"
 
         assert style_route["biscayneTrolleyRenderStyles"][0]["dashArray"] is None, (
             f"first Biscayne walking leg should be solid: {style_route}"

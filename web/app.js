@@ -51,6 +51,11 @@ const SOUTH_BEACH_TROLLEY_WAIT_MINUTES = 10;
 // Source: https://www.miamidade.gov/transit/googletransit/current/google_transit.zip
 const BISCAYNE_TROLLEY_WAIT_MINUTES = 7.5;
 const LITTLE_HAVANA_TROLLEY_WAIT_MINUTES = 7.5;
+// School drop-offs are timed around a known Coral Way departure, so allow a five-minute buffer at Brickell.
+// Return trips use the average wait from the official 20-minute weekday headway near La Prima Casa.
+// Source: https://www.miamidade.gov/transit/googletransit/current/google_transit.zip
+const CORAL_WAY_TROLLEY_TO_SCHOOL_WAIT_MINUTES = 5;
+const CORAL_WAY_TROLLEY_TO_HOME_WAIT_MINUTES = 10;
 const SOUTH_BEACH_TROLLEY_DOCK_NODE_ID = "transit:south_beach_trolley:water_taxi";
 const SOUTH_BEACH_TROLLEY_MIDPOINT_ID = "place_id_south_beach_trolley_alton_10th";
 const SOUTH_BEACH_TROLLEY_SOFI_ID = "place_id_south_beach_trolley_south_pointe";
@@ -198,6 +203,82 @@ const LITTLE_HAVANA_TROLLEY_LINKS = [
     coordinates: [[25.76563, -80.2193], [25.76579, -80.2141], [25.76587, -80.20907], [25.765982, -80.205446], [25.76619, -80.19788], [25.763555, -80.197398], [25.76478, -80.195571]],
   },
 ];
+const CORAL_WAY_TROLLEY_VISIBLE_STOP_ID = "place_id_coral_way_trolley_prima_casa";
+const CORAL_WAY_TROLLEY_BRICKELL_NODE_ID = "transit:coral-way:brickell-station";
+const CORAL_WAY_TROLLEY_SCHOOL_WESTBOUND_NODE_ID = "transit:coral-way:prima-casa-westbound";
+const CORAL_WAY_TROLLEY_SCHOOL_EASTBOUND_NODE_ID = "transit:coral-way:prima-casa-eastbound";
+const CORAL_WAY_TROLLEY_VIRTUAL_STOPS = [
+  { id: CORAL_WAY_TROLLEY_BRICKELL_NODE_ID, name: "Coral Way Trolley - Brickell Station", coordinates: [25.76478, -80.195571] },
+  { id: CORAL_WAY_TROLLEY_SCHOOL_WESTBOUND_NODE_ID, name: "Coral Way Trolley - SW 27th Road", coordinates: [25.754624, -80.209531] },
+  { id: CORAL_WAY_TROLLEY_SCHOOL_EASTBOUND_NODE_ID, name: "Coral Way Trolley - SW 28th Road", coordinates: [25.754234, -80.209651] },
+];
+const CORAL_WAY_TROLLEY_LINKS = [
+  {
+    fromId: CORAL_WAY_TROLLEY_BRICKELL_NODE_ID,
+    toId: CORAL_WAY_TROLLEY_SCHOOL_WESTBOUND_NODE_ID,
+    minutes: 8.533,
+    coordinates: [
+      [25.76478, -80.195571],
+      [25.765200, -80.195656],
+      [25.765373, -80.195671],
+      [25.765324, -80.197380],
+      [25.764362, -80.197342],
+      [25.763401, -80.197311],
+      [25.762440, -80.197273],
+      [25.761477, -80.197243],
+      [25.761464, -80.197705],
+      [25.761446, -80.198334],
+      [25.761419, -80.198628],
+      [25.761436, -80.198964],
+      [25.761447, -80.199103],
+      [25.761442, -80.199238],
+      [25.761470, -80.199444],
+      [25.761435, -80.199542],
+      [25.761398, -80.199635],
+      [25.761310, -80.199824],
+      [25.760652, -80.200762],
+      [25.760082, -80.201572],
+      [25.759368, -80.202601],
+      [25.758368, -80.204047],
+      [25.757276, -80.205631],
+      [25.756627, -80.206554],
+      [25.756057, -80.207394],
+      [25.755427, -80.208284],
+      [25.754831, -80.209147],
+      [25.754624, -80.209531],
+    ],
+  },
+  {
+    fromId: CORAL_WAY_TROLLEY_SCHOOL_EASTBOUND_NODE_ID,
+    toId: CORAL_WAY_TROLLEY_BRICKELL_NODE_ID,
+    minutes: 8.433,
+    coordinates: [
+      [25.754234, -80.209651],
+      [25.754671, -80.208998],
+      [25.755339, -80.208064],
+      [25.755973, -80.207154],
+      [25.756535, -80.206334],
+      [25.757104, -80.205498],
+      [25.757628, -80.204691],
+      [25.758778, -80.203077],
+      [25.759916, -80.201433],
+      [25.761041, -80.199827],
+      [25.761266, -80.199449],
+      [25.761442, -80.199238],
+      [25.761174, -80.198555],
+      [25.760593, -80.197559],
+      [25.760423, -80.197232],
+      [25.761477, -80.197243],
+      [25.763401, -80.197311],
+      [25.763414, -80.196798],
+      [25.763440, -80.195731],
+      [25.763504, -80.195595],
+      [25.764124, -80.195619],
+      [25.764637, -80.195647],
+      [25.76478, -80.195571],
+    ],
+  },
+];
 const NOISE_OVERLAY_MIN_SCORE = 0.25;
 const NOISE_OVERLAY_MAX_EDGES = 9000;
 const RADAR_WMS_URL = "https://opengeo.ncep.noaa.gov/geoserver/conus/conus_bref_qcd/ows";
@@ -327,7 +408,7 @@ const SUPERMARKET_FILTER_TAGS = new Set(["supermarket"]);
 const SCHOOL_FILTER_TAGS = new Set(["academy", "elementary_school", "montessori_school", "preschool", "school"]);
 const PLAYGROUND_FILTER_TAGS = new Set(["playground"]);
 const PARK_FILTER_TAGS = new Set(["beach_park", "dog_park", "nature_preserve", "park"]);
-const TRANSPORT_FILTER_TAGS = new Set(["metromover", "water_taxi", "brickell_trolley", "south_beach_trolley", "biscayne_trolley", "little_havana_trolley", "transit", "transportation"]);
+const TRANSPORT_FILTER_TAGS = new Set(["metromover", "water_taxi", "brickell_trolley", "south_beach_trolley", "biscayne_trolley", "little_havana_trolley", "coral_way_trolley", "transit", "transportation"]);
 const INDOOR_FILTER_TAGS = new Set(["childrens_museum", "indoors", "science_museum"]);
 
 const app = {
@@ -1418,12 +1499,14 @@ function getUnifiedMultimodalRoute(fromCoordinates, toCoordinates) {
   const southBeachTrolleySegments = segments.filter((segment) => segment.type === "south_beach_trolley");
   const biscayneTrolleySegments = segments.filter((segment) => segment.type === "biscayne_trolley");
   const littleHavanaTrolleySegments = segments.filter((segment) => segment.type === "little_havana_trolley");
+  const coralWayTrolleySegments = segments.filter((segment) => segment.type === "coral_way_trolley");
   const metromoverUsed = metromoverSegments.length > 0;
   const waterTaxiUsed = waterTaxiSegments.length > 0;
   const brickellTrolleyUsed = brickellTrolleySegments.length > 0;
   const southBeachTrolleyUsed = southBeachTrolleySegments.length > 0;
   const biscayneTrolleyUsed = biscayneTrolleySegments.length > 0;
   const littleHavanaTrolleyUsed = littleHavanaTrolleySegments.length > 0;
+  const coralWayTrolleyUsed = coralWayTrolleySegments.length > 0;
 
   return {
     coordinates: mergeRouteCoordinates(...segments.map((segment) => segment.coordinates)),
@@ -1435,8 +1518,9 @@ function getUnifiedMultimodalRoute(fromCoordinates, toCoordinates) {
     southBeachTrolleyUsed,
     biscayneTrolleyUsed,
     littleHavanaTrolleyUsed,
+    coralWayTrolleyUsed,
     combinedTransitUsed: metromoverUsed && waterTaxiUsed,
-    transitUsed: metromoverUsed || waterTaxiUsed || brickellTrolleyUsed || southBeachTrolleyUsed || biscayneTrolleyUsed || littleHavanaTrolleyUsed,
+    transitUsed: metromoverUsed || waterTaxiUsed || brickellTrolleyUsed || southBeachTrolleyUsed || biscayneTrolleyUsed || littleHavanaTrolleyUsed || coralWayTrolleyUsed,
     transitStartName: segments.find((segment) => segment.type !== "walk")?.startName,
     transitEndName: [...segments].reverse().find((segment) => segment.type !== "walk")?.endName,
     metromoverStartName: metromoverSegments[0]?.startName,
@@ -1451,6 +1535,8 @@ function getUnifiedMultimodalRoute(fromCoordinates, toCoordinates) {
     biscayneTrolleyEndName: biscayneTrolleySegments[biscayneTrolleySegments.length - 1]?.endName,
     littleHavanaTrolleyStartName: littleHavanaTrolleySegments[0]?.startName,
     littleHavanaTrolleyEndName: littleHavanaTrolleySegments[littleHavanaTrolleySegments.length - 1]?.endName,
+    coralWayTrolleyStartName: coralWayTrolleySegments[0]?.startName,
+    coralWayTrolleyEndName: coralWayTrolleySegments[coralWayTrolleySegments.length - 1]?.endName,
     segments,
     itinerary: createTransportItinerary(result.edges),
   };
@@ -1473,6 +1559,7 @@ function createUnifiedMultimodalContext(fromCoordinates, toCoordinates) {
     ...getSouthBeachTrolleyStops().map((place) => ({ id: place.id, type: "south_beach_trolley", name: place.name, coordinates: place.coordinates })),
     ...getBiscayneTrolleyStops().map((place) => ({ id: place.id, type: "biscayne_trolley", name: place.name, coordinates: place.coordinates })),
     ...getLittleHavanaTrolleyStops().map((place) => ({ id: place.id, type: "little_havana_trolley", name: place.name, coordinates: place.coordinates })),
+    ...getCoralWayTrolleyStops().map((place) => ({ id: place.id, type: "coral_way_trolley", name: place.name, coordinates: place.coordinates })),
   ];
   for (const node of transitNodes) {
     addUnifiedVirtualNode(context, node.id, node.type, node.name, node.coordinates);
@@ -1490,6 +1577,7 @@ function createUnifiedMultimodalContext(fromCoordinates, toCoordinates) {
   addUnifiedSouthBeachTrolleyRideEdges(context);
   addUnifiedBiscayneTrolleyRideEdges(context);
   addUnifiedLittleHavanaTrolleyRideEdges(context);
+  addUnifiedCoralWayTrolleyRideEdges(context);
   return context;
 }
 
@@ -1532,7 +1620,7 @@ function addUnifiedTransitConnectors(context, transitNode) {
     const routeCoordinates = getUnifiedRouteNodeCoordinates(candidate.id);
     if (!routeCoordinates) continue;
     const walkingMinutes = getExactTravelMinutes(candidate.distanceM, WALK_SPEED_KMH);
-    const boardingWaitMinutes = getTransitBoardingWaitMinutes(transitNode.type);
+    const boardingWaitMinutes = getTransitBoardingWaitMinutes(transitNode.type, transitNode.id);
     addUnifiedCustomEdge(context, candidate.id, transitNode.id, createUnifiedMultimodalEdge("walk", candidate.id, transitNode.id, routeCoordinates, transitNode.coordinates, {
       distanceM: candidate.distanceM,
       durationMinutes: walkingMinutes + boardingWaitMinutes,
@@ -1555,7 +1643,7 @@ function addUnifiedEndpointTransitConnectors(context, transitNodes) {
       const distanceM = getDistanceMeters(endpoint.coordinates, transitNode.coordinates);
       if (distanceM > 90) continue;
       const walkingMinutes = getExactTravelMinutes(distanceM, WALK_SPEED_KMH);
-      const boardingWaitMinutes = getTransitBoardingWaitMinutes(transitNode.type);
+      const boardingWaitMinutes = getTransitBoardingWaitMinutes(transitNode.type, transitNode.id);
       if (endpointId === context.originId) {
         addUnifiedCustomEdge(context, endpointId, transitNode.id, createUnifiedMultimodalEdge("walk", endpointId, transitNode.id, endpoint.coordinates, transitNode.coordinates, {
           distanceM,
@@ -1631,6 +1719,10 @@ function addUnifiedLittleHavanaTrolleyRideEdges(context) {
   addUnifiedDirectedTrolleyLinks(context, "little_havana_trolley", LITTLE_HAVANA_TROLLEY_LINKS);
 }
 
+function addUnifiedCoralWayTrolleyRideEdges(context) {
+  addUnifiedDirectedTrolleyLinks(context, "coral_way_trolley", CORAL_WAY_TROLLEY_LINKS);
+}
+
 function addUnifiedDirectedTrolleyLinks(context, type, links) {
   for (const link of links) {
     const from = context.virtualNodes.get(link.fromId);
@@ -1640,7 +1732,12 @@ function addUnifiedDirectedTrolleyLinks(context, type, links) {
   }
 }
 
-function getTransitBoardingWaitMinutes(type) {
+function getTransitBoardingWaitMinutes(type, nodeId) {
+  if (type === "coral_way_trolley") {
+    return nodeId === CORAL_WAY_TROLLEY_BRICKELL_NODE_ID
+      ? CORAL_WAY_TROLLEY_TO_SCHOOL_WAIT_MINUTES
+      : CORAL_WAY_TROLLEY_TO_HOME_WAIT_MINUTES;
+  }
   if (type === "metromover") return METROMOVER_WAIT_MINUTES;
   if (type === "water_taxi") return WATER_TAXI_WAIT_MINUTES;
   if (type === "brickell_trolley") return BRICKELL_TROLLEY_WAIT_MINUTES;
@@ -1833,6 +1930,7 @@ function getTransitTypeLabel(type) {
   if (type === "south_beach_trolley") return "South Beach Trolley";
   if (type === "biscayne_trolley") return "Biscayne Trolley";
   if (type === "little_havana_trolley") return "Little Havana Trolley";
+  if (type === "coral_way_trolley") return "Coral Way Trolley";
   return "Transport";
 }
 
@@ -1863,6 +1961,7 @@ function renderRouteGeometry(route, mode) {
       south_beach_trolley: "#4f63a8",
       biscayne_trolley: "#c75f20",
       little_havana_trolley: "#c23b54",
+      coral_way_trolley: "#8a6d1d",
     };
     for (const segment of route.segments) {
       const lineOptions = {
@@ -1952,6 +2051,12 @@ function getLittleHavanaTrolleyStops() {
     ...LITTLE_HAVANA_TROLLEY_VIRTUAL_STOPS,
     dominoPark,
   ].filter((place) => place && Array.isArray(place.coordinates));
+}
+
+function getCoralWayTrolleyStops() {
+  const visibleStop = app.places.find((place) => place.id === CORAL_WAY_TROLLEY_VISIBLE_STOP_ID);
+  if (!visibleStop) return [];
+  return CORAL_WAY_TROLLEY_VIRTUAL_STOPS.filter((place) => Array.isArray(place.coordinates));
 }
 
 function getMetromoverEdgeMinutes(distanceM) {
