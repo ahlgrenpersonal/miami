@@ -53,6 +53,8 @@ async def collect_routes():
                     startName: segment.startName,
                     endName: segment.endName,
                     minutes: Math.round(segment.durationMinutes),
+                    distanceM: segment.distanceM,
+                    coordinates: segment.coordinates,
                   })),
                 };
               };
@@ -212,6 +214,10 @@ async def collect_routes():
                     littleHavanaTrolley: LITTLE_HAVANA_TROLLEY_WAIT_MINUTES,
                     coralWayToSchool: CORAL_WAY_TROLLEY_TO_SCHOOL_WAIT_MINUTES,
                     coralWayToHome: CORAL_WAY_TROLLEY_TO_HOME_WAIT_MINUTES,
+                  },
+                  coralWaySchoolAccess: {
+                    distanceM: CORAL_WAY_SCHOOL_SAFE_ACCESS_DISTANCE_METERS,
+                    minutes: CORAL_WAY_SCHOOL_SAFE_ACCESS_MINUTES,
                   },
                   transportPreference: {
                     ratio: TRANSPORT_PREFERENCE_MAX_TIME_RATIO,
@@ -386,6 +392,22 @@ async def collect_routes():
         await page.evaluate(
             """
             () => {
+              const safeAccessLine = app.routeSegmentLines.at(-1);
+              if (safeAccessLine) {
+                app.map.fitBounds(safeAccessLine.getBounds(), {
+                  paddingTopLeft: [25, 90],
+                  paddingBottomRight: [25, 315],
+                  animate: false,
+                });
+              }
+            }
+            """
+        )
+        await page.wait_for_timeout(250)
+        await page.screenshot(path=PROJECT_ROOT / ".tmp" / "coral-way-school-safe-access-qa.png")
+        await page.evaluate(
+            """
+            () => {
               app.routeFromId = "place_id_la_prima_casa_montessori_roads_campus";
               app.routeToId = "place_id_panorama_tower";
               renderRoute();
@@ -542,6 +564,10 @@ def main():
             "coralWayToSchool": 5,
             "coralWayToHome": 10,
         }, f"unexpected sourced transport waits: {style_route['waitAssumptions']}"
+        assert style_route["coralWaySchoolAccess"] == {
+            "distanceM": 322,
+            "minutes": 4,
+        }, f"unexpected Coral Way safe school access model: {style_route['coralWaySchoolAccess']}"
         preference = style_route["transportPreference"]
         assert preference["ratio"] == 1.2, f"unexpected Transport preference ratio: {preference}"
         assert preference["below"] == {
@@ -722,6 +748,27 @@ def main():
         )
         assert coral_way_outbound["itinerary"][2]["minutes"] == 9, (
             f"school outbound ride did not use official 8.5-minute timing: {coral_way_outbound}"
+        )
+        assert coral_way_outbound["minutes"] == 24, (
+            f"school outbound total should include the safe four-minute access walk: {coral_way_outbound}"
+        )
+        assert coral_way_outbound["itinerary"][-1] == {
+            "type": "walk",
+            "label": "Walk",
+            "minutes": 4,
+        }, f"school outbound does not show the four-minute safe crossing walk: {coral_way_outbound}"
+        safe_school_access = coral_way_outbound["segments"][-1]
+        assert safe_school_access["startId"] == "transit:coral-way:prima-casa-westbound", (
+            f"safe school access does not begin at the westbound stop: {safe_school_access}"
+        )
+        assert safe_school_access["endId"] == "unified:destination", (
+            f"safe school access does not end at La Prima Casa: {safe_school_access}"
+        )
+        assert safe_school_access["distanceM"] == 322, (
+            f"safe school access does not preserve Google Maps' 0.2-mile distance: {safe_school_access}"
+        )
+        assert max(coordinates[0] for coordinates in safe_school_access["coordinates"]) > 25.7559, (
+            f"safe school access does not detour north to the SW 26th Road crossing: {safe_school_access}"
         )
         assert any(
             segment["startId"] == "transit:coral-way:brickell-station"

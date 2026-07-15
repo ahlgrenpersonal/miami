@@ -281,6 +281,22 @@ const CORAL_WAY_TROLLEY_LINKS = [
     ],
   },
 ];
+// Google Maps routes this stop-to-school walk via the marked crossing at SW 26th Road (0.2 mile).
+// Source: https://www.google.com/maps/dir/?api=1&origin=25.754624%2C-80.209531&destination=La+Prima+Casa+Montessori+-+Roads+Campus%2C+2733+SW+3rd+Ave%2C+Miami%2C+FL+33129&travelmode=walking
+const CORAL_WAY_SCHOOL_SAFE_ACCESS_DISTANCE_METERS = 322;
+const CORAL_WAY_SCHOOL_SAFE_ACCESS_MINUTES = 4;
+const CORAL_WAY_SCHOOL_COORDINATES = [25.7541839, -80.2094603];
+const CORAL_WAY_SCHOOL_SAFE_ACCESS_COORDINATES = [
+  [25.754624, -80.209531],
+  [25.754914, -80.2092739],
+  [25.7551476, -80.2094664],
+  [25.7558721, -80.2099925],
+  [25.7559141, -80.2100322],
+  [25.7559602, -80.2099622],
+  [25.7551758, -80.2094248],
+  [25.7548534, -80.2092821],
+  [25.7541839, -80.2094603],
+];
 const NOISE_OVERLAY_MIN_SCORE = 0.25;
 const NOISE_OVERLAY_MAX_EDGES = 9000;
 const RADAR_WMS_URL = "https://opengeo.ncep.noaa.gov/geoserver/conus/conus_bref_qcd/ows";
@@ -1630,11 +1646,13 @@ function addUnifiedTransitConnectors(context, transitNode) {
       waitMinutes: boardingWaitMinutes,
       endName: transitNode.name,
     }));
-    addUnifiedCustomEdge(context, transitNode.id, candidate.id, createUnifiedMultimodalEdge("walk", transitNode.id, candidate.id, transitNode.coordinates, routeCoordinates, {
-      distanceM: candidate.distanceM,
-      durationMinutes: walkingMinutes,
-      startName: transitNode.name,
-    }));
+    if (transitNode.id !== CORAL_WAY_TROLLEY_SCHOOL_WESTBOUND_NODE_ID) {
+      addUnifiedCustomEdge(context, transitNode.id, candidate.id, createUnifiedMultimodalEdge("walk", transitNode.id, candidate.id, transitNode.coordinates, routeCoordinates, {
+        distanceM: candidate.distanceM,
+        durationMinutes: walkingMinutes,
+        startName: transitNode.name,
+      }));
+    }
   }
 }
 
@@ -1646,6 +1664,29 @@ function addUnifiedEndpointTransitConnectors(context, transitNodes) {
       if (distanceM > 90) continue;
       const walkingMinutes = getExactTravelMinutes(distanceM, WALK_SPEED_KMH);
       const boardingWaitMinutes = getTransitBoardingWaitMinutes(transitNode.type, transitNode.id);
+      const isSafeCoralWaySchoolExit = (
+        endpointId === context.destinationId
+        && transitNode.id === CORAL_WAY_TROLLEY_SCHOOL_WESTBOUND_NODE_ID
+        && getDistanceMeters(endpoint.coordinates, CORAL_WAY_SCHOOL_COORDINATES) < 10
+      );
+      if (isSafeCoralWaySchoolExit) {
+        const safeAccessEdge = createUnifiedMultimodalEdge(
+          "walk",
+          transitNode.id,
+          endpointId,
+          transitNode.coordinates,
+          endpoint.coordinates,
+          {
+            distanceM: CORAL_WAY_SCHOOL_SAFE_ACCESS_DISTANCE_METERS,
+            durationMinutes: CORAL_WAY_SCHOOL_SAFE_ACCESS_MINUTES,
+            startName: transitNode.name,
+            endName: endpoint.name,
+          },
+        );
+        safeAccessEdge.coordinates = CORAL_WAY_SCHOOL_SAFE_ACCESS_COORDINATES;
+        addUnifiedCustomEdge(context, transitNode.id, endpointId, safeAccessEdge);
+        continue;
+      }
       if (endpointId === context.originId) {
         addUnifiedCustomEdge(context, endpointId, transitNode.id, createUnifiedMultimodalEdge("walk", endpointId, transitNode.id, endpoint.coordinates, transitNode.coordinates, {
           distanceM,
