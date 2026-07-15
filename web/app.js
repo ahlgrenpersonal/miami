@@ -56,6 +56,8 @@ const LITTLE_HAVANA_TROLLEY_WAIT_MINUTES = 7.5;
 // Source: https://www.miamidade.gov/transit/googletransit/current/google_transit.zip
 const CORAL_WAY_TROLLEY_TO_SCHOOL_WAIT_MINUTES = 5;
 const CORAL_WAY_TROLLEY_TO_HOME_WAIT_MINUTES = 10;
+// Transport mode may favor a more comfortable transit journey when its total time remains competitive.
+const TRANSPORT_PREFERENCE_MAX_TIME_RATIO = 1.2;
 const SOUTH_BEACH_TROLLEY_DOCK_NODE_ID = "transit:south_beach_trolley:water_taxi";
 const SOUTH_BEACH_TROLLEY_MIDPOINT_ID = "place_id_south_beach_trolley_alton_10th";
 const SOUTH_BEACH_TROLLEY_SOFI_ID = "place_id_south_beach_trolley_south_pointe";
@@ -1489,7 +1491,7 @@ function getMetromoverRoute(fromCoordinates, toCoordinates) {
 function getUnifiedMultimodalRoute(fromCoordinates, toCoordinates) {
   if (!app.routingGraph || !app.routeAdjacency || app.routeNodes.length === 0) return null;
   const context = createUnifiedMultimodalContext(fromCoordinates, toCoordinates);
-  const result = findShortestUnifiedMultimodalPath(context, context.originId, context.destinationId);
+  const result = findPreferredUnifiedMultimodalPath(context, context.originId, context.destinationId);
   if (!result?.edges?.length) return null;
 
   const segments = coalesceUnifiedMultimodalSegments(result.edges);
@@ -1830,6 +1832,75 @@ function findShortestUnifiedMultimodalPath(context, startId, endId) {
   }
   edges.reverse();
   return { edges, durationMinutes: distances.get(endId) };
+}
+
+function findPreferredUnifiedMultimodalPath(context, startId, endId) {
+  const fastest = findShortestUnifiedMultimodalPath(context, startId, endId);
+  if (!fastest || fastest.edges.some((edge) => edge.type !== "walk")) return fastest;
+
+  const fastestWithTransport = findShortestUnifiedMultimodalPathUsingTransport(
+    context,
+    startId,
+    endId,
+    fastest.durationMinutes * TRANSPORT_PREFERENCE_MAX_TIME_RATIO,
+  );
+  if (
+    fastestWithTransport
+    && fastestWithTransport.durationMinutes <= fastest.durationMinutes * TRANSPORT_PREFERENCE_MAX_TIME_RATIO
+  ) {
+    return fastestWithTransport;
+  }
+  return fastest;
+}
+
+function findShortestUnifiedMultimodalPathUsingTransport(context, startId, endId, maxDurationMinutes = Infinity) {
+  const makeStateId = (nodeId, hasUsedTransport) => `${hasUsedTransport ? "transit" : "walk"}\u0000${nodeId}`;
+  const startStateId = makeStateId(startId, false);
+  const states = new Map([[startStateId, { nodeId: startId, hasUsedTransport: false }]]);
+  const distances = new Map([[startStateId, 0]]);
+  const previous = new Map();
+  const visited = new Set();
+  const heap = new MinHeap();
+  let destinationStateId = null;
+  heap.push(startStateId, 0);
+
+  while (heap.size > 0) {
+    const current = heap.pop();
+    if (!current || visited.has(current.id)) continue;
+    if (current.priority > maxDurationMinutes) break;
+    const currentState = states.get(current.id);
+    if (!currentState) continue;
+    visited.add(current.id);
+    if (currentState.nodeId === endId && currentState.hasUsedTransport) {
+      destinationStateId = current.id;
+      break;
+    }
+
+    for (const next of getUnifiedMultimodalNeighbors(context, currentState.nodeId)) {
+      const hasUsedTransport = currentState.hasUsedTransport || next.edge.type !== "walk";
+      const nextStateId = makeStateId(next.toId, hasUsedTransport);
+      if (visited.has(nextStateId)) continue;
+      const candidate = current.priority + next.edge.durationMinutes;
+      if (candidate < (distances.get(nextStateId) ?? Infinity)) {
+        states.set(nextStateId, { nodeId: next.toId, hasUsedTransport });
+        distances.set(nextStateId, candidate);
+        previous.set(nextStateId, { stateId: current.id, edge: next.edge });
+        heap.push(nextStateId, candidate);
+      }
+    }
+  }
+
+  if (!destinationStateId) return null;
+  const edges = [];
+  let currentStateId = destinationStateId;
+  while (currentStateId !== startStateId) {
+    const step = previous.get(currentStateId);
+    if (!step) return null;
+    edges.push(step.edge);
+    currentStateId = step.stateId;
+  }
+  edges.reverse();
+  return { edges, durationMinutes: distances.get(destinationStateId) };
 }
 
 function getUnifiedMultimodalNeighbors(context, nodeId) {

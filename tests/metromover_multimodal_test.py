@@ -59,6 +59,12 @@ async def collect_routes():
               const auditCoralWayReturn = () => {
                 const from = byId("place_id_la_prima_casa_montessori_roads_campus");
                 const context = createUnifiedMultimodalContext(from.coordinates, home.coordinates);
+                const walkingWinner = findShortestUnifiedMultimodalPath(context, context.originId, context.destinationId);
+                const transportCandidate = findShortestUnifiedMultimodalPathUsingTransport(
+                  context,
+                  context.originId,
+                  context.destinationId,
+                );
                 const boarding = (context.customAdjacency.get(context.originId) || [])
                   .find((next) => next.toId === CORAL_WAY_TROLLEY_SCHOOL_EASTBOUND_NODE_ID);
                 const ride = (context.customAdjacency.get(CORAL_WAY_TROLLEY_SCHOOL_EASTBOUND_NODE_ID) || [])
@@ -69,6 +75,11 @@ async def collect_routes():
                   context.destinationId,
                 );
                 return {
+                  walkingMinutes: walkingWinner?.durationMinutes ?? null,
+                  transportMinutes: transportCandidate?.durationMinutes ?? null,
+                  preferenceLimitMinutes: walkingWinner
+                    ? walkingWinner.durationMinutes * TRANSPORT_PREFERENCE_MAX_TIME_RATIO
+                    : null,
                   boardingWaitMinutes: boarding?.edge.waitMinutes ?? null,
                   boardingWalkMinutes: boarding?.edge.movingDurationMinutes ?? null,
                   rideMinutes: ride?.edge.durationMinutes ?? null,
@@ -77,6 +88,43 @@ async def collect_routes():
                   candidateMinutes: boarding && ride && tail
                     ? boarding.edge.durationMinutes + ride.edge.durationMinutes + tail.durationMinutes
                     : null,
+                };
+              };
+              const testTransportPreferenceBoundary = (transitMinutes) => {
+                const startId = "preference-test:origin";
+                const endId = "preference-test:destination";
+                const startCoordinates = [0, 0];
+                const endCoordinates = [0, 0.001];
+                const walkEdge = createUnifiedMultimodalEdge(
+                  "walk",
+                  startId,
+                  endId,
+                  startCoordinates,
+                  endCoordinates,
+                  { durationMinutes: 10 },
+                );
+                const transitEdge = createUnifiedMultimodalEdge(
+                  "metromover",
+                  startId,
+                  endId,
+                  startCoordinates,
+                  endCoordinates,
+                  { durationMinutes: transitMinutes },
+                );
+                const context = {
+                  customAdjacency: new Map([
+                    [startId, [
+                      { toId: endId, edge: walkEdge },
+                      { toId: endId, edge: transitEdge },
+                    ]],
+                    [endId, []],
+                  ]),
+                  virtualNodes: new Map(),
+                };
+                const result = findPreferredUnifiedMultimodalPath(context, startId, endId);
+                return {
+                  durationMinutes: result?.durationMinutes ?? null,
+                  edgeTypes: (result?.edges || []).map((edge) => edge.type),
                 };
               };
               const routeRenderStyles = async (fromId, toId = home.id) => {
@@ -165,6 +213,12 @@ async def collect_routes():
                     coralWayToSchool: CORAL_WAY_TROLLEY_TO_SCHOOL_WAIT_MINUTES,
                     coralWayToHome: CORAL_WAY_TROLLEY_TO_HOME_WAIT_MINUTES,
                   },
+                  transportPreference: {
+                    ratio: TRANSPORT_PREFERENCE_MAX_TIME_RATIO,
+                    below: testTransportPreferenceBoundary(11.99),
+                    boundary: testTransportPreferenceBoundary(12),
+                    above: testTransportPreferenceBoundary(12.01),
+                  },
                   selectionRouting: await testRouteReplacement(),
                   transportFilter: TAG_FILTERS.find((filter) => filter.tag === "transport") || null,
                   transportPlaceIds: app.places
@@ -242,6 +296,10 @@ async def collect_routes():
                     "place_id_panorama_tower",
                     "place_id_la_prima_casa_montessori_roads_campus",
                   ),
+                  coralWayTrolleyReturnRenderStyles: await routeRenderStyles(
+                    "place_id_la_prima_casa_montessori_roads_campus",
+                    "place_id_panorama_tower",
+                  ),
                   newTrolleyRoutes: {
                     edgewater: routeDetails("place_id_panorama_tower", "place_id_margaret_pace_park"),
                     midtown: routeDetails("place_id_panorama_tower", "place_id_collection_at_midtown_miami"),
@@ -305,6 +363,7 @@ async def collect_routes():
             """
             () => {
               app.travelMode = "metromover";
+              syncTravelModeButtons();
               app.routeFromId = "place_id_panorama_tower";
               app.routeToId = "place_id_la_prima_casa_montessori_roads_campus";
               renderRoute();
@@ -324,6 +383,27 @@ async def collect_routes():
         )
         await page.wait_for_timeout(250)
         await page.screenshot(path=PROJECT_ROOT / ".tmp" / "coral-way-school-route-qa.png")
+        await page.evaluate(
+            """
+            () => {
+              app.routeFromId = "place_id_la_prima_casa_montessori_roads_campus";
+              app.routeToId = "place_id_panorama_tower";
+              renderRoute();
+              selectPlace("place_id_panorama_tower");
+              const bounds = L.latLngBounds([]);
+              for (const line of app.routeSegmentLines) bounds.extend(line.getBounds());
+              if (bounds.isValid()) {
+                app.map.fitBounds(bounds, {
+                  paddingTopLeft: [20, 90],
+                  paddingBottomRight: [20, 315],
+                  animate: false,
+                });
+              }
+            }
+            """
+        )
+        await page.wait_for_timeout(250)
+        await page.screenshot(path=PROJECT_ROOT / ".tmp" / "coral-way-school-return-qa.png")
         await page.evaluate(
             """
             () => {
@@ -462,6 +542,20 @@ def main():
             "coralWayToSchool": 5,
             "coralWayToHome": 10,
         }, f"unexpected sourced transport waits: {style_route['waitAssumptions']}"
+        preference = style_route["transportPreference"]
+        assert preference["ratio"] == 1.2, f"unexpected Transport preference ratio: {preference}"
+        assert preference["below"] == {
+            "durationMinutes": 11.99,
+            "edgeTypes": ["metromover"],
+        }, f"Transport should win just below the 20% boundary: {preference}"
+        assert preference["boundary"] == {
+            "durationMinutes": 12,
+            "edgeTypes": ["metromover"],
+        }, f"Transport should win exactly at the 20% boundary: {preference}"
+        assert preference["above"] == {
+            "durationMinutes": 10,
+            "edgeTypes": ["walk"],
+        }, f"Walking should win just above the 20% boundary: {preference}"
         home_replacement = style_route["selectionRouting"]["home"]
         assert home_replacement == {
             "fromId": "place_id_panorama_tower",
@@ -637,11 +731,14 @@ def main():
 
         coral_way_return = new_trolley_routes["coralWaySchoolReturn"]
         coral_way_return_graph = new_trolley_routes["coralWayReturnGraph"]
-        assert not coral_way_return["coralWayTrolleyUsed"], (
-            f"return should remain a 23-minute walk when it beats the trolley candidate: {coral_way_return}"
+        assert coral_way_return["coralWayTrolleyUsed"], (
+            f"return should prefer the trolley when it is within 20% of walking: {coral_way_return}"
         )
         assert coral_way_return["itinerary"] == [
-            {"type": "walk", "label": "Walk", "minutes": 23},
+            {"type": "walk", "label": "Walk", "minutes": 1},
+            {"type": "wait", "label": "Wait", "minutes": 10},
+            {"type": "coral_way_trolley", "label": "Coral Way Trolley", "minutes": 8},
+            {"type": "walk", "label": "Walk", "minutes": 6},
         ], f"unexpected selected school return itinerary: {coral_way_return}"
         assert coral_way_return_graph["boardingWaitMinutes"] == 10, (
             f"school return graph does not use the average ten-minute wait: {coral_way_return_graph}"
@@ -655,8 +752,14 @@ def main():
         assert coral_way_return_graph["rideEndId"] == "transit:coral-way:brickell-station", (
             f"school return graph does not reach Brickell Station: {coral_way_return_graph}"
         )
-        assert coral_way_return_graph["candidateMinutes"] > coral_way_return["minutes"], (
-            f"shortest-time selection should beat the modeled trolley return: "
+        assert coral_way_return_graph["walkingMinutes"] < coral_way_return_graph["transportMinutes"], (
+            f"the base shortest-path search should still identify walking as fastest: {coral_way_return_graph}"
+        )
+        assert coral_way_return_graph["transportMinutes"] <= coral_way_return_graph["preferenceLimitMinutes"], (
+            f"the trolley return should fit within the 20% preference limit: {coral_way_return_graph}"
+        )
+        assert coral_way_return["minutes"] == round(coral_way_return_graph["transportMinutes"]), (
+            f"Transport mode did not select the qualified trolley candidate: "
             f"{coral_way_return_graph} vs {coral_way_return}"
         )
 
@@ -677,6 +780,16 @@ def main():
             style["dashArray"] == "2 8" and style["color"] == "#8a6d1d"
             for style in style_route["coralWayTrolleyRenderStyles"][1:-1]
         ), f"Coral Way trolley ride should be a dotted ochre line: {style_route}"
+        assert style_route["coralWayTrolleyReturnRenderStyles"][0]["dashArray"] is None, (
+            f"first Coral Way return walking leg should be solid: {style_route}"
+        )
+        assert style_route["coralWayTrolleyReturnRenderStyles"][-1]["dashArray"] is None, (
+            f"last Coral Way return walking leg should be solid: {style_route}"
+        )
+        assert any(
+            style["dashArray"] == "2 8" and style["color"] == "#8a6d1d"
+            for style in style_route["coralWayTrolleyReturnRenderStyles"][1:-1]
+        ), f"Coral Way return ride should be a dotted ochre line: {style_route}"
 
         assert style_route["biscayneTrolleyRenderStyles"][0]["dashArray"] is None, (
             f"first Biscayne walking leg should be solid: {style_route}"
