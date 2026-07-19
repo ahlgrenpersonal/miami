@@ -278,6 +278,8 @@ async def collect_routes():
                     "place_id_collection_at_midtown_miami",
                     "place_id_miami_design_district",
                     "place_id_coral_way_trolley_prima_casa",
+                    "place_id_trader_joes_midtown_miami",
+                    "place_id_biscayne_trolley_trader_joes_midtown",
                   ].map((placeId) => {
                     const place = byId(placeId);
                     const route = getGraphRoute(home.coordinates, place.coordinates, "shortest");
@@ -309,6 +311,20 @@ async def collect_routes():
                   newTrolleyRoutes: {
                     edgewater: routeDetails("place_id_panorama_tower", "place_id_margaret_pace_park"),
                     midtown: routeDetails("place_id_panorama_tower", "place_id_collection_at_midtown_miami"),
+                    traderJoesMidtown: routeDetails("place_id_panorama_tower", "place_id_trader_joes_midtown_miami"),
+                    traderJoesBiscayneGraph: {
+                      stopIds: BISCAYNE_TROLLEY_VIRTUAL_STOPS
+                        .filter((stop) => stop.id.includes("trader-joes"))
+                        .map((stop) => stop.id)
+                        .sort(),
+                      links: BISCAYNE_TROLLEY_LINKS
+                        .filter((link) => link.fromId.includes("trader-joes") || link.toId.includes("trader-joes"))
+                        .map((link) => ({
+                          fromId: link.fromId,
+                          toId: link.toId,
+                          minutes: link.minutes,
+                        })),
+                    },
                     designDistrict: routeDetails("place_id_panorama_tower", "place_id_miami_design_district"),
                     bayside: routeDetails("place_id_panorama_tower", "place_id_bayside_marketplace"),
                     littleHavanaHome: routeDetails("place_id_domino_park_calle_ocho_trolley"),
@@ -614,8 +630,8 @@ def main():
         assert style_route["transportPlaceIds"] == style_route["expectedTransportPlaceIds"], (
             f"Transport filter does not exactly cover transit-tagged places: {style_route}"
         )
-        assert len(style_route["transportPlaceIds"]) == 20, (
-            f"expected 20 combined transport markers, got {style_route['transportPlaceIds']}"
+        assert len(style_route["transportPlaceIds"]) == 21, (
+            f"expected 21 combined transport markers, got {style_route['transportPlaceIds']}"
         )
         required_transport_ids = {
             "place_id_water_taxi_mia_miami_beach",
@@ -627,12 +643,14 @@ def main():
             "place_id_brickell_station_trolleys",
             "place_id_domino_park_calle_ocho_trolley",
             "place_id_coral_way_trolley_prima_casa",
+            "place_id_biscayne_trolley_trader_joes_midtown",
         }
         assert required_transport_ids.issubset(style_route["transportPlaceIds"]), (
             f"Transport filter is missing boat or trolley markers: {style_route['transportPlaceIds']}"
         )
         expected_trolley_queries = {
             "place_id_brickell_station_trolleys": "Brickell Station, 1001 SW 1st Ave, Miami, FL 33130",
+            "place_id_biscayne_trolley_trader_joes_midtown": "Midtown Blvd & NE 32nd St, Miami, FL 33137",
             "place_id_brickell_trolley_city_hall": "Miami City Hall, 3500 Pan American Dr, Miami, FL 33133",
             "place_id_brickell_trolley_panorama_stop": "Brickell Ave & SE 12th St, Miami, FL 33131",
             "place_id_domino_park_calle_ocho_trolley": (
@@ -695,12 +713,73 @@ def main():
         ), f"South Beach trolley ride should be a dotted blue line: {style_route}"
 
         new_trolley_routes = style_route["newTrolleyRoutes"]
-        for area in ("edgewater", "midtown"):
-            route = new_trolley_routes[area]
-            assert route["metromoverUsed"], f"{area} did not choose the faster Metromover route: {route}"
-            assert not route["biscayneTrolleyUsed"], (
-                f"{area} incorrectly forced the slower Biscayne Trolley: {route}"
-            )
+        edgewater_route = new_trolley_routes["edgewater"]
+        assert edgewater_route["metromoverUsed"], (
+            f"Edgewater did not choose the faster Metromover route: {edgewater_route}"
+        )
+        assert not edgewater_route["biscayneTrolleyUsed"], (
+            f"Edgewater incorrectly forced the slower Biscayne Trolley: {edgewater_route}"
+        )
+
+        midtown_route = new_trolley_routes["midtown"]
+        assert midtown_route["biscayneTrolleyUsed"], (
+            f"The Shops at Midtown did not use the improved Biscayne Trolley stop: {midtown_route}"
+        )
+        assert any(
+            segment["type"] == "biscayne_trolley"
+            and segment["endId"] == "transit:biscayne:trader-joes-northbound"
+            for segment in midtown_route["segments"]
+        ), f"Midtown route did not alight at the adjacent NE 32nd Street stop: {midtown_route}"
+
+        trader_joes_midtown = new_trolley_routes["traderJoesMidtown"]
+        assert trader_joes_midtown["biscayneTrolleyUsed"], (
+            f"Panorama -> Midtown Trader Joe's did not use Biscayne Trolley: {trader_joes_midtown}"
+        )
+        assert [step["type"] for step in trader_joes_midtown["itinerary"]] == [
+            "walk", "wait", "biscayne_trolley", "walk"
+        ], f"unexpected Trader Joe's outbound itinerary: {trader_joes_midtown}"
+        assert any(
+            segment["type"] == "biscayne_trolley"
+            and segment["endId"] == "transit:biscayne:trader-joes-northbound"
+            for segment in trader_joes_midtown["segments"]
+        ), f"Trader Joe's outbound did not use the adjacent northbound stop: {trader_joes_midtown}"
+        assert trader_joes_midtown["minutes"] == 43, (
+            f"Trader Joe's outbound should round to 43 minutes with average wait: {trader_joes_midtown}"
+        )
+        assert trader_joes_midtown["itinerary"] == [
+            {"type": "walk", "label": "Walk", "minutes": 2},
+            {"type": "wait", "label": "Wait", "minutes": 8},
+            {"type": "biscayne_trolley", "label": "Biscayne Trolley", "minutes": 33},
+            {"type": "walk", "label": "Walk", "minutes": 1},
+        ], f"unexpected Trader Joe's timing breakdown: {trader_joes_midtown}"
+
+        trader_joes_graph = new_trolley_routes["traderJoesBiscayneGraph"]
+        assert trader_joes_graph["stopIds"] == [
+            "transit:biscayne:trader-joes-northbound",
+            "transit:biscayne:trader-joes-southbound",
+        ], f"Trader Joe's directional stops are incomplete: {trader_joes_graph}"
+        assert trader_joes_graph["links"] == [
+            {
+                "fromId": "transit:biscayne:edgewater-northbound",
+                "toId": "transit:biscayne:trader-joes-northbound",
+                "minutes": 11,
+            },
+            {
+                "fromId": "transit:biscayne:trader-joes-northbound",
+                "toId": "transit:biscayne:midtown-northbound",
+                "minutes": 2,
+            },
+            {
+                "fromId": "transit:biscayne:midtown-southbound",
+                "toId": "transit:biscayne:trader-joes-southbound",
+                "minutes": 3,
+            },
+            {
+                "fromId": "transit:biscayne:trader-joes-southbound",
+                "toId": "transit:biscayne:edgewater-southbound",
+                "minutes": 13,
+            },
+        ], f"Trader Joe's GTFS link splits are wrong: {trader_joes_graph}"
 
         design_district_route = new_trolley_routes["designDistrict"]
         assert design_district_route["biscayneTrolleyUsed"], (

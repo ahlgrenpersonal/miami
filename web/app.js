@@ -115,14 +115,21 @@ const SOUTH_BEACH_TROLLEY_ROUTE_COORDINATES = [
 const BRICKELL_STATION_TROLLEYS_ID = "place_id_brickell_station_trolleys";
 const DOMINO_PARK_TROLLEY_ID = "place_id_domino_park_calle_ocho_trolley";
 const BISCAYNE_TROLLEY_PANORAMA_ID = "transit:biscayne:panorama";
+// Route MIABIS stop IDs 11614/11613 sit across Midtown Boulevard from Trader Joe's.
+// The 11+2 and 3+13 minute splits below preserve the official scheduled travel time.
+// Source: https://www.miamidade.gov/transit/googletransit/current/google_transit.zip
+const BISCAYNE_TROLLEY_TRADER_JOES_NORTHBOUND_ID = "transit:biscayne:trader-joes-northbound";
+const BISCAYNE_TROLLEY_TRADER_JOES_SOUTHBOUND_ID = "transit:biscayne:trader-joes-southbound";
 const BISCAYNE_TROLLEY_VIRTUAL_STOPS = [
   { id: "transit:biscayne:brickell-terminal", name: "Biscayne Trolley - Brickell Station", coordinates: [25.763335, -80.19532] },
   { id: BISCAYNE_TROLLEY_PANORAMA_ID, name: "Biscayne Trolley - Panorama Tower", coordinates: [25.7620570063591, -80.19164979457855] },
   { id: "transit:biscayne:bayside-northbound", name: "Biscayne Trolley - Bayside", coordinates: [25.776525, -80.187488] },
   { id: "transit:biscayne:edgewater-northbound", name: "Biscayne Trolley - Edgewater", coordinates: [25.79383, -80.18888] },
+  { id: BISCAYNE_TROLLEY_TRADER_JOES_NORTHBOUND_ID, name: "Biscayne Trolley - Trader Joe's Midtown", coordinates: [25.806597, -80.193089] },
   { id: "transit:biscayne:midtown-northbound", name: "Biscayne Trolley - Midtown", coordinates: [25.80974, -80.192358] },
   { id: "transit:biscayne:design-district", name: "Biscayne Trolley - Design District", coordinates: [25.811188, -80.19119] },
   { id: "transit:biscayne:midtown-southbound", name: "Biscayne Trolley - Midtown", coordinates: [25.809102, -80.19538] },
+  { id: BISCAYNE_TROLLEY_TRADER_JOES_SOUTHBOUND_ID, name: "Biscayne Trolley - Trader Joe's Midtown", coordinates: [25.807017, -80.193136] },
   { id: "transit:biscayne:edgewater-southbound", name: "Biscayne Trolley - Edgewater", coordinates: [25.791889, -80.187249] },
   { id: "transit:biscayne:bayside-southbound", name: "Biscayne Trolley - Bayside", coordinates: [25.777444, -80.188432] },
 ];
@@ -147,9 +154,15 @@ const BISCAYNE_TROLLEY_LINKS = [
   },
   {
     fromId: "transit:biscayne:edgewater-northbound",
+    toId: BISCAYNE_TROLLEY_TRADER_JOES_NORTHBOUND_ID,
+    minutes: 11,
+    coordinates: [[25.79383, -80.18888], [25.7973, -80.18895], [25.80115, -80.18906], [25.804175, -80.1916], [25.806597, -80.193089]],
+  },
+  {
+    fromId: BISCAYNE_TROLLEY_TRADER_JOES_NORTHBOUND_ID,
     toId: "transit:biscayne:midtown-northbound",
-    minutes: 13,
-    coordinates: [[25.79383, -80.18888], [25.7973, -80.18895], [25.80115, -80.18906], [25.804175, -80.1916], [25.806597, -80.193089], [25.80974, -80.192358]],
+    minutes: 2,
+    coordinates: [[25.806597, -80.193089], [25.808119, -80.192733], [25.80974, -80.192358]],
   },
   {
     fromId: "transit:biscayne:midtown-northbound",
@@ -165,9 +178,15 @@ const BISCAYNE_TROLLEY_LINKS = [
   },
   {
     fromId: "transit:biscayne:midtown-southbound",
+    toId: BISCAYNE_TROLLEY_TRADER_JOES_SOUTHBOUND_ID,
+    minutes: 3,
+    coordinates: [[25.809102, -80.19538], [25.808167, -80.193984], [25.807017, -80.193136]],
+  },
+  {
+    fromId: BISCAYNE_TROLLEY_TRADER_JOES_SOUTHBOUND_ID,
     toId: "transit:biscayne:edgewater-southbound",
-    minutes: 16,
-    coordinates: [[25.809102, -80.19538], [25.808167, -80.193984], [25.807017, -80.193136], [25.804266, -80.193787], [25.803996, -80.189448], [25.79791, -80.189157], [25.793892, -80.189095], [25.791889, -80.187249]],
+    minutes: 13,
+    coordinates: [[25.807017, -80.193136], [25.804266, -80.193787], [25.803996, -80.189448], [25.79791, -80.189157], [25.793892, -80.189095], [25.791889, -80.187249]],
   },
   {
     fromId: "transit:biscayne:edgewater-southbound",

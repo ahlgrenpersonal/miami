@@ -4669,6 +4669,68 @@
         "notes": "",
         "npc_associations": []
       }
+    },
+    "place_id_trader_joes_midtown_miami": {
+      "name": "Trader Joe's Midtown Miami",
+      "coordinates": [25.806877, -80.1926601],
+      "tags": ["supermarket"],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 195,
+        "category": "Grocery store",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "3191 NE 1st Ave, Miami, FL 33137",
+        "google_maps_query": "Trader Joe's Midtown Miami, 3191 NE 1st Ave, Miami, FL 33137",
+        "distance_from_home_m": 4850,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": ["trader_joes_official", "nominatim_address_lookup"],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "nominatim",
+          "query": "Trader Joe's, 3191 NE 1st Ave, Miami, FL 33137",
+          "display_name": "Trader Joe's, 3191, Northeast 1st Avenue, Midtown, Miami, Miami-Dade County, Florida, 33137, United States",
+          "match_score": 1,
+          "osm_type": "node",
+          "osm_id": 11600360550
+        },
+        "notes": "Official Trader Joe's store 794 in Midtown Miami.",
+        "npc_associations": []
+      }
+    },
+    "place_id_biscayne_trolley_trader_joes_midtown": {
+      "name": "Biscayne Trolley - Trader Joe's Midtown",
+      "coordinates": [25.806807, -80.193113],
+      "tags": ["biscayne_trolley", "transit"],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 196,
+        "category": "Biscayne Trolley stop",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Midtown Blvd & NE 32nd St, Miami, FL 33137",
+        "google_maps_query": "Midtown Blvd & NE 32nd St, Miami, FL 33137",
+        "distance_from_home_m": 4844,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": ["miami_dade_gtfs"],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "miami_dade_gtfs",
+          "query": "MIDTOWN BLVD @ NE 32ND ST, Miami, FL",
+          "display_name": "MIDTOWN BLVD @ NE 32ND ST (both directions)",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "One visible marker for official Biscayne Trolley stop IDs 11613 and 11614, each about 50 m from Trader Joe's.",
+        "npc_associations": []
+      }
     }
   },
   "routines": {
