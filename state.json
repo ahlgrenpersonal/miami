@@ -4702,7 +4702,7 @@
       }
     },
     "place_id_biscayne_trolley_trader_joes_midtown": {
-      "name": "Biscayne Trolley - Trader Joe's Midtown",
+      "name": "Biscayne Trolley - Midtown Blvd & NE 32nd St",
       "coordinates": [25.806807, -80.193113],
       "tags": ["biscayne_trolley", "transit"],
       "meta": {
@@ -4728,7 +4728,7 @@
           "osm_type": null,
           "osm_id": null
         },
-        "notes": "One visible marker for official Biscayne Trolley stop IDs 11613 and 11614, each about 50 m from Trader Joe's.",
+        "notes": "One visible marker for official Biscayne Trolley stop IDs 11613 and 11614 at Midtown Boulevard and Northeast 32nd Street.",
         "npc_associations": []
       }
     }

@@ -125,11 +125,11 @@ const BISCAYNE_TROLLEY_VIRTUAL_STOPS = [
   { id: BISCAYNE_TROLLEY_PANORAMA_ID, name: "Biscayne Trolley - Panorama Tower", coordinates: [25.7620570063591, -80.19164979457855] },
   { id: "transit:biscayne:bayside-northbound", name: "Biscayne Trolley - Bayside", coordinates: [25.776525, -80.187488] },
   { id: "transit:biscayne:edgewater-northbound", name: "Biscayne Trolley - Edgewater", coordinates: [25.79383, -80.18888] },
-  { id: BISCAYNE_TROLLEY_TRADER_JOES_NORTHBOUND_ID, name: "Biscayne Trolley - Trader Joe's Midtown", coordinates: [25.806597, -80.193089] },
+  { id: BISCAYNE_TROLLEY_TRADER_JOES_NORTHBOUND_ID, name: "Biscayne Trolley - Midtown Blvd & NE 32nd St", coordinates: [25.806597, -80.193089] },
   { id: "transit:biscayne:midtown-northbound", name: "Biscayne Trolley - Midtown", coordinates: [25.80974, -80.192358] },
   { id: "transit:biscayne:design-district", name: "Biscayne Trolley - Design District", coordinates: [25.811188, -80.19119] },
   { id: "transit:biscayne:midtown-southbound", name: "Biscayne Trolley - Midtown", coordinates: [25.809102, -80.19538] },
-  { id: BISCAYNE_TROLLEY_TRADER_JOES_SOUTHBOUND_ID, name: "Biscayne Trolley - Trader Joe's Midtown", coordinates: [25.807017, -80.193136] },
+  { id: BISCAYNE_TROLLEY_TRADER_JOES_SOUTHBOUND_ID, name: "Biscayne Trolley - Midtown Blvd & NE 32nd St", coordinates: [25.807017, -80.193136] },
   { id: "transit:biscayne:edgewater-southbound", name: "Biscayne Trolley - Edgewater", coordinates: [25.791889, -80.187249] },
   { id: "transit:biscayne:bayside-southbound", name: "Biscayne Trolley - Bayside", coordinates: [25.777444, -80.188432] },
 ];

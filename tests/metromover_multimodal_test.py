@@ -313,6 +313,10 @@ async def collect_routes():
                     midtown: routeDetails("place_id_panorama_tower", "place_id_collection_at_midtown_miami"),
                     traderJoesMidtown: routeDetails("place_id_panorama_tower", "place_id_trader_joes_midtown_miami"),
                     traderJoesBiscayneGraph: {
+                      visibleName: byId("place_id_biscayne_trolley_trader_joes_midtown").name,
+                      stopNames: BISCAYNE_TROLLEY_VIRTUAL_STOPS
+                        .filter((stop) => stop.id.includes("trader-joes"))
+                        .map((stop) => stop.name),
                       stopIds: BISCAYNE_TROLLEY_VIRTUAL_STOPS
                         .filter((stop) => stop.id.includes("trader-joes"))
                         .map((stop) => stop.id)
@@ -754,6 +758,12 @@ def main():
         ], f"unexpected Trader Joe's timing breakdown: {trader_joes_midtown}"
 
         trader_joes_graph = new_trolley_routes["traderJoesBiscayneGraph"]
+        expected_midtown_stop_name = "Biscayne Trolley - Midtown Blvd & NE 32nd St"
+        assert trader_joes_graph["visibleName"] == expected_midtown_stop_name, trader_joes_graph
+        assert trader_joes_graph["stopNames"] == [
+            expected_midtown_stop_name,
+            expected_midtown_stop_name,
+        ], f"Directional trolley labels still misuse the Trader Joe's name: {trader_joes_graph}"
         assert trader_joes_graph["stopIds"] == [
             "transit:biscayne:trader-joes-northbound",
             "transit:biscayne:trader-joes-southbound",
