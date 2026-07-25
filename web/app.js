@@ -1,6 +1,7 @@
 const STATE_URL = "../state.json";
 const ROUTING_GRAPH_URL = "routing_graph.json";
 const ROUTING_GRAPH_MANIFEST_URL = "routing_graph/manifest.json";
+const CROSSING_CONTROLS_URL = "routing_graph/crossing-controls.json?v=1";
 const HOME_PLACE_ID = "place_id_panorama_tower";
 const OFFLINE_TILE_VERSION = "177";
 const WALK_SPEED_KMH = 6;
@@ -8,6 +9,16 @@ const KID_SCOOTER_SPEED_KMH = 14;
 const KID_SCOOTER_BREAK_INTERVAL_MINUTES = 30;
 const KID_SCOOTER_FIRST_BREAK_MINUTES = 3;
 const KID_SCOOTER_LATER_BREAK_MINUTES = 5;
+// Miami-Dade field observations found roughly 14-47 seconds of pedestrian delay at signalized
+// crossings as signal timing varied; 20 seconds is a practical central estimate for this map.
+// FHWA's broader review found about 1.4 seconds at unsignalized crossings, rounded here to two
+// seconds for the normal look-and-yield pause. OSM control tags distinguish the two offline.
+// Sources:
+// https://highways.dot.gov/safety/pedestrian-bicyclist/safety-countermeasures/miami-dade-pedestrian-safety-project-phase-ii-5
+// https://www.fhwa.dot.gov/publications/research/safety/pedbike/98107/section3.cfm
+// https://wiki.openstreetmap.org/wiki/Tag:crossing%3Dtraffic_signals
+const SIGNALIZED_CROSSING_DELAY_MINUTES = 20 / 60;
+const OTHER_TRAFFIC_CROSSING_DELAY_MINUTES = 2 / 60;
 // Model a weekend pedestrian encounter with the movable Brickell Avenue span as a fixed
 // three-minute expected wait. Combining weekend on-demand operation, a roughly 10-16 minute
 // full closure, and observed opening/blockage frequency gives a practical 2-4 minute expected-
@@ -31,6 +42,7 @@ const BRICKELL_DRAWBRIDGE_GATE_EDGES = new Set([
 const DEFAULT_HOME_ZOOM = 15;
 const DEFAULT_MAX_SNAP_DISTANCE_METERS = 500;
 const ROUTE_SNAP_CANDIDATE_LIMIT = 32;
+const DIRECT_ENDPOINT_TRANSIT_CONNECTOR_MAX_METERS = 10;
 const METROMOVER_SPEED_KMH = 14.5;
 // Weekend outer-loop service is every 5 minutes, so random arrival averages a 2.5-minute wait.
 // Source: https://www.miamidade.gov/transit/googletransit/current/google_transit.zip
@@ -465,6 +477,7 @@ const app = {
   routingGraphStatus: "idle",
   routeAdjacency: null,
   routeNodes: [],
+  signalizedCrossingNodeIds: new Set(),
   noiseOverlayEnabled: false,
   noiseOverlayEdges: null,
   noiseOverlayLayer: null,
@@ -987,7 +1000,15 @@ async function loadState() {
 async function loadRoutingGraph() {
   try {
     app.routingGraphStatus = "loading";
-    app.routingGraph = await fetchRoutingGraph();
+    const [routingGraph, crossingControls] = await Promise.all([
+      fetchRoutingGraph(),
+      fetchCrossingControls().catch((error) => {
+        console.info("Crossing controls unavailable; treating marked crossings as unsignalized.", error);
+        return { signalized_crossing_node_ids: [] };
+      }),
+    ]);
+    app.routingGraph = routingGraph;
+    app.signalizedCrossingNodeIds = new Set(crossingControls.signalized_crossing_node_ids || []);
     app.routeNodes = Object.entries(app.routingGraph.nodes || {}).map(([id, node]) => ({
       id,
       lat: node.lat,
@@ -1065,6 +1086,12 @@ async function fetchRoutingGraphChunk(url) {
   if (!response.ok) {
     throw new Error(`Unable to load ${url}`);
   }
+  return response.json();
+}
+
+async function fetchCrossingControls() {
+  const response = await fetch(CROSSING_CONTROLS_URL, { cache: "no-store" });
+  if (!response.ok) throw new Error(`Unable to load ${CROSSING_CONTROLS_URL}`);
   return response.json();
 }
 
@@ -1509,11 +1536,17 @@ function getGraphRoute(fromCoordinates, toCoordinates, mode) {
     (sum, edge) => sum + getBrickellDrawbridgeWaitMinutes(edge),
     0,
   );
+  const crossingDelay = getPedestrianCrossingDelaySummary(routeResult.edges);
   return {
     coordinates,
     distanceM,
-    durationMinutes: getTravelMinutes(distanceM, mode) + bridgeWaitMinutes,
+    durationMinutes: Math.max(1, Math.round(
+      getTravelMinutes(distanceM, mode) + bridgeWaitMinutes + crossingDelay.totalMinutes,
+    )),
     bridgeWaitMinutes,
+    crossingDelayMinutes: crossingDelay.totalMinutes,
+    signalizedCrossingCount: crossingDelay.signalizedCount,
+    otherTrafficCrossingCount: crossingDelay.otherCount,
     startSnapM: routeResult.start.distanceM,
     endSnapM: routeResult.end.distanceM,
   };
@@ -1544,11 +1577,22 @@ function getUnifiedMultimodalRoute(fromCoordinates, toCoordinates) {
   const biscayneTrolleyUsed = biscayneTrolleySegments.length > 0;
   const littleHavanaTrolleyUsed = littleHavanaTrolleySegments.length > 0;
   const coralWayTrolleyUsed = coralWayTrolleySegments.length > 0;
+  const crossingDelayEdges = result.edges.filter((edge) => edge.crossingDelayMinutes > 0);
 
   return {
     coordinates: mergeRouteCoordinates(...segments.map((segment) => segment.coordinates)),
     distanceM: segments.reduce((sum, segment) => sum + segment.distanceM, 0),
     durationMinutes: Math.max(1, Math.round(result.durationMinutes)),
+    crossingDelayMinutes: crossingDelayEdges.reduce(
+      (sum, edge) => sum + edge.crossingDelayMinutes,
+      0,
+    ),
+    signalizedCrossingCount: crossingDelayEdges.filter(
+      (edge) => edge.signalizedTrafficCrossing,
+    ).length,
+    otherTrafficCrossingCount: crossingDelayEdges.filter(
+      (edge) => !edge.signalizedTrafficCrossing,
+    ).length,
     metromoverUsed,
     waterTaxiUsed,
     brickellTrolleyUsed,
@@ -1680,9 +1724,6 @@ function addUnifiedEndpointTransitConnectors(context, transitNodes) {
     const endpoint = context.virtualNodes.get(endpointId);
     for (const transitNode of transitNodes) {
       const distanceM = getDistanceMeters(endpoint.coordinates, transitNode.coordinates);
-      if (distanceM > 90) continue;
-      const walkingMinutes = getExactTravelMinutes(distanceM, WALK_SPEED_KMH);
-      const boardingWaitMinutes = getTransitBoardingWaitMinutes(transitNode.type, transitNode.id);
       const isSafeCoralWaySchoolExit = (
         endpointId === context.destinationId
         && transitNode.id === CORAL_WAY_TROLLEY_SCHOOL_WESTBOUND_NODE_ID
@@ -1706,6 +1747,12 @@ function addUnifiedEndpointTransitConnectors(context, transitNodes) {
         addUnifiedCustomEdge(context, transitNode.id, endpointId, safeAccessEdge);
         continue;
       }
+
+      // Only collapse genuinely co-located place/stop markers. Nearby places must traverse the
+      // walking graph so intervening streets and their crossing delays remain visible to Dijkstra.
+      if (distanceM > DIRECT_ENDPOINT_TRANSIT_CONNECTOR_MAX_METERS) continue;
+      const walkingMinutes = getExactTravelMinutes(distanceM, WALK_SPEED_KMH);
+      const boardingWaitMinutes = getTransitBoardingWaitMinutes(transitNode.type, transitNode.id);
       if (endpointId === context.originId) {
         addUnifiedCustomEdge(context, endpointId, transitNode.id, createUnifiedMultimodalEdge("walk", endpointId, transitNode.id, endpoint.coordinates, transitNode.coordinates, {
           distanceM,
@@ -1854,44 +1901,62 @@ function createUnifiedMultimodalEdge(type, startId, endId, startCoordinates, end
     endId,
     startName: options.startName,
     endName: options.endName,
+    trafficCrossing: Boolean(options.trafficCrossing),
+    pedestrianCrossingDelayMinutes: options.pedestrianCrossingDelayMinutes || 0,
+    crossingDelayMinutes: options.crossingDelayMinutes || 0,
+    signalizedTrafficCrossing: Boolean(options.signalizedTrafficCrossing),
   };
 }
 
 function findShortestUnifiedMultimodalPath(context, startId, endId) {
-  const distances = new Map([[startId, 0]]);
+  const makeStateId = (nodeId, inTrafficCrossing) => `${inTrafficCrossing ? "crossing" : "clear"}\u0000${nodeId}`;
+  const startStateId = makeStateId(startId, false);
+  const states = new Map([[startStateId, { nodeId: startId, inTrafficCrossing: false }]]);
+  const distances = new Map([[startStateId, 0]]);
   const previous = new Map();
   const visited = new Set();
   const heap = new MinHeap();
-  heap.push(startId, 0);
+  let destinationStateId = null;
+  heap.push(startStateId, 0);
 
   while (heap.size > 0) {
     const current = heap.pop();
     if (!current || visited.has(current.id)) continue;
+    const currentState = states.get(current.id);
+    if (!currentState) continue;
     visited.add(current.id);
-    if (current.id === endId) break;
+    if (currentState.nodeId === endId) {
+      destinationStateId = current.id;
+      break;
+    }
 
-    for (const next of getUnifiedMultimodalNeighbors(context, current.id)) {
-      if (visited.has(next.toId)) continue;
-      const candidate = current.priority + next.edge.durationMinutes;
-      if (candidate < (distances.get(next.toId) ?? Infinity)) {
-        distances.set(next.toId, candidate);
-        previous.set(next.toId, { id: current.id, edge: next.edge });
-        heap.push(next.toId, candidate);
+    for (const next of getUnifiedMultimodalNeighbors(context, currentState.nodeId)) {
+      const inTrafficCrossing = next.edge.type === "walk" && Boolean(next.edge.trafficCrossing);
+      const enteringTrafficCrossing = inTrafficCrossing && !currentState.inTrafficCrossing;
+      const traversedEdge = addPedestrianCrossingDelayToUnifiedEdge(next.edge, enteringTrafficCrossing);
+      const nextStateId = makeStateId(next.toId, inTrafficCrossing);
+      if (visited.has(nextStateId)) continue;
+      const candidate = current.priority + traversedEdge.durationMinutes;
+      if (candidate < (distances.get(nextStateId) ?? Infinity)) {
+        states.set(nextStateId, { nodeId: next.toId, inTrafficCrossing });
+        distances.set(nextStateId, candidate);
+        previous.set(nextStateId, { stateId: current.id, edge: traversedEdge });
+        heap.push(nextStateId, candidate);
       }
     }
   }
 
-  if (!previous.has(endId)) return null;
+  if (!destinationStateId) return null;
   const edges = [];
-  let currentId = endId;
-  while (currentId !== startId) {
-    const step = previous.get(currentId);
+  let currentStateId = destinationStateId;
+  while (currentStateId !== startStateId) {
+    const step = previous.get(currentStateId);
     if (!step) return null;
     edges.push(step.edge);
-    currentId = step.id;
+    currentStateId = step.stateId;
   }
   edges.reverse();
-  return { edges, durationMinutes: distances.get(endId) };
+  return { edges, durationMinutes: distances.get(destinationStateId) };
 }
 
 function findPreferredUnifiedMultimodalPath(context, startId, endId) {
@@ -1914,9 +1979,11 @@ function findPreferredUnifiedMultimodalPath(context, startId, endId) {
 }
 
 function findShortestUnifiedMultimodalPathUsingTransport(context, startId, endId, maxDurationMinutes = Infinity) {
-  const makeStateId = (nodeId, hasUsedTransport) => `${hasUsedTransport ? "transit" : "walk"}\u0000${nodeId}`;
-  const startStateId = makeStateId(startId, false);
-  const states = new Map([[startStateId, { nodeId: startId, hasUsedTransport: false }]]);
+  const makeStateId = (nodeId, hasUsedTransport, inTrafficCrossing) => (
+    `${hasUsedTransport ? "transit" : "walk"}:${inTrafficCrossing ? "crossing" : "clear"}\u0000${nodeId}`
+  );
+  const startStateId = makeStateId(startId, false, false);
+  const states = new Map([[startStateId, { nodeId: startId, hasUsedTransport: false, inTrafficCrossing: false }]]);
   const distances = new Map([[startStateId, 0]]);
   const previous = new Map();
   const visited = new Set();
@@ -1938,13 +2005,16 @@ function findShortestUnifiedMultimodalPathUsingTransport(context, startId, endId
 
     for (const next of getUnifiedMultimodalNeighbors(context, currentState.nodeId)) {
       const hasUsedTransport = currentState.hasUsedTransport || next.edge.type !== "walk";
-      const nextStateId = makeStateId(next.toId, hasUsedTransport);
+      const inTrafficCrossing = next.edge.type === "walk" && Boolean(next.edge.trafficCrossing);
+      const enteringTrafficCrossing = inTrafficCrossing && !currentState.inTrafficCrossing;
+      const traversedEdge = addPedestrianCrossingDelayToUnifiedEdge(next.edge, enteringTrafficCrossing);
+      const nextStateId = makeStateId(next.toId, hasUsedTransport, inTrafficCrossing);
       if (visited.has(nextStateId)) continue;
-      const candidate = current.priority + next.edge.durationMinutes;
+      const candidate = current.priority + traversedEdge.durationMinutes;
       if (candidate < (distances.get(nextStateId) ?? Infinity)) {
-        states.set(nextStateId, { nodeId: next.toId, hasUsedTransport });
+        states.set(nextStateId, { nodeId: next.toId, hasUsedTransport, inTrafficCrossing });
         distances.set(nextStateId, candidate);
-        previous.set(nextStateId, { stateId: current.id, edge: next.edge });
+        previous.set(nextStateId, { stateId: current.id, edge: traversedEdge });
         heap.push(nextStateId, candidate);
       }
     }
@@ -1980,6 +2050,9 @@ function getUnifiedMultimodalNeighbors(context, nodeId) {
         durationMinutes: movingDurationMinutes + bridgeWaitMinutes,
         movingDurationMinutes,
         waitMinutes: bridgeWaitMinutes,
+        trafficCrossing: isTrafficCrossingEdge(next.edge),
+        pedestrianCrossingDelayMinutes: getPedestrianCrossingDelayMinutes(next.edge),
+        signalizedTrafficCrossing: isSignalizedTrafficCrossingEdge(next.edge),
       }),
     });
   }
@@ -2228,113 +2301,104 @@ function findNearestRouteNodes(coordinates, limit) {
 }
 
 function findShortestPathBetweenCandidates(startCandidates, endCandidates, mode) {
+  const makeStateId = (nodeId, inTrafficCrossing) => `${inTrafficCrossing ? "crossing" : "clear"}\u0000${nodeId}`;
   const endById = new Map(endCandidates.map((candidate) => [candidate.id, candidate]));
+  const states = new Map();
   const distances = new Map();
   const previous = new Map();
-  const sourceByNode = new Map();
+  const sourceByState = new Map();
   const visited = new Set();
   const heap = new MinHeap();
   let bestEnd = null;
   let bestTotalCost = Infinity;
 
   for (const start of startCandidates) {
+    const stateId = makeStateId(start.id, false);
     const initialCost = start.distanceM;
-    if (initialCost >= (distances.get(start.id) ?? Infinity)) continue;
-    distances.set(start.id, initialCost);
-    previous.set(start.id, null);
-    sourceByNode.set(start.id, start);
-    heap.push(start.id, initialCost);
+    if (initialCost >= (distances.get(stateId) ?? Infinity)) continue;
+    states.set(stateId, { nodeId: start.id, inTrafficCrossing: false });
+    distances.set(stateId, initialCost);
+    previous.set(stateId, null);
+    sourceByState.set(stateId, start);
+    heap.push(stateId, initialCost);
   }
 
   while (heap.size > 0) {
     const current = heap.pop();
     if (!current || visited.has(current.id)) continue;
     if (current.priority >= bestTotalCost) break;
+    const currentState = states.get(current.id);
+    if (!currentState) continue;
     visited.add(current.id);
 
-    const end = endById.get(current.id);
+    const end = endById.get(currentState.nodeId);
     if (end) {
       const totalCost = current.priority + end.distanceM;
       if (totalCost < bestTotalCost) {
         bestTotalCost = totalCost;
-        bestEnd = { id: current.id, end };
+        bestEnd = { stateId: current.id, end };
       }
     }
 
-    for (const next of app.routeAdjacency.get(current.id) || []) {
-      if (visited.has(next.toId)) continue;
-      const candidate = current.priority + getEdgeCost(next.edge, mode);
-      if (candidate < (distances.get(next.toId) ?? Infinity)) {
-        distances.set(next.toId, candidate);
-        previous.set(next.toId, { id: current.id, edge: next.edge });
-        sourceByNode.set(next.toId, sourceByNode.get(current.id));
-        heap.push(next.toId, candidate);
+    for (const next of app.routeAdjacency.get(currentState.nodeId) || []) {
+      const inTrafficCrossing = isTrafficCrossingEdge(next.edge);
+      const enteringTrafficCrossing = inTrafficCrossing && !currentState.inTrafficCrossing;
+      const nextStateId = makeStateId(next.toId, inTrafficCrossing);
+      if (visited.has(nextStateId)) continue;
+      const candidate = current.priority + getEdgeCost(next.edge, mode, { enteringTrafficCrossing });
+      if (candidate < (distances.get(nextStateId) ?? Infinity)) {
+        states.set(nextStateId, { nodeId: next.toId, inTrafficCrossing });
+        distances.set(nextStateId, candidate);
+        previous.set(nextStateId, { stateId: current.id, edge: next.edge });
+        sourceByState.set(nextStateId, sourceByState.get(current.id));
+        heap.push(nextStateId, candidate);
       }
     }
   }
 
   if (!bestEnd) return null;
-  const nodeIds = [bestEnd.id];
+  const nodeIds = [];
   const edges = [];
-  let currentId = bestEnd.id;
-  while (previous.get(currentId)) {
-    const step = previous.get(currentId);
+  let currentStateId = bestEnd.stateId;
+  while (currentStateId) {
+    const state = states.get(currentStateId);
+    if (!state) return null;
+    nodeIds.push(state.nodeId);
+    const step = previous.get(currentStateId);
+    if (!step) break;
     edges.push(step.edge);
-    currentId = step.id;
-    nodeIds.push(currentId);
+    currentStateId = step.stateId;
   }
   nodeIds.reverse();
   edges.reverse();
   return {
     nodeIds,
     edges,
-    start: sourceByNode.get(nodeIds[0]),
+    start: sourceByState.get(bestEnd.stateId),
     end: bestEnd.end,
   };
 }
 
 function findShortestPath(startId, endId, mode) {
-  if (startId === endId) return [startId];
-  const distances = new Map([[startId, 0]]);
-  const previous = new Map();
-  const visited = new Set();
-  const heap = new MinHeap();
-  heap.push(startId, 0);
-
-  while (heap.size > 0) {
-    const current = heap.pop();
-    if (!current || visited.has(current.id)) continue;
-    visited.add(current.id);
-    if (current.id === endId) break;
-
-    for (const next of app.routeAdjacency.get(current.id) || []) {
-      if (visited.has(next.toId)) continue;
-      const candidate = current.priority + getEdgeCost(next.edge, mode);
-      if (candidate < (distances.get(next.toId) ?? Infinity)) {
-        distances.set(next.toId, candidate);
-        previous.set(next.toId, current.id);
-        heap.push(next.toId, candidate);
-      }
-    }
-  }
-
-  if (!previous.has(endId) && startId !== endId) return [];
-  const path = [endId];
-  let currentId = endId;
-  while (currentId !== startId) {
-    currentId = previous.get(currentId);
-    if (!currentId) return [];
-    path.push(currentId);
-  }
-  return path.reverse();
+  return findShortestPathBetweenCandidates(
+    [{ id: startId, distanceM: 0 }],
+    [{ id: endId, distanceM: 0 }],
+    mode,
+  )?.nodeIds || [];
 }
 
-function getEdgeCost(edge, mode) {
+function getEdgeCost(edge, mode, options = {}) {
   const distance = edge.distance_m || 1;
   const profile = getRoutingProfile(mode);
+  const enteringTrafficCrossing = options.enteringTrafficCrossing ?? isTrafficCrossingEdge(edge);
   const bridgePenaltyM = getBrickellDrawbridgePenaltyM(edge, profile);
+  const crossingDelayPenaltyM = getPedestrianCrossingDelayPenaltyM(
+    edge,
+    profile,
+    enteringTrafficCrossing,
+  );
   const hardPenalty = getHardPenalty(edge, profile.hardPenalties || {});
-  if (hardPenalty) return distance * hardPenalty + bridgePenaltyM;
+  if (hardPenalty) return distance * hardPenalty + bridgePenaltyM + crossingDelayPenaltyM;
 
   let score = 0;
   for (const [field, weight] of Object.entries(profile.scoreWeights || {})) {
@@ -2344,7 +2408,67 @@ function getEdgeCost(edge, mode) {
     profile.minMultiplier ?? 0.35,
     Math.min(profile.maxMultiplier ?? 3, 1 - score)
   );
-  return distance * multiplier + getFixedPenalty(edge, profile.fixedPenaltiesM || {}) + bridgePenaltyM;
+  return distance * multiplier
+    + getFixedPenalty(edge, profile.fixedPenaltiesM || {}, enteringTrafficCrossing)
+    + bridgePenaltyM
+    + crossingDelayPenaltyM;
+}
+
+function isTrafficCrossingEdge(edge) {
+  return Boolean(edge?.traffic_crossing) || Boolean(edge) && (
+    app.signalizedCrossingNodeIds.has(edge.from)
+    || app.signalizedCrossingNodeIds.has(edge.to)
+  );
+}
+
+function isSignalizedTrafficCrossingEdge(edge) {
+  return isTrafficCrossingEdge(edge) && (
+    app.signalizedCrossingNodeIds.has(edge.from)
+    || app.signalizedCrossingNodeIds.has(edge.to)
+  );
+}
+
+function getPedestrianCrossingDelayMinutes(edge) {
+  if (!isTrafficCrossingEdge(edge)) return 0;
+  return isSignalizedTrafficCrossingEdge(edge)
+    ? SIGNALIZED_CROSSING_DELAY_MINUTES
+    : OTHER_TRAFFIC_CROSSING_DELAY_MINUTES;
+}
+
+function getPedestrianCrossingDelayPenaltyM(edge, profile, enteringTrafficCrossing) {
+  if (!enteringTrafficCrossing) return 0;
+  const waitMinutes = getPedestrianCrossingDelayMinutes(edge);
+  const speedKmh = profile.speedKmh || WALK_SPEED_KMH;
+  return speedKmh * 1000 * waitMinutes / 60;
+}
+
+function getPedestrianCrossingDelaySummary(edges) {
+  let inTrafficCrossing = false;
+  let totalMinutes = 0;
+  let signalizedCount = 0;
+  let otherCount = 0;
+  for (const edge of edges || []) {
+    const crossing = isTrafficCrossingEdge(edge);
+    if (crossing && !inTrafficCrossing) {
+      totalMinutes += getPedestrianCrossingDelayMinutes(edge);
+      if (isSignalizedTrafficCrossingEdge(edge)) signalizedCount += 1;
+      else otherCount += 1;
+    }
+    inTrafficCrossing = crossing;
+  }
+  return { totalMinutes, signalizedCount, otherCount };
+}
+
+function addPedestrianCrossingDelayToUnifiedEdge(edge, enteringTrafficCrossing) {
+  if (!enteringTrafficCrossing || edge.type !== "walk" || !edge.trafficCrossing) return edge;
+  const delayMinutes = edge.pedestrianCrossingDelayMinutes || 0;
+  if (!delayMinutes) return edge;
+  return {
+    ...edge,
+    durationMinutes: edge.durationMinutes + delayMinutes,
+    movingDurationMinutes: (edge.movingDurationMinutes ?? edge.durationMinutes) + delayMinutes,
+    crossingDelayMinutes: delayMinutes,
+  };
 }
 
 function getBrickellDrawbridgeWaitMinutes(edge) {
@@ -2384,9 +2508,10 @@ function getHardPenalty(edge, hardPenalties) {
   return 0;
 }
 
-function getFixedPenalty(edge, fixedPenaltiesM) {
+function getFixedPenalty(edge, fixedPenaltiesM, enteringTrafficCrossing = true) {
   let penalty = 0;
   for (const [field, penaltyM] of Object.entries(fixedPenaltiesM)) {
+    if (field === "traffic_crossing" && !enteringTrafficCrossing) continue;
     if (edge[field]) penalty += penaltyM;
   }
   return penalty;

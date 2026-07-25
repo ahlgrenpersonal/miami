@@ -66,6 +66,7 @@ async def collect_results():
                 waitConstant: BRICKELL_DRAWBRIDGE_WAIT_MINUTES,
                 appRoute: {
                   bridgeWaitMinutes: appRoute.bridgeWaitMinutes,
+                  crossingDelayMinutes: appRoute.crossingDelayMinutes,
                   movingMinutes: getTravelMinutes(appRoute.distanceM, "shortest"),
                   durationMinutes: appRoute.durationMinutes,
                 },
@@ -117,7 +118,12 @@ def main():
         results = asyncio.run(collect_results())
         assert results["waitConstant"] == 3, results
         assert results["appRoute"]["bridgeWaitMinutes"] == 3, results
-        assert results["appRoute"]["durationMinutes"] == results["appRoute"]["movingMinutes"] + 3, results
+        expected_app_minutes = round(
+            results["appRoute"]["movingMinutes"]
+            + results["appRoute"]["bridgeWaitMinutes"]
+            + results["appRoute"]["crossingDelayMinutes"]
+        )
+        assert results["appRoute"]["durationMinutes"] == expected_app_minutes, results
         assert results["directEdgeWaits"] == {
             "north": 3,
             "south": 3,

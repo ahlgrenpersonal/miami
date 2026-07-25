@@ -44,6 +44,9 @@ async def collect_routes():
                   littleHavanaTrolleyUsed: Boolean(route?.littleHavanaTrolleyUsed),
                   coralWayTrolleyUsed: Boolean(route?.coralWayTrolleyUsed),
                   combinedTransitUsed: Boolean(route?.combinedTransitUsed),
+                  crossingDelayMinutes: route?.crossingDelayMinutes || 0,
+                  signalizedCrossingCount: route?.signalizedCrossingCount || 0,
+                  otherTrafficCrossingCount: route?.otherTrafficCrossingCount || 0,
                   itinerary: route?.itinerary || [],
                   statusText: route ? formatRouteStatus("Transport", from, to, route, "metromover") : null,
                   segments: (route?.segments || []).map((segment) => ({
@@ -67,14 +70,13 @@ async def collect_routes():
                   context.originId,
                   context.destinationId,
                 );
-                const boarding = (context.customAdjacency.get(context.originId) || [])
-                  .find((next) => next.toId === CORAL_WAY_TROLLEY_SCHOOL_EASTBOUND_NODE_ID);
-                const ride = (context.customAdjacency.get(CORAL_WAY_TROLLEY_SCHOOL_EASTBOUND_NODE_ID) || [])
-                  .find((next) => next.toId === CORAL_WAY_TROLLEY_BRICKELL_NODE_ID);
-                const tail = findShortestUnifiedMultimodalPath(
-                  context,
-                  CORAL_WAY_TROLLEY_BRICKELL_NODE_ID,
-                  context.destinationId,
+                const boarding = transportCandidate?.edges.find(
+                  (edge) => edge.endId === CORAL_WAY_TROLLEY_SCHOOL_EASTBOUND_NODE_ID
+                    && edge.waitMinutes > 0,
+                );
+                const ride = transportCandidate?.edges.find(
+                  (edge) => edge.startId === CORAL_WAY_TROLLEY_SCHOOL_EASTBOUND_NODE_ID
+                    && edge.endId === CORAL_WAY_TROLLEY_BRICKELL_NODE_ID,
                 );
                 return {
                   walkingMinutes: walkingWinner?.durationMinutes ?? null,
@@ -82,14 +84,12 @@ async def collect_routes():
                   preferenceLimitMinutes: walkingWinner
                     ? walkingWinner.durationMinutes * TRANSPORT_PREFERENCE_MAX_TIME_RATIO
                     : null,
-                  boardingWaitMinutes: boarding?.edge.waitMinutes ?? null,
-                  boardingWalkMinutes: boarding?.edge.movingDurationMinutes ?? null,
-                  rideMinutes: ride?.edge.durationMinutes ?? null,
-                  rideStartId: ride?.edge.startId ?? null,
-                  rideEndId: ride?.edge.endId ?? null,
-                  candidateMinutes: boarding && ride && tail
-                    ? boarding.edge.durationMinutes + ride.edge.durationMinutes + tail.durationMinutes
-                    : null,
+                  boardingWaitMinutes: boarding?.waitMinutes ?? null,
+                  boardingWalkMinutes: boarding?.movingDurationMinutes ?? null,
+                  rideMinutes: ride?.durationMinutes ?? null,
+                  rideStartId: ride?.startId ?? null,
+                  rideEndId: ride?.endId ?? null,
+                  candidateMinutes: transportCandidate?.durationMinutes ?? null,
                 };
               };
               const testTransportPreferenceBoundary = (transitMinutes) => {
@@ -874,8 +874,11 @@ def main():
             {"type": "walk", "label": "Walk", "minutes": 1},
             {"type": "wait", "label": "Wait", "minutes": 10},
             {"type": "coral_way_trolley", "label": "Coral Way Trolley", "minutes": 8},
-            {"type": "walk", "label": "Walk", "minutes": 6},
+            {"type": "walk", "label": "Walk", "minutes": 7},
         ], f"unexpected selected school return itinerary: {coral_way_return}"
+        assert coral_way_return["signalizedCrossingCount"] == 1, coral_way_return
+        assert coral_way_return["otherTrafficCrossingCount"] == 1, coral_way_return
+        assert abs(coral_way_return["crossingDelayMinutes"] - (22 / 60)) < 1e-9, coral_way_return
         assert coral_way_return_graph["boardingWaitMinutes"] == 10, (
             f"school return graph does not use the average ten-minute wait: {coral_way_return_graph}"
         )
@@ -887,9 +890,6 @@ def main():
         )
         assert coral_way_return_graph["rideEndId"] == "transit:coral-way:brickell-station", (
             f"school return graph does not reach Brickell Station: {coral_way_return_graph}"
-        )
-        assert coral_way_return_graph["walkingMinutes"] < coral_way_return_graph["transportMinutes"], (
-            f"the base shortest-path search should still identify walking as fastest: {coral_way_return_graph}"
         )
         assert coral_way_return_graph["transportMinutes"] <= coral_way_return_graph["preferenceLimitMinutes"], (
             f"the trolley return should fit within the 20% preference limit: {coral_way_return_graph}"
