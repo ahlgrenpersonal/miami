@@ -214,6 +214,7 @@ async def collect_routes():
                     littleHavanaTrolley: LITTLE_HAVANA_TROLLEY_WAIT_MINUTES,
                     coralWayToSchool: CORAL_WAY_TROLLEY_TO_SCHOOL_WAIT_MINUTES,
                     coralWayToHome: CORAL_WAY_TROLLEY_TO_HOME_WAIT_MINUTES,
+                    metrobus26: METROBUS_26_WAIT_MINUTES,
                   },
                   coralWaySchoolAccess: {
                     distanceM: CORAL_WAY_SCHOOL_SAFE_ACCESS_DISTANCE_METERS,
@@ -583,6 +584,7 @@ def main():
             "littleHavanaTrolley": 7.5,
             "coralWayToSchool": 5,
             "coralWayToHome": 10,
+            "metrobus26": 15,
         }, f"unexpected sourced transport waits: {style_route['waitAssumptions']}"
         assert style_route["coralWaySchoolAccess"] == {
             "distanceM": 322,
@@ -634,8 +636,8 @@ def main():
         assert style_route["transportPlaceIds"] == style_route["expectedTransportPlaceIds"], (
             f"Transport filter does not exactly cover transit-tagged places: {style_route}"
         )
-        assert len(style_route["transportPlaceIds"]) == 21, (
-            f"expected 21 combined transport markers, got {style_route['transportPlaceIds']}"
+        assert len(style_route["transportPlaceIds"]) == 24, (
+            f"expected 24 combined transport markers, got {style_route['transportPlaceIds']}"
         )
         required_transport_ids = {
             "place_id_water_taxi_mia_miami_beach",
@@ -648,6 +650,9 @@ def main():
             "place_id_domino_park_calle_ocho_trolley",
             "place_id_coral_way_trolley_prima_casa",
             "place_id_biscayne_trolley_trader_joes_midtown",
+            "place_id_metrobus_26_panorama",
+            "place_id_metrobus_26_hobie_beach",
+            "place_id_metrobus_26_crandon_beach",
         }
         assert required_transport_ids.issubset(style_route["transportPlaceIds"]), (
             f"Transport filter is missing boat or trolley markers: {style_route['transportPlaceIds']}"

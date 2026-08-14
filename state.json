@@ -128,6 +128,99 @@
         "npc_associations": []
       }
     },
+    "place_id_metrobus_26_panorama": {
+      "name": "Metrobus 26 - Brickell Ave & SE 13th St",
+      "coordinates": [25.761173, -80.192184],
+      "tags": ["metrobus_26", "bus_26", "transit"],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 194,
+        "category": "Metrobus 26 stop",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Brickell Ave & SE 13th St, Miami, FL 33131",
+        "google_maps_query": "Brickell Ave & SE 13th St, Miami, FL 33131",
+        "distance_from_home_m": 294,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": ["miami_dade_gtfs_stop_1015"],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "miami_dade_gtfs",
+          "query": "BRICKELL AV & SE 13 ST, Miami, FL",
+          "display_name": "BRICKELL AV & SE 13 ST",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "Southbound Route 26 boarding stop for Key Biscayne.",
+        "npc_associations": []
+      }
+    },
+    "place_id_metrobus_26_hobie_beach": {
+      "name": "Metrobus 26 - Hobie Island Beach Park",
+      "coordinates": [25.745796, -80.176324],
+      "tags": ["metrobus_26", "bus_26", "transit"],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 195,
+        "category": "Metrobus 26 stop",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Rickenbacker Causeway opposite Rusty Pelican, Miami, FL 33149",
+        "google_maps_query": "Rickenbacker Causeway opposite Rusty Pelican, Miami, FL 33149",
+        "distance_from_home_m": 2406,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": ["miami_dade_gtfs_stop_8294"],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "miami_dade_gtfs",
+          "query": "RICKENBACKER CY & OP RUSTY PELICAN, Miami, FL",
+          "display_name": "RICKENBACKER CY & OP RUSTY PELICAN",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "Southbound Route 26 stop, about one minute from Hobie Island Beach Park.",
+        "npc_associations": []
+      }
+    },
+    "place_id_metrobus_26_crandon_beach": {
+      "name": "Metrobus 26 - Crandon Park Beach",
+      "coordinates": [25.708376, -80.157757],
+      "tags": ["metrobus_26", "bus_26", "transit"],
+      "meta": {
+        "source_list": "Curated",
+        "source_ordinal": 196,
+        "category": "Metrobus 26 stop",
+        "rating": null,
+        "rating_count": null,
+        "price": null,
+        "status": null,
+        "address": "Crandon Blvd & International Tennis Center, Key Biscayne, FL 33149",
+        "google_maps_query": "Crandon Blvd & International Tennis Center, Key Biscayne, FL 33149",
+        "distance_from_home_m": 6930,
+        "local_evidence": [],
+        "scan_evidence": [],
+        "external_evidence": ["miami_dade_gtfs_stop_4363"],
+        "skip_geocode_evidence": [],
+        "geocode": {
+          "source": "miami_dade_gtfs",
+          "query": "CRANDON BD & INTL TENNIS CENTER, Key Biscayne, FL",
+          "display_name": "CRANDON BD & INTL TENNIS CENTER",
+          "match_score": 1,
+          "osm_type": null,
+          "osm_id": null
+        },
+        "notes": "Southbound Route 26 stop, about eight minutes on foot from Crandon Park Beach.",
+        "npc_associations": []
+      }
+    },
     "place_id_hobie_island_beach_park": {
       "name": "Hobie Island Beach Park",
       "coordinates": [
@@ -4084,14 +4177,16 @@
       }
     },
     "place_id_virginia_key_swimming_beach_lifeguards": {
-      "name": "Virginia Key Swimming Beach with Lifeguards",
+      "name": "Virginia Key Beach North Point Park (Lifeguarded)",
       "coordinates": [
         25.7448986,
         -80.1436005
       ],
       "tags": [
         "beach",
-        "park"
+        "park",
+        "lifeguard",
+        "lifeguarded"
       ],
       "meta": {
         "source_list": "Curated",
@@ -4236,9 +4331,9 @@
       }
     },
     "place_id_crandon_beach": {
-      "name": "Crandon Beach",
+      "name": "Crandon Park Beach (Lifeguarded)",
       "coordinates": [25.7066667, -80.1519444],
-      "tags": ["beach", "park"],
+      "tags": ["beach", "park", "lifeguard", "lifeguarded"],
       "meta": {
         "source_list": "Curated",
         "source_ordinal": 169,

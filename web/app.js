@@ -68,6 +68,13 @@ const LITTLE_HAVANA_TROLLEY_WAIT_MINUTES = 7.5;
 // Source: https://www.miamidade.gov/transit/googletransit/current/google_transit.zip
 const CORAL_WAY_TROLLEY_TO_SCHOOL_WAIT_MINUTES = 5;
 const CORAL_WAY_TROLLEY_TO_HOME_WAIT_MINUTES = 10;
+// Route 26 runs every 30 minutes during the weekend daytime window used by this app,
+// so an untimed arrival has a 15-minute average wait. Segment ride times below are
+// medians from Saturday/Sunday 10:00-16:00 GTFS trips on the actual stop pairs.
+// Sources:
+// https://www.miamidade.gov/transit/googletransit/current/google_transit.zip
+// https://www.miamidade.gov/resources/transportation_publicworks/documents/routes/26.pdf
+const METROBUS_26_WAIT_MINUTES = 15;
 // Transport mode may favor a more comfortable transit journey when its total time remains competitive.
 const TRANSPORT_PREFERENCE_MAX_TIME_RATIO = 1.2;
 const SOUTH_BEACH_TROLLEY_DOCK_NODE_ID = "transit:south_beach_trolley:water_taxi";
@@ -328,7 +335,48 @@ const CORAL_WAY_SCHOOL_SAFE_ACCESS_COORDINATES = [
   [25.7548534, -80.2092821],
   [25.7541839, -80.2094603],
 ];
-const NOISE_OVERLAY_MIN_SCORE = 0.25;
+const METROBUS_26_PANORAMA_SOUTHBOUND_ID = "place_id_metrobus_26_panorama";
+const METROBUS_26_HOBIE_SOUTHBOUND_ID = "place_id_metrobus_26_hobie_beach";
+const METROBUS_26_CRANDON_SOUTHBOUND_ID = "place_id_metrobus_26_crandon_beach";
+const METROBUS_26_CRANDON_NORTHBOUND_ID = "transit:metrobus26:crandon-northbound";
+const METROBUS_26_HOBIE_NORTHBOUND_ID = "transit:metrobus26:hobie-northbound";
+const METROBUS_26_PANORAMA_NORTHBOUND_ID = "transit:metrobus26:panorama-northbound";
+const METROBUS_26_VISIBLE_STOP_IDS = [
+  METROBUS_26_PANORAMA_SOUTHBOUND_ID,
+  METROBUS_26_HOBIE_SOUTHBOUND_ID,
+  METROBUS_26_CRANDON_SOUTHBOUND_ID,
+];
+const METROBUS_26_VIRTUAL_STOPS = [
+  { id: METROBUS_26_CRANDON_NORTHBOUND_ID, name: "Metrobus 26 - Crandon Blvd northbound", coordinates: [25.708925, -80.156664] },
+  { id: METROBUS_26_HOBIE_NORTHBOUND_ID, name: "Metrobus 26 - Hobie Island northbound", coordinates: [25.744529, -80.174292] },
+  { id: METROBUS_26_PANORAMA_NORTHBOUND_ID, name: "Metrobus 26 - SW 13th St & Brickell Ave", coordinates: [25.761725, -80.192519] },
+];
+const METROBUS_26_LINKS = [
+  {
+    fromId: METROBUS_26_PANORAMA_SOUTHBOUND_ID,
+    toId: METROBUS_26_HOBIE_SOUTHBOUND_ID,
+    minutes: 14,
+    coordinates: [[25.761173,-80.192184],[25.761145,-80.192090],[25.758206,-80.192865],[25.757955,-80.192999],[25.751998,-80.201572],[25.750608,-80.203705],[25.750418,-80.204100],[25.748188,-80.202262],[25.747381,-80.201309],[25.746887,-80.200486],[25.746138,-80.198654],[25.745922,-80.197495],[25.745863,-80.196213],[25.745913,-80.194210],[25.746259,-80.191061],[25.746299,-80.184007],[25.746483,-80.178495],[25.746408,-80.177770],[25.746196,-80.177003],[25.745787,-80.176183],[25.745796,-80.176324]],
+  },
+  {
+    fromId: METROBUS_26_HOBIE_SOUTHBOUND_ID,
+    toId: METROBUS_26_CRANDON_SOUTHBOUND_ID,
+    minutes: 11,
+    coordinates: [[25.745796,-80.176324],[25.745787,-80.176183],[25.745489,-80.175758],[25.743709,-80.173698],[25.733363,-80.162206],[25.732659,-80.161397],[25.732618,-80.161255],[25.728026,-80.156096],[25.727911,-80.156069],[25.727370,-80.155525],[25.724586,-80.152402],[25.723907,-80.151845],[25.723131,-80.151405],[25.721992,-80.151046],[25.720981,-80.150962],[25.720108,-80.151080],[25.719434,-80.151310],[25.717337,-80.152459],[25.711645,-80.155914],[25.708298,-80.157733],[25.708376,-80.157757]],
+  },
+  {
+    fromId: METROBUS_26_CRANDON_NORTHBOUND_ID,
+    toId: METROBUS_26_HOBIE_NORTHBOUND_ID,
+    minutes: 9.5,
+    coordinates: [[25.708925,-80.156664],[25.708351,-80.157082],[25.719808,-80.150810],[25.720713,-80.150566],[25.721429,-80.150520],[25.722203,-80.150604],[25.723243,-80.150978],[25.723713,-80.151260],[25.724466,-80.151902],[25.727182,-80.154950],[25.728321,-80.156453],[25.732001,-80.160575],[25.733987,-80.162585],[25.744606,-80.174459],[25.744529,-80.174292]],
+  },
+  {
+    fromId: METROBUS_26_HOBIE_NORTHBOUND_ID,
+    toId: METROBUS_26_PANORAMA_NORTHBOUND_ID,
+    minutes: 10,
+    coordinates: [[25.744529,-80.174292],[25.745625,-80.175625],[25.745984,-80.176180],[25.746363,-80.177035],[25.746553,-80.177931],[25.746614,-80.179028],[25.746410,-80.183621],[25.746373,-80.190474],[25.746111,-80.194014],[25.746088,-80.197128],[25.746256,-80.198220],[25.746677,-80.199514],[25.747224,-80.200542],[25.747887,-80.201431],[25.750040,-80.203569],[25.750452,-80.203615],[25.757844,-80.192833],[25.758488,-80.192598],[25.761681,-80.191795],[25.761644,-80.192337],[25.761725,-80.192519]],
+  },
+];const NOISE_OVERLAY_MIN_SCORE = 0.25;
 const NOISE_OVERLAY_MAX_EDGES = 9000;
 const RADAR_WMS_URL = "https://opengeo.ncep.noaa.gov/geoserver/conus/conus_bref_qcd/ows";
 const RADAR_LAYER_NAME = "conus_bref_qcd";
@@ -457,7 +505,7 @@ const SUPERMARKET_FILTER_TAGS = new Set(["supermarket"]);
 const SCHOOL_FILTER_TAGS = new Set(["academy", "elementary_school", "montessori_school", "preschool", "school"]);
 const PLAYGROUND_FILTER_TAGS = new Set(["playground"]);
 const PARK_FILTER_TAGS = new Set(["beach_park", "dog_park", "nature_preserve", "park"]);
-const TRANSPORT_FILTER_TAGS = new Set(["metromover", "water_taxi", "brickell_trolley", "south_beach_trolley", "biscayne_trolley", "little_havana_trolley", "coral_way_trolley", "transit", "transportation"]);
+const TRANSPORT_FILTER_TAGS = new Set(["metromover", "water_taxi", "brickell_trolley", "south_beach_trolley", "biscayne_trolley", "little_havana_trolley", "coral_way_trolley", "metrobus_26", "transit", "transportation"]);
 const INDOOR_FILTER_TAGS = new Set(["childrens_museum", "indoors", "science_museum"]);
 
 const app = {
@@ -1570,6 +1618,7 @@ function getUnifiedMultimodalRoute(fromCoordinates, toCoordinates) {
   const biscayneTrolleySegments = segments.filter((segment) => segment.type === "biscayne_trolley");
   const littleHavanaTrolleySegments = segments.filter((segment) => segment.type === "little_havana_trolley");
   const coralWayTrolleySegments = segments.filter((segment) => segment.type === "coral_way_trolley");
+  const metrobus26Segments = segments.filter((segment) => segment.type === "metrobus_26");
   const metromoverUsed = metromoverSegments.length > 0;
   const waterTaxiUsed = waterTaxiSegments.length > 0;
   const brickellTrolleyUsed = brickellTrolleySegments.length > 0;
@@ -1577,6 +1626,7 @@ function getUnifiedMultimodalRoute(fromCoordinates, toCoordinates) {
   const biscayneTrolleyUsed = biscayneTrolleySegments.length > 0;
   const littleHavanaTrolleyUsed = littleHavanaTrolleySegments.length > 0;
   const coralWayTrolleyUsed = coralWayTrolleySegments.length > 0;
+  const metrobus26Used = metrobus26Segments.length > 0;
   const crossingDelayEdges = result.edges.filter((edge) => edge.crossingDelayMinutes > 0);
 
   return {
@@ -1600,8 +1650,9 @@ function getUnifiedMultimodalRoute(fromCoordinates, toCoordinates) {
     biscayneTrolleyUsed,
     littleHavanaTrolleyUsed,
     coralWayTrolleyUsed,
+    metrobus26Used,
     combinedTransitUsed: metromoverUsed && waterTaxiUsed,
-    transitUsed: metromoverUsed || waterTaxiUsed || brickellTrolleyUsed || southBeachTrolleyUsed || biscayneTrolleyUsed || littleHavanaTrolleyUsed || coralWayTrolleyUsed,
+    transitUsed: metromoverUsed || waterTaxiUsed || brickellTrolleyUsed || southBeachTrolleyUsed || biscayneTrolleyUsed || littleHavanaTrolleyUsed || coralWayTrolleyUsed || metrobus26Used,
     transitStartName: segments.find((segment) => segment.type !== "walk")?.startName,
     transitEndName: [...segments].reverse().find((segment) => segment.type !== "walk")?.endName,
     metromoverStartName: metromoverSegments[0]?.startName,
@@ -1618,6 +1669,8 @@ function getUnifiedMultimodalRoute(fromCoordinates, toCoordinates) {
     littleHavanaTrolleyEndName: littleHavanaTrolleySegments[littleHavanaTrolleySegments.length - 1]?.endName,
     coralWayTrolleyStartName: coralWayTrolleySegments[0]?.startName,
     coralWayTrolleyEndName: coralWayTrolleySegments[coralWayTrolleySegments.length - 1]?.endName,
+    metrobus26StartName: metrobus26Segments[0]?.startName,
+    metrobus26EndName: metrobus26Segments[metrobus26Segments.length - 1]?.endName,
     segments,
     itinerary: createTransportItinerary(result.edges),
   };
@@ -1641,6 +1694,7 @@ function createUnifiedMultimodalContext(fromCoordinates, toCoordinates) {
     ...getBiscayneTrolleyStops().map((place) => ({ id: place.id, type: "biscayne_trolley", name: place.name, coordinates: place.coordinates })),
     ...getLittleHavanaTrolleyStops().map((place) => ({ id: place.id, type: "little_havana_trolley", name: place.name, coordinates: place.coordinates })),
     ...getCoralWayTrolleyStops().map((place) => ({ id: place.id, type: "coral_way_trolley", name: place.name, coordinates: place.coordinates })),
+    ...getMetrobus26Stops().map((place) => ({ id: place.id, type: "metrobus_26", name: place.name, coordinates: place.coordinates })),
   ];
   for (const node of transitNodes) {
     addUnifiedVirtualNode(context, node.id, node.type, node.name, node.coordinates);
@@ -1659,6 +1713,7 @@ function createUnifiedMultimodalContext(fromCoordinates, toCoordinates) {
   addUnifiedBiscayneTrolleyRideEdges(context);
   addUnifiedLittleHavanaTrolleyRideEdges(context);
   addUnifiedCoralWayTrolleyRideEdges(context);
+  addUnifiedMetrobus26RideEdges(context);
   return context;
 }
 
@@ -1832,6 +1887,10 @@ function addUnifiedCoralWayTrolleyRideEdges(context) {
   addUnifiedDirectedTrolleyLinks(context, "coral_way_trolley", CORAL_WAY_TROLLEY_LINKS);
 }
 
+function addUnifiedMetrobus26RideEdges(context) {
+  addUnifiedDirectedTrolleyLinks(context, "metrobus_26", METROBUS_26_LINKS);
+}
+
 function addUnifiedDirectedTrolleyLinks(context, type, links) {
   for (const link of links) {
     const from = context.virtualNodes.get(link.fromId);
@@ -1853,6 +1912,7 @@ function getTransitBoardingWaitMinutes(type, nodeId) {
   if (type === "south_beach_trolley") return SOUTH_BEACH_TROLLEY_WAIT_MINUTES;
   if (type === "biscayne_trolley") return BISCAYNE_TROLLEY_WAIT_MINUTES;
   if (type === "little_havana_trolley") return LITTLE_HAVANA_TROLLEY_WAIT_MINUTES;
+  if (type === "metrobus_26") return METROBUS_26_WAIT_MINUTES;
   return 0;
 }
 
@@ -2135,6 +2195,7 @@ function getTransitTypeLabel(type) {
   if (type === "biscayne_trolley") return "Biscayne Trolley";
   if (type === "little_havana_trolley") return "Little Havana Trolley";
   if (type === "coral_way_trolley") return "Coral Way Trolley";
+  if (type === "metrobus_26") return "Metrobus 26";
   return "Transport";
 }
 
@@ -2166,6 +2227,7 @@ function renderRouteGeometry(route, mode) {
       biscayne_trolley: "#c75f20",
       little_havana_trolley: "#c23b54",
       coral_way_trolley: "#8a6d1d",
+      metrobus_26: "#008fa8",
     };
     for (const segment of route.segments) {
       const lineOptions = {
@@ -2261,6 +2323,13 @@ function getCoralWayTrolleyStops() {
   const visibleStop = app.places.find((place) => place.id === CORAL_WAY_TROLLEY_VISIBLE_STOP_ID);
   if (!visibleStop) return [];
   return CORAL_WAY_TROLLEY_VIRTUAL_STOPS.filter((place) => Array.isArray(place.coordinates));
+}
+
+function getMetrobus26Stops() {
+  const visibleStops = METROBUS_26_VISIBLE_STOP_IDS
+    .map((id) => app.places.find((place) => place.id === id))
+    .filter((place) => place && Array.isArray(place.coordinates));
+  return [...visibleStops, ...METROBUS_26_VIRTUAL_STOPS];
 }
 
 function getMetromoverEdgeMinutes(distanceM) {
@@ -2670,7 +2739,7 @@ function getFilterTags(place) {
   const hasSchool = hasAnyTag(rawTags, SCHOOL_FILTER_TAGS) || /\b(school|academy|montessori|preschool)\b/.test(text);
   const hasPlayground = hasAnyTag(rawTags, PLAYGROUND_FILTER_TAGS);
   const hasPark = hasAnyTag(rawTags, PARK_FILTER_TAGS);
-  const hasTransport = hasAnyTag(rawTags, TRANSPORT_FILTER_TAGS) || /\b(metromover|water taxi|trolley)\b/.test(text);
+  const hasTransport = hasAnyTag(rawTags, TRANSPORT_FILTER_TAGS) || /\b(metromover|water taxi|trolley|metrobus|bus 26)\b/.test(text);
   const hasIndoors = hasAnyTag(rawTags, INDOOR_FILTER_TAGS);
 
   if (hasFood) filterTags.push("food");
